@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/server';
 import type { ShipmentRequest, ApiResponse } from '@/types';
 import type { CreateRequestInput } from '@/lib/validations';
 import { PLATFORM_FEE_PERCENT } from '@/constants';
+import { capturePayment } from './transactions';
 
 /**
  * Generate a 6-digit confirmation code
@@ -159,6 +160,9 @@ export async function confirmDelivery(
   if (error) {
     return { data: null, error: error.message, status: 400 };
   }
+
+  // Release escrow payment to traveler
+  await capturePayment(requestId);
 
   return { data: data as ShipmentRequest, error: null, status: 200 };
 }

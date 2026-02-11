@@ -174,3 +174,17 @@ export const searchListingsSchema = z.object({
 });
 
 export type SearchListingsInput = z.infer<typeof searchListingsSchema>;
+
+// ─── Payment Schemas ──────────────────────────────────────
+
+export const createCheckoutSchema = z.object({
+  request_id: z.string().uuid('ID de demande invalide'),
+});
+
+export type CreateCheckoutInput = z.infer<typeof createCheckoutSchema>;
+
+export const refundSchema = z.object({
+  request_id: z.string().uuid('ID de demande invalide'),
+});
+
+export type RefundInput = z.infer<typeof refundSchema>;

@@ -68,6 +68,24 @@ export const toasts = {
   validationError: (message: string) =>
     toast.error('Erreur de validation', { description: message }),
 
+  // Payments
+  paymentSuccess: () =>
+    toast.success('Paiement effectu\u00e9', {
+      description: 'Votre paiement a \u00e9t\u00e9 autoris\u00e9 avec succ\u00e8s.',
+    }),
+  paymentFailed: () =>
+    toast.error('Paiement \u00e9chou\u00e9', {
+      description: 'Le paiement a \u00e9chou\u00e9. Veuillez r\u00e9essayer.',
+    }),
+  refundSuccess: () =>
+    toast.success('Remboursement effectu\u00e9', {
+      description: 'Le remboursement a \u00e9t\u00e9 trait\u00e9 avec succ\u00e8s.',
+    }),
+  paymentReleased: () =>
+    toast.success('Paiement lib\u00e9r\u00e9', {
+      description: 'Le paiement a \u00e9t\u00e9 lib\u00e9r\u00e9 au voyageur.',
+    }),
+
   // Clipboard
   copiedToClipboard: () => toast.success('Copi\u00e9 !'),
 } as const;
