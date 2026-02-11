@@ -15,6 +15,8 @@ const eslintConfig = defineConfig([
     // macOS metadata files
     "._*",
     "**/._*",
+    // Test files (Vitest globals)
+    "src/**/__tests__/**",
   ]),
 ]);
 
