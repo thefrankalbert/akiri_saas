@@ -12,3 +12,6 @@ export * from './listings';
 export * from './requests';
 export * from './reviews';
 export * from './messages';
+export * from './profiles';
+export * from './notifications';
+export * from './corridors';
