@@ -6,7 +6,7 @@
 
 import { useEffect, useRef } from 'react';
 import { createClient, supabaseConfigured } from '@/lib/supabase/client';
-import type { RealtimeChannel } from '@supabase/supabase-js';
+import type { RealtimeChannel, RealtimePostgresChangesPayload } from '@supabase/supabase-js';
 
 type RealtimeEvent = 'INSERT' | 'UPDATE' | 'DELETE' | '*';
 
@@ -58,13 +58,17 @@ export function useRealtime({
 
     const channel = supabase
       .channel(channelName)
-      .on('postgres_changes', channelConfig, (payload) => {
-        onData({
-          eventType: payload.eventType,
-          new: payload.new as Record<string, unknown>,
-          old: payload.old as Record<string, unknown>,
-        });
-      })
+      .on(
+        'postgres_changes',
+        channelConfig,
+        (payload: RealtimePostgresChangesPayload<Record<string, unknown>>) => {
+          onData({
+            eventType: payload.eventType,
+            new: (payload.new ?? {}) as Record<string, unknown>,
+            old: (payload.old ?? {}) as Record<string, unknown>,
+          });
+        }
+      )
       .subscribe();
 
     channelRef.current = channel;

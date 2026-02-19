@@ -53,6 +53,9 @@ export function RegisterForm() {
       return;
     }
 
+    // Store email for verification page resend functionality
+    localStorage.setItem('akiri_signup_email', data.email);
+
     // Redirect to verification page
     router.push('/verify');
   };

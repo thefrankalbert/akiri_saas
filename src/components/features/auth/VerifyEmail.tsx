@@ -1,32 +1,52 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Mail, ArrowLeft, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui';
 import { createClient } from '@/lib/supabase/client';
 
+function getStoredEmail(): string {
+  if (typeof window === 'undefined') return '';
+  return localStorage.getItem('akiri_signup_email') || '';
+}
+
 export function VerifyEmail() {
+  const searchParams = useSearchParams();
   const [resending, setResending] = useState(false);
   const [resent, setResent] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Derive email from URL params or localStorage (no effect needed)
+  const email = useMemo(() => {
+    const emailParam = searchParams.get('email');
+    return emailParam || getStoredEmail();
+  }, [searchParams]);
 
   const handleResend = async () => {
+    if (!email) {
+      setError("Impossible de renvoyer l'email. Veuillez vous réinscrire.");
+      return;
+    }
+
     setResending(true);
     setResent(false);
+    setError(null);
 
     const supabase = createClient();
 
-    // We can't resend without the email, so we'll use a generic approach
-    // The user should check their email or try signing up again
-    const { error } = await supabase.auth.resend({
+    const { error: resendError } = await supabase.auth.resend({
       type: 'signup',
-      email: '', // User needs to provide this
+      email,
     });
 
     setResending(false);
 
-    if (!error) {
+    if (resendError) {
+      setError(resendError.message);
+    } else {
       setResent(true);
     }
   };
@@ -65,6 +85,8 @@ export function VerifyEmail() {
         {resent && (
           <p className="text-secondary-600 text-center text-sm">Email renvoyé avec succès !</p>
         )}
+
+        {error && <p className="text-center text-sm text-red-600">{error}</p>}
 
         <div className="text-center">
           <Link

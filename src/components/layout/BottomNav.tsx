@@ -5,7 +5,14 @@ import { usePathname } from 'next/navigation';
 import { Home, Search, PlusCircle, Globe, Package, MessageCircle, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-const navItems = [
+interface NavItem {
+  href: string;
+  label: string;
+  icon: typeof Home;
+  isAction?: boolean;
+}
+
+const navItems: NavItem[] = [
   { href: '/', label: 'Accueil', icon: Home },
   { href: '/annonces', label: 'Annonces', icon: Search },
   { href: '/annonces/new', label: 'Publier', icon: PlusCircle, isAction: true },
@@ -13,7 +20,7 @@ const navItems = [
   { href: '/corridors', label: 'Corridors', icon: Globe },
 ];
 
-const secondaryItems = [
+const secondaryItems: NavItem[] = [
   { href: '/messages', label: 'Messages', icon: MessageCircle },
   { href: '/dashboard', label: 'Profil', icon: User },
 ];

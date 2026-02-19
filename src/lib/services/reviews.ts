@@ -15,10 +15,10 @@ export async function createReview(
 ): Promise<ApiResponse<Review>> {
   const supabase = await createClient();
 
-  // Verify the request is confirmed (delivery completed)
+  // Verify the request is confirmed (delivery completed) and get listing info
   const { data: request, error: reqError } = await supabase
     .from('shipment_requests')
-    .select('*')
+    .select('*, listing:listings!inner(traveler_id)')
     .eq('id', input.request_id)
     .eq('status', 'confirmed')
     .single();
@@ -31,11 +31,9 @@ export async function createReview(
     };
   }
 
-  // Verify the reviewer is part of the transaction
-  const isParticipant =
-    request.sender_id === reviewerId ||
-    // We need to check if the reviewer is the traveler via the listing
-    true; // Will be verified via RLS policies
+  // Verify the reviewer is part of the transaction (sender or traveler)
+  const travelerId = (request.listing as { traveler_id: string })?.traveler_id;
+  const isParticipant = request.sender_id === reviewerId || travelerId === reviewerId;
 
   if (!isParticipant) {
     return { data: null, error: 'Non autorisé', status: 403 };

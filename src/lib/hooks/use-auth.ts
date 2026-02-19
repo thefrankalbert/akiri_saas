@@ -6,7 +6,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { createClient, supabaseConfigured } from '@/lib/supabase/client';
-import type { User } from '@supabase/supabase-js';
+import type { User, AuthChangeEvent, Session } from '@supabase/supabase-js';
 import type { Profile } from '@/types';
 
 interface AuthState {
@@ -80,7 +80,7 @@ export function useAuth() {
     // Listen for auth state changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
+    } = supabase.auth.onAuthStateChange(async (event: AuthChangeEvent, session: Session | null) => {
       if (event === 'SIGNED_IN' && session?.user) {
         const profile = await fetchProfile(session.user.id);
         setState({
