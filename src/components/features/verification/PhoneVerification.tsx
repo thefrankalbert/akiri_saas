@@ -63,7 +63,7 @@ export function PhoneVerification({
     setMockCodeHint(null);
 
     try {
-      const response = await fetch('/api/verification/phone/send-otp', {
+      const response = await fetch('/api/verification/phone/send', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
@@ -96,7 +96,7 @@ export function PhoneVerification({
     setServerError(null);
 
     try {
-      const response = await fetch('/api/verification/phone/verify-otp', {
+      const response = await fetch('/api/verification/phone/verify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...data, phone }),
