@@ -5,10 +5,11 @@
 // ============================================
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { createClient } from '@/lib/supabase/client';
+import { createClient, supabaseConfigured } from '@/lib/supabase/client';
 import type { Listing } from '@/types';
 import type { SearchListingsInput } from '@/lib/validations';
 import { DEFAULT_PAGE_SIZE } from '@/constants';
+import { mockListings } from '@/lib/mock-data';
 
 interface ListingsState {
   listings: Listing[];
@@ -38,6 +39,19 @@ export function useListings(initialFilters?: Partial<SearchListingsInput>) {
 
   // Fetch listings within the effect to satisfy React Compiler rules
   useEffect(() => {
+    // Skip when Supabase is not configured (local dev without env vars)
+    if (!supabaseConfigured) {
+      queueMicrotask(() => {
+        setState({
+          listings: mockListings,
+          total: mockListings.length,
+          loading: false,
+          error: null,
+        });
+      });
+      return;
+    }
+
     const controller = new AbortController();
     abortRef.current = controller;
 

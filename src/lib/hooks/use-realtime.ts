@@ -5,7 +5,7 @@
 // ============================================
 
 import { useEffect, useRef } from 'react';
-import { createClient } from '@/lib/supabase/client';
+import { createClient, supabaseConfigured } from '@/lib/supabase/client';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 
 type RealtimeEvent = 'INSERT' | 'UPDATE' | 'DELETE' | '*';
@@ -41,7 +41,7 @@ export function useRealtime({
   const supabase = createClient();
 
   useEffect(() => {
-    if (!enabled) return;
+    if (!enabled || !supabaseConfigured) return;
 
     const channelName = `${schema}:${table}${filter ? `:${filter}` : ''}`;
 

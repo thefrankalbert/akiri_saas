@@ -5,7 +5,7 @@
 // ============================================
 
 import { useCallback, useEffect, useState } from 'react';
-import { createClient } from '@/lib/supabase/client';
+import { createClient, supabaseConfigured } from '@/lib/supabase/client';
 import type { User } from '@supabase/supabase-js';
 import type { Profile } from '@/types';
 
@@ -46,6 +46,14 @@ export function useAuth() {
 
   // Initialize auth state
   useEffect(() => {
+    // Skip when Supabase is not configured (local dev without env vars)
+    if (!supabaseConfigured) {
+      queueMicrotask(() => {
+        setState({ user: null, profile: null, loading: false, error: null });
+      });
+      return;
+    }
+
     const initAuth = async () => {
       try {
         const {

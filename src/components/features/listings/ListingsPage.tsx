@@ -160,7 +160,7 @@ export function ListingsPage() {
 
       {/* Listings Grid */}
       {loading ? (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 6 }).map((_, i) => (
             <Skeleton key={i} className="h-64 w-full rounded-xl" />
           ))}
@@ -176,7 +176,7 @@ export function ListingsPage() {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {listings.map((listing) => (
             <Link key={listing.id} href={`/annonces/${listing.id}`}>
               <Card className="h-full transition-shadow hover:shadow-md">

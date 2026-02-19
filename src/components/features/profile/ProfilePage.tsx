@@ -8,9 +8,10 @@ import { Button } from '@/components/ui';
 import { Badge } from '@/components/ui';
 import { Avatar } from '@/components/ui';
 import { Skeleton } from '@/components/ui';
-import { createClient } from '@/lib/supabase/client';
+import { createClient, supabaseConfigured } from '@/lib/supabase/client';
 import type { Profile, Review } from '@/types';
 import { formatDate } from '@/lib/utils';
+import { mockProfiles } from '@/lib/mock-data';
 
 interface ProfilePageProps {
   userId: string;
@@ -22,6 +23,15 @@ export function ProfilePage({ userId }: ProfilePageProps) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!supabaseConfigured) {
+      queueMicrotask(() => {
+        const mockProfile = mockProfiles.find((p) => p.user_id === userId) || null;
+        setProfile(mockProfile as Profile | null);
+        setLoading(false);
+      });
+      return;
+    }
+
     const controller = new AbortController();
 
     const fetchProfile = async () => {
@@ -133,7 +143,7 @@ export function ProfilePage({ userId }: ProfilePageProps) {
           )}
 
           {/* Stats */}
-          <div className="mt-6 grid grid-cols-3 gap-4">
+          <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3">
             <div className="rounded-lg bg-neutral-50 p-3 text-center">
               <Plane className="text-primary-500 mx-auto h-5 w-5" />
               <p className="mt-1 text-lg font-bold text-neutral-900">{profile.total_trips}</p>

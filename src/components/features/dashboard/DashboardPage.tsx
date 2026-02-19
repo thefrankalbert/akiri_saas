@@ -8,9 +8,10 @@ import { Button } from '@/components/ui';
 import { Badge } from '@/components/ui';
 import { Avatar } from '@/components/ui';
 import { Skeleton } from '@/components/ui';
-import { createClient } from '@/lib/supabase/client';
+import { createClient, supabaseConfigured } from '@/lib/supabase/client';
 import type { Profile } from '@/types';
-// Utils imported as needed
+import { mockProfiles } from '@/lib/mock-data';
+import { toast } from 'sonner';
 
 interface DashboardStats {
   activeListings: number;
@@ -30,6 +31,20 @@ export function DashboardPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!supabaseConfigured) {
+      queueMicrotask(() => {
+        setProfile(mockProfiles[0] as Profile);
+        setStats({
+          activeListings: 3,
+          pendingRequests: 2,
+          unreadMessages: 5,
+          totalEarnings: 450,
+        });
+        setLoading(false);
+      });
+      return;
+    }
+
     const controller = new AbortController();
 
     const fetchDashboard = async () => {
@@ -252,7 +267,15 @@ export function DashboardPage() {
                 Vérifiez votre identité pour gagner la confiance de la communauté
               </p>
             </div>
-            <Button variant="outline" size="sm">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() =>
+                toast.info('Vérification à venir', {
+                  description: "La vérification d'identité sera disponible prochainement.",
+                })
+              }
+            >
               Vérifier
             </Button>
           </CardContent>

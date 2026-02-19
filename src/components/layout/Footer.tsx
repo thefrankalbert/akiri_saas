@@ -34,6 +34,11 @@ export function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href="/demandes" className="hover:text-primary-600 text-sm text-neutral-500">
+                  Demandes
+                </Link>
+              </li>
+              <li>
                 <Link href="/register" className="hover:text-primary-600 text-sm text-neutral-500">
                   Devenir voyageur
                 </Link>

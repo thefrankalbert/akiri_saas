@@ -18,9 +18,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui';
 import { Badge } from '@/components/ui';
 import { Avatar } from '@/components/ui';
 import { Skeleton } from '@/components/ui';
-import { createClient } from '@/lib/supabase/client';
+import { createClient, supabaseConfigured } from '@/lib/supabase/client';
 import type { Listing } from '@/types';
 import { formatCurrency, formatDate, formatRelativeDate } from '@/lib/utils';
+import { mockListings } from '@/lib/mock-data';
 
 interface ListingDetailProps {
   listingId: string;
@@ -32,6 +33,19 @@ export function ListingDetail({ listingId }: ListingDetailProps) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (!supabaseConfigured) {
+      queueMicrotask(() => {
+        const mock = mockListings.find((l) => l.id === listingId);
+        if (mock) {
+          setListing(mock);
+        } else {
+          setError('Annonce introuvable');
+        }
+        setLoading(false);
+      });
+      return;
+    }
+
     const controller = new AbortController();
 
     const fetchListing = async () => {
@@ -88,7 +102,7 @@ export function ListingDetail({ listingId }: ListingDetailProps) {
   const totalCost = listing.available_kg * listing.price_per_kg;
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 lg:px-8">
+    <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
       {/* Back button */}
       <Link
         href="/annonces"
@@ -107,11 +121,11 @@ export function ListingDetail({ listingId }: ListingDetailProps) {
               <div className="flex items-center gap-3">
                 <MapPin className="text-primary-500 h-5 w-5" />
                 <div>
-                  <h1 className="text-xl font-bold text-neutral-900">
+                  <h1 className="truncate text-xl font-bold text-neutral-900">
                     {listing.departure_city}, {listing.departure_country}
                   </h1>
                   <p className="text-neutral-500">&darr;</p>
-                  <h1 className="text-xl font-bold text-neutral-900">
+                  <h1 className="truncate text-xl font-bold text-neutral-900">
                     {listing.arrival_city}, {listing.arrival_country}
                   </h1>
                 </div>
@@ -203,35 +217,42 @@ export function ListingDetail({ listingId }: ListingDetailProps) {
             <CardHeader>
               <CardTitle className="text-lg">Résumé</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3 p-6 pt-0">
-              <div className="flex justify-between text-sm">
-                <span className="text-neutral-500">Prix par kg</span>
-                <span className="font-medium">{formatCurrency(listing.price_per_kg)}</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-neutral-500">Kilos disponibles</span>
-                <span className="font-medium">{listing.available_kg} kg</span>
-              </div>
-              <div className="border-t border-neutral-100 pt-3">
-                <div className="flex justify-between">
-                  <span className="font-medium text-neutral-700">Total max</span>
-                  <span className="text-primary-600 text-lg font-bold">
-                    {formatCurrency(totalCost)}
-                  </span>
+            <CardContent className="p-6 pt-0">
+              <div className="space-y-3">
+                <div className="flex justify-between text-sm">
+                  <span className="text-neutral-500">Prix par kg</span>
+                  <span className="font-medium">{formatCurrency(listing.price_per_kg)}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-neutral-500">Kilos disponibles</span>
+                  <span className="font-medium">{listing.available_kg} kg</span>
+                </div>
+                <div className="border-t border-neutral-100 pt-3">
+                  <div className="flex justify-between">
+                    <span className="font-medium text-neutral-700">Total max</span>
+                    <span className="text-primary-600 text-lg font-bold">
+                      {formatCurrency(totalCost)}
+                    </span>
+                  </div>
                 </div>
               </div>
 
-              <Button className="w-full" size="lg">
-                Envoyer une demande
-              </Button>
-
-              <Button
-                variant="outline"
-                className="w-full"
-                leftIcon={<MessageCircle className="h-4 w-4" />}
-              >
-                Contacter le voyageur
-              </Button>
+              <div className="mt-5 flex flex-col gap-3">
+                <Link href="/demandes" className="block">
+                  <Button className="w-full" size="lg">
+                    Envoyer une demande
+                  </Button>
+                </Link>
+                <Link href="/messages" className="block">
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    leftIcon={<MessageCircle className="h-4 w-4" />}
+                  >
+                    Contacter le voyageur
+                  </Button>
+                </Link>
+              </div>
             </CardContent>
           </Card>
 
@@ -274,8 +295,8 @@ export function ListingDetail({ listingId }: ListingDetailProps) {
                     <p className="text-neutral-500">envois</p>
                   </div>
                 </div>
-                <Link href={`/profil/${listing.traveler.user_id}`}>
-                  <Button variant="ghost" className="mt-3 w-full" size="sm">
+                <Link href={`/profil/${listing.traveler.user_id}`} className="mt-3 block">
+                  <Button variant="ghost" className="w-full" size="sm">
                     Voir le profil
                   </Button>
                 </Link>

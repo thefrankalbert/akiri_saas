@@ -44,13 +44,13 @@ export function Header() {
 
         {/* Desktop Actions */}
         <div className="hidden items-center gap-2 md:flex">
-          <button className="rounded-lg p-2 text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-neutral-700">
+          <button className="rounded-lg p-2.5 text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-neutral-700">
             <Search className="h-5 w-5" />
           </button>
-          <button className="relative rounded-lg p-2 text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-neutral-700">
+          <button className="relative rounded-lg p-2.5 text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-neutral-700">
             <Bell className="h-5 w-5" />
           </button>
-          <button className="rounded-lg p-2 text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-neutral-700">
+          <button className="rounded-lg p-2.5 text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-neutral-700">
             <MessageCircle className="h-5 w-5" />
           </button>
           <div className="mx-2 h-6 w-px bg-neutral-200" />
@@ -66,7 +66,7 @@ export function Header() {
 
         {/* Mobile Menu Button */}
         <button
-          className="rounded-lg p-2 text-neutral-500 md:hidden"
+          className="rounded-lg p-2.5 text-neutral-500 md:hidden"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
         >
           {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
