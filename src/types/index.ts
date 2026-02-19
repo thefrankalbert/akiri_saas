@@ -15,6 +15,11 @@ export interface Profile {
   first_name: string;
   last_name: string;
   phone: string | null;
+  phone_verified: boolean;
+  phone_verified_at: string | null;
+  id_verification_status: 'none' | 'pending' | 'verified' | 'failed';
+  id_verified_at: string | null;
+  verification_level: 1 | 2 | 3;
   avatar_url: string | null;
   bio: string | null;
   is_verified: boolean;
@@ -180,4 +185,22 @@ export interface PaginatedResponse<T> {
   page: number;
   per_page: number;
   total_pages: number;
+}
+
+// --- Verification ---
+export type VerificationSessionType = 'phone' | 'identity';
+export type VerificationProvider = 'mock' | 'stripe' | 'twilio';
+export type VerificationStatus = 'pending' | 'processing' | 'verified' | 'failed' | 'expired';
+
+export interface VerificationSession {
+  id: string;
+  user_id: string;
+  type: VerificationSessionType;
+  provider: VerificationProvider;
+  external_session_id: string | null;
+  status: VerificationStatus;
+  metadata: Record<string, unknown>;
+  created_at: string;
+  updated_at: string;
+  expires_at: string | null;
 }

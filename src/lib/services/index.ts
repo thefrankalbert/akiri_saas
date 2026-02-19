@@ -16,3 +16,4 @@ export * from './profiles';
 export * from './notifications';
 export * from './corridors';
 export * from './transactions';
+export * from './verification';

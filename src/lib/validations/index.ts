@@ -188,3 +188,29 @@ export const refundSchema = z.object({
 });
 
 export type RefundInput = z.infer<typeof refundSchema>;
+
+// ─── Verification Schemas ──────────────────────────────────
+
+export const sendPhoneOtpSchema = z.object({
+  phone: z
+    .string()
+    .regex(/^\+[1-9]\d{6,14}$/, 'Numéro de téléphone invalide (format: +33612345678)'),
+});
+
+export type SendPhoneOtpInput = z.infer<typeof sendPhoneOtpSchema>;
+
+export const verifyPhoneOtpSchema = z.object({
+  phone: z.string().regex(/^\+[1-9]\d{6,14}$/, 'Numéro de téléphone invalide'),
+  code: z
+    .string()
+    .length(6, 'Le code doit contenir 6 chiffres')
+    .regex(/^\d{6}$/, 'Le code doit contenir uniquement des chiffres'),
+});
+
+export type VerifyPhoneOtpInput = z.infer<typeof verifyPhoneOtpSchema>;
+
+export const createIdentitySessionSchema = z.object({
+  return_url: z.string().url('URL de retour invalide').optional(),
+});
+
+export type CreateIdentitySessionInput = z.infer<typeof createIdentitySessionSchema>;
