@@ -2,26 +2,35 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Search, PlusCircle, Globe, Package, MessageCircle, User } from 'lucide-react';
+import {
+  House,
+  MagnifyingGlass,
+  PlusCircle,
+  GlobeHemisphereWest,
+  Package,
+  ChatCircle,
+  User,
+} from '@phosphor-icons/react';
+import type { Icon as PhosphorIcon } from '@phosphor-icons/react';
 import { cn } from '@/lib/utils';
 
 interface NavItem {
   href: string;
   label: string;
-  icon: typeof Home;
+  icon: PhosphorIcon;
   isAction?: boolean;
 }
 
 const navItems: NavItem[] = [
-  { href: '/', label: 'Accueil', icon: Home },
-  { href: '/annonces', label: 'Annonces', icon: Search },
+  { href: '/', label: 'Accueil', icon: House },
+  { href: '/annonces', label: 'Annonces', icon: MagnifyingGlass },
   { href: '/annonces/new', label: 'Publier', icon: PlusCircle, isAction: true },
   { href: '/demandes', label: 'Demandes', icon: Package },
-  { href: '/corridors', label: 'Corridors', icon: Globe },
+  { href: '/corridors', label: 'Corridors', icon: GlobeHemisphereWest },
 ];
 
 const secondaryItems: NavItem[] = [
-  { href: '/messages', label: 'Messages', icon: MessageCircle },
+  { href: '/messages', label: 'Messages', icon: ChatCircle },
   { href: '/dashboard', label: 'Profil', icon: User },
 ];
 
@@ -44,8 +53,8 @@ export function BottomNav() {
                 href={item.href}
                 className="flex flex-col items-center justify-center"
               >
-                <div className="bg-primary-500 flex h-11 w-11 items-center justify-center rounded-full text-white shadow-sm">
-                  <Icon className="h-4.5 w-4.5" />
+                <div className="bg-primary-600 flex h-11 w-11 items-center justify-center rounded-full text-white shadow-sm">
+                  <Icon weight="bold" size={18} />
                 </div>
               </Link>
             );
@@ -60,7 +69,7 @@ export function BottomNav() {
                 isActive ? 'text-primary-600' : 'text-neutral-400'
               )}
             >
-              <Icon className="h-5 w-5" />
+              <Icon weight={isActive ? 'fill' : 'duotone'} size={20} />
               <span className="text-[9px] leading-tight font-medium">{item.label}</span>
             </Link>
           );

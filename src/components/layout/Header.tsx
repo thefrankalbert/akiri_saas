@@ -2,9 +2,17 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Menu, X, Search, Bell, MessageCircle, LogOut, TestTube2 } from 'lucide-react';
+import {
+  List,
+  X,
+  MagnifyingGlass,
+  Bell,
+  ChatCircle,
+  SignOut,
+  TestTube,
+} from '@phosphor-icons/react';
 import { useState } from 'react';
-import { Button, Avatar } from '@/components/ui';
+import { Avatar } from '@/components/ui';
 import { APP_NAME } from '@/constants';
 import { useAuth } from '@/lib/hooks';
 
@@ -24,7 +32,7 @@ export function Header() {
       {/* Demo Mode Banner */}
       {isDemo && (
         <div className="bg-amber-500 px-4 py-1.5 text-center text-sm font-medium text-white">
-          <TestTube2 className="mr-1.5 inline-block h-4 w-4" />
+          <TestTube weight="duotone" size={16} className="mr-1.5 inline-block" />
           Mode Démonstration — Les données sont simulées
         </div>
       )}
@@ -32,7 +40,7 @@ export function Header() {
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2">
-          <div className="bg-primary-500 flex h-8 w-8 items-center justify-center rounded-lg">
+          <div className="bg-primary-600 flex h-8 w-8 items-center justify-center rounded-lg">
             <span className="text-lg font-bold text-white">A</span>
           </div>
           <span className="text-xl font-bold text-neutral-900">{APP_NAME}</span>
@@ -63,7 +71,7 @@ export function Header() {
         {/* Desktop Actions */}
         <div className="hidden items-center gap-2 md:flex">
           <button className="rounded-lg p-2.5 text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-neutral-700">
-            <Search className="h-5 w-5" />
+            <MagnifyingGlass weight="duotone" size={20} />
           </button>
           {isAuthenticated ? (
             <>
@@ -71,10 +79,10 @@ export function Header() {
                 href="/messages"
                 className="relative rounded-lg p-2.5 text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-neutral-700"
               >
-                <MessageCircle className="h-5 w-5" />
+                <ChatCircle weight="duotone" size={20} />
               </Link>
               <button className="relative rounded-lg p-2.5 text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-neutral-700">
-                <Bell className="h-5 w-5" />
+                <Bell weight="duotone" size={20} />
               </button>
               <div className="mx-2 h-6 w-px bg-neutral-200" />
               <Link href="/dashboard" className="flex items-center gap-2">
@@ -94,25 +102,29 @@ export function Header() {
                 className="rounded-lg p-2.5 text-neutral-500 transition-colors hover:bg-red-50 hover:text-red-600"
                 title="Déconnexion"
               >
-                <LogOut className="h-5 w-5" />
+                <SignOut weight="duotone" size={20} />
               </button>
             </>
           ) : (
             <>
               <button className="relative rounded-lg p-2.5 text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-neutral-700">
-                <Bell className="h-5 w-5" />
+                <Bell weight="duotone" size={20} />
               </button>
               <button className="rounded-lg p-2.5 text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-neutral-700">
-                <MessageCircle className="h-5 w-5" />
+                <ChatCircle weight="duotone" size={20} />
               </button>
               <div className="mx-2 h-6 w-px bg-neutral-200" />
-              <Link href="/login">
-                <Button variant="ghost" size="sm">
-                  Connexion
-                </Button>
+              <Link
+                href="/login"
+                className="rounded-lg px-3 py-2 text-sm font-medium text-neutral-600 transition-colors hover:text-neutral-900"
+              >
+                Connexion
               </Link>
-              <Link href="/register">
-                <Button size="sm">Publier une annonce</Button>
+              <Link
+                href="/register"
+                className="bg-primary-500 hover:bg-primary-600 rounded-lg px-4 py-2 text-sm font-medium text-white transition-colors"
+              >
+                Publier une annonce
               </Link>
             </>
           )}
@@ -123,7 +135,7 @@ export function Header() {
           className="rounded-lg p-2.5 text-neutral-500 md:hidden"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
         >
-          {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          {mobileMenuOpen ? <X weight="bold" size={24} /> : <List weight="duotone" size={24} />}
         </button>
       </div>
 
@@ -188,15 +200,19 @@ export function Header() {
               </>
             ) : (
               <>
-                <Link href="/login">
-                  <Button variant="outline" size="md" className="w-full">
-                    Connexion
-                  </Button>
+                <Link
+                  href="/login"
+                  className="block rounded-lg px-3 py-2.5 text-center text-sm font-medium text-neutral-700 ring-1 ring-neutral-200 hover:bg-neutral-50"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Connexion
                 </Link>
-                <Link href="/register">
-                  <Button size="md" className="w-full">
-                    Publier une annonce
-                  </Button>
+                <Link
+                  href="/register"
+                  className="bg-primary-500 hover:bg-primary-600 block rounded-lg px-3 py-2.5 text-center text-sm font-medium text-white"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Publier une annonce
                 </Link>
               </>
             )}

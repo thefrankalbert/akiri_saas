@@ -9,7 +9,7 @@ export function Footer() {
           {/* Brand */}
           <div className="col-span-2 md:col-span-1">
             <div className="flex items-center gap-2">
-              <div className="bg-primary-500 flex h-8 w-8 items-center justify-center rounded-lg">
+              <div className="bg-primary-600 flex h-8 w-8 items-center justify-center rounded-lg">
                 <span className="text-lg font-bold text-white">A</span>
               </div>
               <span className="text-xl font-bold text-neutral-900">{APP_NAME}</span>
@@ -24,22 +24,22 @@ export function Footer() {
             <h4 className="text-sm font-semibold text-neutral-900">Naviguer</h4>
             <ul className="mt-3 space-y-2">
               <li>
-                <Link href="/annonces" className="hover:text-primary-600 text-sm text-neutral-500">
+                <Link href="/annonces" className="text-sm text-neutral-500 hover:text-neutral-900">
                   Annonces
                 </Link>
               </li>
               <li>
-                <Link href="/corridors" className="hover:text-primary-600 text-sm text-neutral-500">
+                <Link href="/corridors" className="text-sm text-neutral-500 hover:text-neutral-900">
                   Corridors
                 </Link>
               </li>
               <li>
-                <Link href="/demandes" className="hover:text-primary-600 text-sm text-neutral-500">
+                <Link href="/demandes" className="text-sm text-neutral-500 hover:text-neutral-900">
                   Demandes
                 </Link>
               </li>
               <li>
-                <Link href="/register" className="hover:text-primary-600 text-sm text-neutral-500">
+                <Link href="/register" className="text-sm text-neutral-500 hover:text-neutral-900">
                   Devenir voyageur
                 </Link>
               </li>
@@ -51,17 +51,17 @@ export function Footer() {
             <h4 className="text-sm font-semibold text-neutral-900">Support</h4>
             <ul className="mt-3 space-y-2">
               <li>
-                <Link href="/faq" className="hover:text-primary-600 text-sm text-neutral-500">
+                <Link href="/faq" className="text-sm text-neutral-500 hover:text-neutral-900">
                   FAQ
                 </Link>
               </li>
               <li>
-                <Link href="/contact" className="hover:text-primary-600 text-sm text-neutral-500">
+                <Link href="/contact" className="text-sm text-neutral-500 hover:text-neutral-900">
                   Contact
                 </Link>
               </li>
               <li>
-                <Link href="/securite" className="hover:text-primary-600 text-sm text-neutral-500">
+                <Link href="/securite" className="text-sm text-neutral-500 hover:text-neutral-900">
                   S&eacute;curit&eacute;
                 </Link>
               </li>
@@ -73,20 +73,20 @@ export function Footer() {
             <h4 className="text-sm font-semibold text-neutral-900">L&eacute;gal</h4>
             <ul className="mt-3 space-y-2">
               <li>
-                <Link href="/cgu" className="hover:text-primary-600 text-sm text-neutral-500">
+                <Link href="/cgu" className="text-sm text-neutral-500 hover:text-neutral-900">
                   CGU
                 </Link>
               </li>
               <li>
                 <Link
                   href="/confidentialite"
-                  className="hover:text-primary-600 text-sm text-neutral-500"
+                  className="text-sm text-neutral-500 hover:text-neutral-900"
                 >
                   Confidentialit&eacute;
                 </Link>
               </li>
               <li>
-                <Link href="/mentions" className="hover:text-primary-600 text-sm text-neutral-500">
+                <Link href="/mentions" className="text-sm text-neutral-500 hover:text-neutral-900">
                   Mentions l&eacute;gales
                 </Link>
               </li>
