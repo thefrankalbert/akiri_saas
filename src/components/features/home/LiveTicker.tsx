@@ -26,14 +26,14 @@ export function LiveTicker() {
   }, []);
 
   return (
-    <section className="relative overflow-hidden border-b border-neutral-200 bg-white py-3">
+    <section className="relative overflow-hidden border-b border-white/5 bg-neutral-950 py-3">
       <div className="flex items-center">
-        <div className="z-10 flex shrink-0 items-center gap-1.5 bg-white pr-2 pl-3 sm:gap-2 sm:pr-3 sm:pl-4">
+        <div className="z-10 flex shrink-0 items-center gap-1.5 bg-neutral-950 pr-2 pl-3 sm:gap-2 sm:pr-3 sm:pl-4">
           <span className="relative flex h-2 w-2">
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75" />
             <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500" />
           </span>
-          <span className="text-[10px] font-bold tracking-wider text-green-600 uppercase sm:text-xs">
+          <span className="text-[10px] font-bold tracking-wider text-emerald-400 uppercase sm:text-xs">
             Live
           </span>
         </div>
@@ -41,16 +41,20 @@ export function LiveTicker() {
         <div className="relative min-w-0 flex-1 overflow-hidden">
           <div className="animate-marquee flex gap-8 whitespace-nowrap">
             {[...liveFeedItems, ...liveFeedItems].map((item, i) => (
-              <span key={i} className="inline-flex items-center gap-2 text-sm text-neutral-600">
-                <span className="font-semibold text-neutral-900">{item.travelerName}</span>
-                <span className="text-primary-500">→</span>
+              <span key={i} className="inline-flex items-center gap-2 text-sm text-neutral-400">
+                <span className="font-semibold text-neutral-200">{item.travelerName}</span>
+                <span className="text-primary-400">&rarr;</span>
                 <span>
-                  {item.departure} → {item.arrival}
+                  {item.departure} &rarr; {item.arrival}
                 </span>
-                <Badge variant="outline" size="sm">
+                <Badge
+                  variant="outline"
+                  size="sm"
+                  className="bg-white/5 text-neutral-400 ring-white/10"
+                >
                   {item.kg}kg
                 </Badge>
-                <span className="text-primary-600 font-medium">{item.price}€/kg</span>
+                <span className="text-primary-400 font-medium">{item.price}&euro;/kg</span>
               </span>
             ))}
           </div>

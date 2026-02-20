@@ -2,7 +2,15 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { ArrowRight, Shield, Globe, Package, CheckCircle2, Zap, ArrowDown } from 'lucide-react';
+import {
+  ArrowRight,
+  ShieldCheck,
+  GlobeHemisphereWest,
+  Package,
+  CheckCircle,
+  Lightning,
+  ArrowDown,
+} from '@phosphor-icons/react';
 import { cn } from '@/lib/utils';
 
 export function HeroSection() {
@@ -15,16 +23,8 @@ export function HeroSection() {
 
   return (
     <section className="relative min-h-[92vh] overflow-hidden bg-neutral-950 sm:min-h-[88vh]">
-      {/* Animated gradient blobs */}
-      <div className="pointer-events-none absolute inset-0">
-        <div className="from-primary-950/90 absolute inset-0 bg-gradient-to-br via-neutral-950 to-neutral-950" />
-        <div className="animate-gradient-x from-primary-500/20 absolute top-0 -left-1/4 h-[600px] w-[600px] rounded-full bg-gradient-to-r to-transparent blur-[120px]" />
-        <div
-          className="animate-gradient-x from-secondary-500/15 absolute -right-1/4 bottom-0 h-[500px] w-[500px] rounded-full bg-gradient-to-l to-transparent blur-[100px]"
-          style={{ animationDelay: '2s' }}
-        />
-        <div className="animate-float-slow bg-accent-500/10 absolute top-1/4 left-1/3 h-[300px] w-[300px] rounded-full blur-[80px]" />
-      </div>
+      {/* Subtle radial gradient */}
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(99,102,241,0.15),transparent_50%)]" />
 
       {/* Subtle dot grid */}
       <div
@@ -45,8 +45,8 @@ export function HeroSection() {
         >
           <div className="inline-flex items-center gap-2.5 rounded-full border border-white/10 bg-white/5 px-5 py-2 backdrop-blur-sm">
             <span className="relative flex h-2.5 w-2.5">
-              <span className="bg-secondary-400 absolute inline-flex h-full w-full animate-ping rounded-full opacity-75" />
-              <span className="bg-secondary-400 relative inline-flex h-2.5 w-2.5 rounded-full" />
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+              <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-400" />
             </span>
             <span className="text-sm font-medium text-neutral-300">
               <span className="font-bold text-white">+250</span> voyageurs cette semaine
@@ -93,7 +93,7 @@ export function HeroSection() {
             className="bg-primary-500 hover:bg-primary-600 shadow-primary-500/25 inline-flex h-14 items-center gap-2 rounded-xl px-8 text-base font-semibold text-white shadow-lg transition-colors"
           >
             Trouver un voyageur
-            <ArrowRight className="h-5 w-5" />
+            <ArrowRight weight="bold" size={20} />
           </Link>
           <Link
             href="/register"
@@ -114,14 +114,14 @@ export function HeroSection() {
             href="/demandes"
             className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm font-medium text-white/80 backdrop-blur-sm transition-all hover:bg-white/10 hover:text-white"
           >
-            <Package className="h-3.5 w-3.5" />
+            <Package weight="duotone" size={14} />
             Voir les demandes
           </Link>
           <Link
             href="/corridors"
             className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm font-medium text-white/80 backdrop-blur-sm transition-all hover:bg-white/10 hover:text-white"
           >
-            <Globe className="h-3.5 w-3.5" />
+            <GlobeHemisphereWest weight="duotone" size={14} />
             Hub des corridors
           </Link>
         </div>
@@ -134,12 +134,12 @@ export function HeroSection() {
           )}
         >
           {[
-            { icon: Shield, text: 'Paiement sécurisé' },
-            { icon: CheckCircle2, text: 'Profils vérifiés' },
-            { icon: Zap, text: 'Inscription gratuite' },
+            { icon: ShieldCheck, text: 'Paiement sécurisé' },
+            { icon: CheckCircle, text: 'Profils vérifiés' },
+            { icon: Lightning, text: 'Inscription gratuite' },
           ].map((item) => (
             <span key={item.text} className="flex items-center gap-1.5 text-sm text-neutral-500">
-              <item.icon className="text-secondary-400 h-3.5 w-3.5" />
+              <item.icon weight="duotone" size={14} className="text-primary-400" />
               {item.text}
             </span>
           ))}
@@ -147,7 +147,7 @@ export function HeroSection() {
 
         {/* Scroll indicator */}
         <div className="animate-bounce-subtle mt-16 sm:mt-20">
-          <ArrowDown className="h-5 w-5 text-neutral-600" />
+          <ArrowDown weight="bold" size={20} className="text-neutral-600" />
         </div>
       </div>
     </section>

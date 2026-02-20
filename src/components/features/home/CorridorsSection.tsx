@@ -2,7 +2,13 @@
 
 import { useMemo } from 'react';
 import Link from 'next/link';
-import { ArrowRight, Globe, Plane, Package, TrendingUp } from 'lucide-react';
+import {
+  ArrowRight,
+  GlobeHemisphereWest,
+  AirplaneTilt,
+  Package,
+  TrendUp,
+} from '@phosphor-icons/react';
 import { Button } from '@/components/ui';
 import { SUPPORTED_COUNTRIES } from '@/constants';
 import { useInView } from '@/lib/hooks/use-in-view';
@@ -54,8 +60,8 @@ export function CorridorsSection() {
             inView ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
           )}
         >
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-blue-100 px-4 py-1.5 text-sm font-medium text-blue-700">
-            <Globe className="h-4 w-4" />
+          <div className="bg-primary-50 text-primary-600 mb-4 inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-medium">
+            <GlobeHemisphereWest weight="duotone" size={16} />
             Corridors
           </div>
           <h2 className="text-3xl font-bold text-neutral-900 sm:text-4xl">
@@ -77,27 +83,31 @@ export function CorridorsSection() {
               )}
               style={{ transitionDelay: `${i * 80}ms` }}
             >
-              <div className="group relative overflow-hidden rounded-2xl border border-neutral-100 bg-white p-5 transition-all hover:-translate-y-1 hover:shadow-lg">
+              <div className="group hover:border-primary-200 relative overflow-hidden rounded-lg border border-neutral-200/60 bg-white p-5 transition-all hover:-translate-y-1 hover:shadow-lg">
                 <div className="flex items-center gap-3">
                   <div className="flex items-center gap-2 text-3xl">
-                    <span>{corridor.fromFlag}</span>
-                    <div className="bg-primary-100 flex h-7 w-7 items-center justify-center rounded-full">
-                      <Plane className="text-primary-600 h-3.5 w-3.5" />
+                    <span className="shrink-0">{corridor.fromFlag}</span>
+                    <div className="bg-primary-50 flex h-7 w-7 items-center justify-center rounded-full">
+                      <AirplaneTilt weight="duotone" size={14} className="text-primary-600" />
                     </div>
-                    <span>{corridor.toFlag}</span>
+                    <span className="shrink-0">{corridor.toFlag}</span>
                   </div>
-                  <ArrowRight className="group-hover:text-primary-500 ml-auto h-4 w-4 text-neutral-300 transition-transform group-hover:translate-x-1" />
+                  <ArrowRight
+                    weight="bold"
+                    size={16}
+                    className="group-hover:text-primary-500 ml-auto text-neutral-300 transition-transform group-hover:translate-x-1"
+                  />
                 </div>
                 <p className="mt-3 truncate text-sm font-semibold text-neutral-900">
-                  {corridor.from} → {corridor.to}
+                  {corridor.from} &rarr; {corridor.to}
                 </p>
                 <div className="mt-2 flex items-center gap-3 text-xs text-neutral-500">
                   <span className="flex items-center gap-1">
-                    <Package className="h-3 w-3" />
+                    <Package weight="duotone" size={12} />
                     {corridor.count} annonce{corridor.count > 1 ? 's' : ''}
                   </span>
                   <span className="flex items-center gap-1">
-                    <TrendingUp className="text-secondary-500 h-3 w-3" />
+                    <TrendUp weight="duotone" size={12} className="text-primary-500" />
                     {corridor.totalKg}kg dispo
                   </span>
                 </div>
@@ -110,8 +120,8 @@ export function CorridorsSection() {
         <div className="mx-auto mt-10 flex max-w-3xl flex-wrap justify-center gap-2">
           {SUPPORTED_COUNTRIES.map((country) => (
             <Link key={country.code} href={`/annonces?to=${country.code}`}>
-              <span className="hover:border-primary-200 hover:bg-primary-50 inline-flex cursor-pointer items-center gap-1.5 rounded-full border border-neutral-200 bg-white px-3 py-1.5 text-xs font-medium text-neutral-600 transition-colors">
-                <span>{country.flag}</span>
+              <span className="hover:border-primary-200 hover:bg-primary-50 inline-flex cursor-pointer items-center gap-1.5 rounded-full border border-neutral-200/60 bg-white px-3 py-1.5 text-xs font-medium text-neutral-600 transition-colors">
+                <span className="shrink-0">{country.flag}</span>
                 {country.name}
               </span>
             </Link>
@@ -124,7 +134,7 @@ export function CorridorsSection() {
               variant="outline"
               size="lg"
               className="rounded-xl"
-              rightIcon={<ArrowRight className="h-4 w-4" />}
+              rightIcon={<ArrowRight weight="bold" size={16} />}
             >
               Explorer le hub des corridors
             </Button>

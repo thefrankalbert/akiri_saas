@@ -1,38 +1,38 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Plane, Package, Users, CheckCircle2, Sparkles } from 'lucide-react';
+import { AirplaneTilt, Package, Users, CheckCircle, Sparkle } from '@phosphor-icons/react';
 import { useInView } from '@/lib/hooks/use-in-view';
 import { cn } from '@/lib/utils';
 
 const steps = [
   {
     step: 1,
-    icon: Plane,
+    icon: AirplaneTilt,
     title: 'Le voyageur publie',
     description: 'Trajet, date de départ et kilos disponibles.',
-    emoji: '✈️',
+    emoji: '\u2708\uFE0F',
   },
   {
     step: 2,
     icon: Package,
     title: "L'expéditeur demande",
     description: 'Description du colis, poids. Paiement sécurisé.',
-    emoji: '📦',
+    emoji: '\uD83D\uDCE6',
   },
   {
     step: 3,
     icon: Users,
     title: 'Rencontre & remise',
     description: 'Point de collecte convenu. Le voyageur prend le colis.',
-    emoji: '🤝',
+    emoji: '\uD83E\uDD1D',
   },
   {
     step: 4,
-    icon: CheckCircle2,
+    icon: CheckCircle,
     title: 'Livraison confirmée',
     description: 'Code à 6 chiffres. Le voyageur est payé instantanément.',
-    emoji: '✅',
+    emoji: '\u2705',
   },
 ];
 
@@ -48,12 +48,7 @@ export function HowItWorks() {
   }, []);
 
   return (
-    <section ref={inViewRef} className="relative overflow-hidden bg-neutral-50 py-20 sm:py-28">
-      <div className="pointer-events-none absolute inset-0">
-        <div className="bg-primary-100/30 absolute top-0 right-0 h-72 w-72 rounded-full blur-[100px]" />
-        <div className="bg-secondary-100/30 absolute bottom-0 left-0 h-72 w-72 rounded-full blur-[100px]" />
-      </div>
-
+    <section ref={inViewRef} className="relative overflow-hidden bg-white py-20 sm:py-28">
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div
           className={cn(
@@ -61,8 +56,8 @@ export function HowItWorks() {
             inView ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
           )}
         >
-          <div className="bg-primary-100 text-primary-700 mb-4 inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-medium">
-            <Sparkles className="h-4 w-4" />
+          <div className="bg-primary-50 text-primary-600 mb-4 inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-medium">
+            <Sparkle weight="duotone" size={16} />
             Simple &amp; rapide
           </div>
           <h2 className="text-3xl font-bold text-neutral-900 sm:text-4xl">Comment ça marche ?</h2>
@@ -70,7 +65,7 @@ export function HowItWorks() {
         </div>
 
         <div className="relative mx-auto mt-16 max-w-4xl">
-          <div className="from-primary-200 via-primary-300 to-secondary-200 absolute top-0 left-1/2 hidden h-full w-px -translate-x-1/2 bg-gradient-to-b lg:block" />
+          <div className="from-primary-200 via-primary-300 to-primary-200 absolute top-0 left-1/2 hidden h-full w-px -translate-x-1/2 bg-gradient-to-b lg:block" />
 
           <div className="grid gap-8 lg:gap-0">
             {steps.map((item, index) => {
@@ -109,8 +104,8 @@ export function HowItWorks() {
                       <div className="flex items-center gap-2">
                         <span
                           className={cn(
-                            'flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold text-white transition-colors',
-                            isActive ? 'bg-primary-500' : 'bg-neutral-400'
+                            'bg-primary-50 text-primary-600 flex h-6 w-6 items-center justify-center rounded-full text-xs font-semibold transition-colors',
+                            isActive ? 'bg-primary-500 text-white' : ''
                           )}
                         >
                           {item.step}
@@ -131,7 +126,7 @@ export function HowItWorks() {
                         className={cn(
                           'w-full rounded-2xl p-6 text-left transition-all duration-300',
                           isEven ? 'text-right' : 'text-left',
-                          isActive ? 'scale-[1.02] bg-white shadow-lg' : 'bg-transparent'
+                          isActive ? 'scale-[1.02] bg-neutral-50 shadow-sm' : 'bg-transparent'
                         )}
                         onClick={() => setActiveStep(index)}
                       >
