@@ -52,7 +52,7 @@ export function Avatar({
         </div>
       )}
       {isVerified && (
-        <div className="bg-secondary-500 absolute -right-0.5 -bottom-0.5 flex h-4 w-4 items-center justify-center rounded-full text-white">
+        <div className="absolute -right-0.5 -bottom-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-emerald-500 text-white">
           <svg className="h-2.5 w-2.5" fill="currentColor" viewBox="0 0 20 20">
             <path
               fillRule="evenodd"

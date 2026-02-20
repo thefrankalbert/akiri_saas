@@ -10,13 +10,12 @@ export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 const variantStyles: Record<string, string> = {
-  default: 'bg-white shadow-card rounded-2xl',
-  bordered: 'bg-white border border-neutral-200 rounded-2xl',
-  elevated: 'bg-white shadow-soft rounded-2xl',
-  interactive: 'bg-white shadow-card rounded-2xl cursor-pointer',
-  gradient:
-    'bg-white rounded-2xl relative before:absolute before:inset-0 before:rounded-2xl before:p-[1px] before:bg-gradient-to-br before:from-primary-200 before:via-transparent before:to-secondary-200 before:-z-10',
-  glass: 'bg-white/70 backdrop-blur-lg border border-white/20 rounded-2xl shadow-lg',
+  default: 'bg-white border border-neutral-200/60 rounded-lg shadow-xs',
+  bordered: 'bg-white border border-neutral-200 rounded-lg',
+  elevated: 'bg-white border border-neutral-200/60 rounded-lg shadow-soft',
+  interactive: 'bg-white border border-neutral-200/60 rounded-lg shadow-xs cursor-pointer',
+  gradient: 'bg-white border border-neutral-200/60 rounded-lg shadow-xs',
+  glass: 'bg-white/80 backdrop-blur-lg border border-neutral-200/40 rounded-lg shadow-sm',
 };
 
 const paddingStyles: Record<string, string> = {
@@ -40,10 +39,10 @@ export function Card({
       className={cn(
         variantStyles[variant],
         paddingStyles[padding],
-        hover && 'transition-all duration-300 hover:-translate-y-1 hover:shadow-xl',
+        hover && 'hover:shadow-soft transition-all duration-200 hover:border-neutral-300',
         variant === 'interactive' &&
-          'transition-all duration-300 hover:-translate-y-1 hover:shadow-xl active:scale-[0.98]',
-        glow && 'hover:ring-primary-200 hover:ring-2 hover:ring-offset-2',
+          'hover:shadow-soft transition-all duration-200 hover:border-neutral-300 active:scale-[0.99]',
+        glow && 'hover:ring-primary-200 hover:ring-2',
         className
       )}
       {...props}
@@ -136,17 +135,17 @@ const statsVariantStyles: Record<string, { bg: string; iconBg: string; iconColor
   primary: {
     bg: 'bg-white',
     iconBg: 'bg-primary-50',
-    iconColor: 'text-primary-500',
+    iconColor: 'text-primary-600',
   },
   secondary: {
     bg: 'bg-white',
-    iconBg: 'bg-secondary-50',
-    iconColor: 'text-secondary-500',
+    iconBg: 'bg-emerald-50',
+    iconColor: 'text-emerald-600',
   },
   accent: {
     bg: 'bg-white',
-    iconBg: 'bg-amber-50',
-    iconColor: 'text-amber-500',
+    iconBg: 'bg-accent-50',
+    iconColor: 'text-accent-600',
   },
 };
 
@@ -190,7 +189,7 @@ export function StatsCard({
         {icon && (
           <div
             className={cn(
-              'flex h-12 w-12 shrink-0 items-center justify-center rounded-xl transition-transform duration-300 group-hover:scale-110',
+              'flex h-12 w-12 shrink-0 items-center justify-center rounded-xl',
               styles.iconBg
             )}
           >

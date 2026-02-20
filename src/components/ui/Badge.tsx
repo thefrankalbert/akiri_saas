@@ -6,12 +6,12 @@ export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
 }
 
 const variantStyles: Record<string, string> = {
-  default: 'bg-neutral-100 text-neutral-700',
-  success: 'bg-green-100 text-green-800',
-  warning: 'bg-yellow-100 text-yellow-800',
-  error: 'bg-red-100 text-red-800',
-  info: 'bg-blue-100 text-blue-800',
-  outline: 'border border-neutral-300 text-neutral-600',
+  default: 'bg-neutral-50 text-neutral-700 ring-1 ring-neutral-200/60',
+  success: 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200/60',
+  warning: 'bg-amber-50 text-amber-700 ring-1 ring-amber-200/60',
+  error: 'bg-rose-50 text-rose-700 ring-1 ring-rose-200/60',
+  info: 'bg-blue-50 text-blue-700 ring-1 ring-blue-200/60',
+  outline: 'bg-transparent text-neutral-600 ring-1 ring-neutral-200',
 };
 
 const sizeStyles: Record<string, string> = {
@@ -30,7 +30,7 @@ export function Badge({
   return (
     <span
       className={cn(
-        'inline-flex items-center rounded-full font-medium',
+        'inline-flex items-center rounded-md font-medium',
         variantStyles[variant],
         sizeStyles[size],
         className
