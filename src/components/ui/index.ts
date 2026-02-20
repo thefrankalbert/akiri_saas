@@ -4,7 +4,15 @@ export type { ButtonProps } from './Button';
 export { Input } from './Input';
 export type { InputProps } from './Input';
 
-export { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from './Card';
+export {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  CardFooter,
+  StatsCard,
+} from './Card';
 export type { CardProps } from './Card';
 
 export { Badge } from './Badge';
@@ -52,6 +60,21 @@ export { Tabs, TabsList, TabsTrigger, TabsContent, AnimatedTabs, UnderlineTabs }
 
 // Tooltip
 export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider, SimpleTooltip } from './Tooltip';
+
+// Sheet / Drawer
+export {
+  Sheet,
+  SheetPortal,
+  SheetOverlay,
+  SheetTrigger,
+  SheetClose,
+  SheetContent,
+  SheetHeader,
+  SheetFooter,
+  SheetTitle,
+  SheetDescription,
+  AnimatedSheet,
+} from './Sheet';
 
 // Motion / Animation components
 export {

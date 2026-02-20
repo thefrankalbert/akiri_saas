@@ -2,16 +2,41 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Package, Plane, MessageCircle, TrendingUp, Plus, ArrowRight, Clock } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui';
-import { Button } from '@/components/ui';
-import { Badge } from '@/components/ui';
-import { Avatar } from '@/components/ui';
-import { Skeleton } from '@/components/ui';
+import {
+  Package,
+  Plane,
+  MessageCircle,
+  TrendingUp,
+  Plus,
+  ArrowRight,
+  Clock,
+  CheckCircle2,
+  AlertCircle,
+  Star,
+  ShieldCheck,
+  Sparkles,
+  ChevronRight,
+} from 'lucide-react';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Button,
+  Badge,
+  Avatar,
+  FadeIn,
+  SlideUp,
+  StaggerContainer,
+  StaggerItem,
+  HoverScale,
+  AnimatedCounter,
+  Shimmer,
+} from '@/components/ui';
 import { createClient, supabaseConfigured } from '@/lib/supabase/client';
 import type { Profile } from '@/types';
 import { mockProfiles } from '@/lib/mock-data';
-import { toast } from 'sonner';
+import { formatRelativeDate } from '@/lib/utils';
 
 interface DashboardStats {
   activeListings: number;
@@ -19,6 +44,70 @@ interface DashboardStats {
   unreadMessages: number;
   totalEarnings: number;
 }
+
+interface ActivityItem {
+  id: string;
+  type: 'listing' | 'request' | 'message' | 'payment' | 'review';
+  title: string;
+  description: string;
+  timestamp: Date;
+  icon: 'plane' | 'package' | 'message' | 'payment' | 'star';
+  status?: 'success' | 'pending' | 'info';
+}
+
+// Mock activity data for demo
+const mockActivities: ActivityItem[] = [
+  {
+    id: '1',
+    type: 'listing',
+    title: 'Nouvelle annonce publiée',
+    description: 'Paris → Dakar, 10kg disponibles',
+    timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000),
+    icon: 'plane',
+    status: 'success',
+  },
+  {
+    id: '2',
+    type: 'request',
+    title: "Demande d'envoi reçue",
+    description: 'Colis 3kg pour Abidjan',
+    timestamp: new Date(Date.now() - 5 * 60 * 60 * 1000),
+    icon: 'package',
+    status: 'pending',
+  },
+  {
+    id: '3',
+    type: 'message',
+    title: 'Nouveau message',
+    description: 'De Aminata K. concernant votre annonce',
+    timestamp: new Date(Date.now() - 8 * 60 * 60 * 1000),
+    icon: 'message',
+    status: 'info',
+  },
+  {
+    id: '4',
+    type: 'review',
+    title: 'Nouvel avis reçu',
+    description: '★★★★★ "Excellent service, très professionnel"',
+    timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000),
+    icon: 'star',
+    status: 'success',
+  },
+];
+
+const activityIcons = {
+  plane: Plane,
+  package: Package,
+  message: MessageCircle,
+  payment: TrendingUp,
+  star: Star,
+};
+
+const statusColors = {
+  success: 'bg-success/10 text-success',
+  pending: 'bg-amber-100 text-amber-600',
+  info: 'bg-blue-100 text-blue-600',
+};
 
 export function DashboardPage() {
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -28,6 +117,7 @@ export function DashboardPage() {
     unreadMessages: 0,
     totalEarnings: 0,
   });
+  const [activities] = useState<ActivityItem[]>(mockActivities);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -58,7 +148,6 @@ export function DashboardPage() {
         return;
       }
 
-      // Fetch profile
       const { data: profileData } = await supabase
         .from('profiles')
         .select('*')
@@ -71,7 +160,6 @@ export function DashboardPage() {
         setProfile(profileData as Profile);
       }
 
-      // Fetch stats
       const [listingsRes, requestsRes] = await Promise.all([
         supabase
           .from('listings')
@@ -105,11 +193,21 @@ export function DashboardPage() {
   if (loading) {
     return (
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <Skeleton className="mb-6 h-8 w-48" />
+        <div className="mb-8 flex items-center gap-4">
+          <Shimmer className="h-16 w-16 rounded-full" />
+          <div className="space-y-2">
+            <Shimmer className="h-7 w-48 rounded-lg" />
+            <Shimmer className="h-4 w-32 rounded-lg" />
+          </div>
+        </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {Array.from({ length: 4 }).map((_, i) => (
-            <Skeleton key={i} className="h-32 w-full rounded-xl" />
+            <Shimmer key={i} className="h-28 w-full rounded-2xl" />
           ))}
+        </div>
+        <div className="mt-8 grid gap-6 lg:grid-cols-2">
+          <Shimmer className="h-64 rounded-2xl" />
+          <Shimmer className="h-64 rounded-2xl" />
         </div>
       </div>
     );
@@ -120,167 +218,303 @@ export function DashboardPage() {
       label: 'Annonces actives',
       value: stats.activeListings,
       icon: Plane,
-      color: 'text-primary-500',
-      bg: 'bg-primary-50',
+      gradient: 'from-primary-500 to-primary-600',
+      lightBg: 'bg-primary-50',
       href: '/annonces',
     },
     {
       label: 'Demandes en cours',
       value: stats.pendingRequests,
       icon: Package,
-      color: 'text-secondary-500',
-      bg: 'bg-secondary-50',
+      gradient: 'from-secondary-500 to-secondary-600',
+      lightBg: 'bg-secondary-50',
       href: '/demandes',
     },
     {
       label: 'Messages',
       value: stats.unreadMessages,
       icon: MessageCircle,
-      color: 'text-info',
-      bg: 'bg-blue-50',
+      gradient: 'from-blue-500 to-blue-600',
+      lightBg: 'bg-blue-50',
       href: '/messages',
     },
     {
       label: 'Gains totaux',
-      value: `${stats.totalEarnings} EUR`,
+      value: stats.totalEarnings,
       icon: TrendingUp,
-      color: 'text-accent-500',
-      bg: 'bg-amber-50',
+      gradient: 'from-accent-500 to-accent-600',
+      lightBg: 'bg-amber-50',
       href: '/transactions',
+      suffix: ' €',
+    },
+  ];
+
+  const quickActions = [
+    {
+      href: '/annonces/new',
+      icon: Plane,
+      iconColor: 'text-primary-500',
+      iconBg: 'bg-primary-50',
+      label: 'Publier une annonce',
+      description: 'Proposez vos kilos disponibles',
+    },
+    {
+      href: '/annonces',
+      icon: Package,
+      iconColor: 'text-secondary-500',
+      iconBg: 'bg-secondary-50',
+      label: 'Envoyer un colis',
+      description: 'Trouvez un voyageur',
+    },
+    {
+      href: '/messages',
+      icon: MessageCircle,
+      iconColor: 'text-blue-500',
+      iconBg: 'bg-blue-50',
+      label: 'Mes messages',
+      description: stats.unreadMessages > 0 ? `${stats.unreadMessages} non lus` : 'Aucun nouveau',
     },
   ];
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-      {/* Welcome */}
-      <div className="mb-8 flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          {profile && (
-            <Avatar
-              src={profile.avatar_url}
-              firstName={profile.first_name}
-              lastName={profile.last_name}
-              size="lg"
-              isVerified={profile.is_verified}
-            />
-          )}
-          <div>
-            <h1 className="text-2xl font-bold text-neutral-900">
-              Bonjour, {profile?.first_name || 'Utilisateur'} !
-            </h1>
-            <p className="text-sm text-neutral-500">Voici un résumé de votre activité</p>
+      {/* Welcome Section */}
+      <FadeIn>
+        <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-4">
+            {profile && (
+              <div className="relative">
+                <Avatar
+                  src={profile.avatar_url}
+                  firstName={profile.first_name}
+                  lastName={profile.last_name}
+                  size="lg"
+                  isVerified={profile.is_verified}
+                />
+                {profile.is_verified && (
+                  <div className="absolute -right-1 -bottom-1 rounded-full bg-white p-0.5 shadow-sm">
+                    <ShieldCheck className="text-success h-4 w-4" />
+                  </div>
+                )}
+              </div>
+            )}
+            <div>
+              <h1 className="text-2xl font-bold text-neutral-900 sm:text-3xl">
+                Bonjour, {profile?.first_name || 'Utilisateur'} !
+              </h1>
+              <p className="mt-1 flex items-center gap-1.5 text-sm text-neutral-500">
+                <Sparkles className="h-4 w-4 text-amber-400" />
+                Voici un résumé de votre activité
+              </p>
+            </div>
           </div>
+          <Link href="/annonces/new" className="shrink-0">
+            <Button size="lg" leftIcon={<Plus className="h-5 w-5" />}>
+              Nouvelle annonce
+            </Button>
+          </Link>
         </div>
-        <Link href="/annonces/new">
-          <Button leftIcon={<Plus className="h-4 w-4" />}>Nouvelle annonce</Button>
-        </Link>
-      </div>
+      </FadeIn>
 
       {/* Stats Grid */}
-      <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <StaggerContainer className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {statCards.map((stat) => {
           const Icon = stat.icon;
           return (
-            <Link key={stat.label} href={stat.href}>
-              <Card className="h-full transition-shadow hover:shadow-md">
-                <CardContent className="flex items-center gap-4 p-5">
-                  <div
-                    className={`flex h-12 w-12 items-center justify-center rounded-xl ${stat.bg}`}
+            <StaggerItem key={stat.label}>
+              <Link href={stat.href}>
+                <HoverScale scale={1.02}>
+                  <Card
+                    variant="elevated"
+                    padding="none"
+                    className="group relative overflow-hidden"
                   >
-                    <Icon className={`h-6 w-6 ${stat.color}`} />
-                  </div>
-                  <div>
-                    <p className="text-2xl font-bold text-neutral-900">{stat.value}</p>
-                    <p className="text-sm text-neutral-500">{stat.label}</p>
-                  </div>
-                </CardContent>
-              </Card>
-            </Link>
+                    <div
+                      className={`absolute inset-0 bg-gradient-to-br ${stat.gradient} opacity-0 transition-opacity duration-300 group-hover:opacity-5`}
+                    />
+                    <CardContent className="flex items-center gap-4 p-5">
+                      <div
+                        className={`flex h-14 w-14 items-center justify-center rounded-2xl ${stat.lightBg} transition-transform duration-300 group-hover:scale-110`}
+                      >
+                        <Icon
+                          className={`h-7 w-7 bg-gradient-to-br ${stat.gradient} bg-clip-text text-transparent`}
+                          style={{
+                            color: `var(--${stat.gradient.split('-')[1]}-500)`,
+                          }}
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-baseline gap-1">
+                          <span className="text-3xl font-bold text-neutral-900">
+                            <AnimatedCounter value={stat.value} />
+                          </span>
+                          {stat.suffix && (
+                            <span className="text-lg font-medium text-neutral-500">
+                              {stat.suffix}
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-sm text-neutral-500">{stat.label}</p>
+                      </div>
+                      <ChevronRight className="h-5 w-5 text-neutral-300 transition-transform duration-200 group-hover:translate-x-1 group-hover:text-neutral-400" />
+                    </CardContent>
+                  </Card>
+                </HoverScale>
+              </Link>
+            </StaggerItem>
           );
         })}
-      </div>
+      </StaggerContainer>
 
-      {/* Quick actions */}
+      {/* Main Content Grid */}
       <div className="grid gap-6 lg:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">Actions rapides</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3 p-6 pt-0">
-            <Link href="/annonces/new" className="block">
-              <div className="flex items-center justify-between rounded-lg border border-neutral-200 p-3 transition-colors hover:bg-neutral-50">
-                <div className="flex items-center gap-3">
-                  <Plane className="text-primary-500 h-5 w-5" />
-                  <span className="text-sm font-medium text-neutral-700">
-                    Publier une nouvelle annonce
-                  </span>
-                </div>
-                <ArrowRight className="h-4 w-4 text-neutral-400" />
-              </div>
-            </Link>
-            <Link href="/annonces" className="block">
-              <div className="flex items-center justify-between rounded-lg border border-neutral-200 p-3 transition-colors hover:bg-neutral-50">
-                <div className="flex items-center gap-3">
-                  <Package className="text-secondary-500 h-5 w-5" />
-                  <span className="text-sm font-medium text-neutral-700">Envoyer un colis</span>
-                </div>
-                <ArrowRight className="h-4 w-4 text-neutral-400" />
-              </div>
-            </Link>
-            <Link href="/messages" className="block">
-              <div className="flex items-center justify-between rounded-lg border border-neutral-200 p-3 transition-colors hover:bg-neutral-50">
-                <div className="flex items-center gap-3">
-                  <MessageCircle className="text-info h-5 w-5" />
-                  <span className="text-sm font-medium text-neutral-700">Mes messages</span>
-                </div>
-                <ArrowRight className="h-4 w-4 text-neutral-400" />
-              </div>
-            </Link>
-          </CardContent>
-        </Card>
+        {/* Quick Actions */}
+        <SlideUp delay={0.2}>
+          <Card variant="elevated" padding="none" className="h-full">
+            <CardHeader className="border-b border-neutral-100 px-6 py-4">
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <Sparkles className="h-5 w-5 text-amber-400" />
+                Actions rapides
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2 p-4">
+              {quickActions.map((action) => {
+                const Icon = action.icon;
+                return (
+                  <Link key={action.href} href={action.href} className="block">
+                    <HoverScale scale={1.01}>
+                      <div className="flex items-center gap-4 rounded-xl border border-neutral-100 bg-white p-4 shadow-sm transition-all hover:border-neutral-200 hover:shadow-md">
+                        <div
+                          className={`flex h-12 w-12 items-center justify-center rounded-xl ${action.iconBg}`}
+                        >
+                          <Icon className={`h-6 w-6 ${action.iconColor}`} />
+                        </div>
+                        <div className="flex-1">
+                          <p className="font-semibold text-neutral-900">{action.label}</p>
+                          <p className="text-sm text-neutral-500">{action.description}</p>
+                        </div>
+                        <ArrowRight className="h-5 w-5 text-neutral-300 transition-transform group-hover:translate-x-1" />
+                      </div>
+                    </HoverScale>
+                  </Link>
+                );
+              })}
+            </CardContent>
+          </Card>
+        </SlideUp>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">Activité récente</CardTitle>
-          </CardHeader>
-          <CardContent className="p-6 pt-0">
-            <div className="flex flex-col items-center justify-center py-8 text-center">
-              <Clock className="h-10 w-10 text-neutral-300" />
-              <p className="mt-3 text-sm text-neutral-500">Aucune activité récente</p>
-              <p className="mt-1 text-xs text-neutral-400">
-                Vos dernières transactions et activités apparaîtront ici
-              </p>
-            </div>
-          </CardContent>
-        </Card>
+        {/* Activity Feed */}
+        <SlideUp delay={0.3}>
+          <Card variant="elevated" padding="none" className="h-full">
+            <CardHeader className="border-b border-neutral-100 px-6 py-4">
+              <div className="flex items-center justify-between">
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <Clock className="h-5 w-5 text-neutral-400" />
+                  Activité récente
+                </CardTitle>
+                <Link
+                  href="/activite"
+                  className="text-primary-500 hover:text-primary-600 text-sm font-medium"
+                >
+                  Tout voir
+                </Link>
+              </div>
+            </CardHeader>
+            <CardContent className="p-4">
+              {activities.length > 0 ? (
+                <div className="space-y-3">
+                  {activities.map((activity, index) => {
+                    const Icon = activityIcons[activity.icon];
+                    return (
+                      <FadeIn key={activity.id} delay={index * 0.1}>
+                        <div className="flex items-start gap-3 rounded-xl p-3 transition-colors hover:bg-neutral-50">
+                          <div
+                            className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${statusColors[activity.status || 'info']}`}
+                          >
+                            <Icon className="h-5 w-5" />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <p className="font-medium text-neutral-900">{activity.title}</p>
+                            <p className="truncate text-sm text-neutral-500">
+                              {activity.description}
+                            </p>
+                          </div>
+                          <span className="shrink-0 text-xs text-neutral-400">
+                            {formatRelativeDate(activity.timestamp)}
+                          </span>
+                        </div>
+                      </FadeIn>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center py-12 text-center">
+                  <div className="flex h-16 w-16 items-center justify-center rounded-full bg-neutral-100">
+                    <Clock className="h-8 w-8 text-neutral-300" />
+                  </div>
+                  <p className="mt-4 font-medium text-neutral-600">Aucune activité récente</p>
+                  <p className="mt-1 text-sm text-neutral-400">
+                    Vos dernières transactions apparaîtront ici
+                  </p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </SlideUp>
       </div>
 
-      {/* Verification banner */}
+      {/* Verification Banner */}
       {profile && !profile.is_verified && (
-        <Card className="mt-6 border-amber-200 bg-amber-50">
-          <CardContent className="flex items-center justify-between p-4">
-            <div className="flex items-center gap-3">
-              <Badge variant="warning" size="md">
-                Non vérifié
-              </Badge>
-              <p className="text-sm text-amber-800">
-                Vérifiez votre identité pour gagner la confiance de la communauté
-              </p>
-            </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() =>
-                toast.info('Vérification à venir', {
-                  description: "La vérification d'identité sera disponible prochainement.",
-                })
-              }
-            >
-              Vérifier
-            </Button>
-          </CardContent>
-        </Card>
+        <FadeIn delay={0.4}>
+          <Card className="mt-6 overflow-hidden border-0 bg-gradient-to-r from-amber-50 to-orange-50">
+            <CardContent className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-start gap-4">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-amber-100">
+                  <AlertCircle className="h-6 w-6 text-amber-600" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-semibold text-neutral-900">Vérifiez votre identité</h3>
+                    <Badge variant="warning" size="sm">
+                      Non vérifié
+                    </Badge>
+                  </div>
+                  <p className="mt-1 text-sm text-neutral-600">
+                    Gagnez la confiance de la communauté et accédez à toutes les fonctionnalités
+                  </p>
+                </div>
+              </div>
+              <Link href="/profil/verification" className="shrink-0">
+                <Button
+                  variant="primary"
+                  size="md"
+                  rightIcon={<CheckCircle2 className="h-4 w-4" />}
+                >
+                  Vérifier maintenant
+                </Button>
+              </Link>
+            </CardContent>
+          </Card>
+        </FadeIn>
       )}
+
+      {/* Trust indicators */}
+      <FadeIn delay={0.5}>
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-6 text-sm text-neutral-400">
+          <div className="flex items-center gap-2">
+            <ShieldCheck className="text-success h-5 w-5" />
+            <span>Paiements sécurisés</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Star className="h-5 w-5 text-amber-400" />
+            <span>Utilisateurs vérifiés</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <MessageCircle className="h-5 w-5 text-blue-400" />
+            <span>Support 24/7</span>
+          </div>
+        </div>
+      </FadeIn>
     </div>
   );
 }
