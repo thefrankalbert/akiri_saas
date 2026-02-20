@@ -4,9 +4,6 @@ export type { ButtonProps } from './Button';
 export { Input } from './Input';
 export type { InputProps } from './Input';
 
-export { Select } from './Select';
-export type { SelectProps } from './Select';
-
 export {
   Card,
   CardHeader,
@@ -14,7 +11,6 @@ export {
   CardDescription,
   CardContent,
   CardFooter,
-  CardGradientHeader,
   StatsCard,
 } from './Card';
 export type { CardProps } from './Card';
