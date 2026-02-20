@@ -166,7 +166,10 @@ export async function capturePayment(requestId: string): Promise<ApiResponse<Tra
 /**
  * Refund a payment
  */
-export async function refundPayment(requestId: string): Promise<ApiResponse<Transaction>> {
+export async function refundPayment(
+  requestId: string,
+  userId: string
+): Promise<ApiResponse<Transaction>> {
   const adminSupabase = await createAdminClient();
 
   // Find the transaction
@@ -179,6 +182,11 @@ export async function refundPayment(requestId: string): Promise<ApiResponse<Tran
 
   if (txError || !transaction) {
     return { data: null, error: 'Transaction introuvable ou non remboursable', status: 404 };
+  }
+
+  // Verify the user is the payer
+  if (transaction.payer_id !== userId) {
+    return { data: null, error: 'Non autorisé à rembourser cette transaction', status: 403 };
   }
 
   try {
