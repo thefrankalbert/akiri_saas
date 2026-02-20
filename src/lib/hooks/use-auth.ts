@@ -14,6 +14,35 @@ interface AuthState {
   profile: Profile | null;
   loading: boolean;
   error: string | null;
+  isDemo: boolean;
+}
+
+// Check for demo session in localStorage
+function getDemoSession(): { user: User | null; profile: Profile | null } {
+  if (typeof window === 'undefined') return { user: null, profile: null };
+
+  const isDemoSession = localStorage.getItem('akiri_demo_session') === 'true';
+  if (!isDemoSession) return { user: null, profile: null };
+
+  try {
+    const userStr = localStorage.getItem('akiri_demo_user');
+    const profileStr = localStorage.getItem('akiri_demo_profile');
+
+    const user = userStr ? JSON.parse(userStr) : null;
+    const profile = profileStr ? JSON.parse(profileStr) : null;
+
+    return { user, profile };
+  } catch {
+    return { user: null, profile: null };
+  }
+}
+
+// Clear demo session
+function clearDemoSession() {
+  if (typeof window === 'undefined') return;
+  localStorage.removeItem('akiri_demo_session');
+  localStorage.removeItem('akiri_demo_user');
+  localStorage.removeItem('akiri_demo_profile');
 }
 
 export function useAuth() {
@@ -22,6 +51,7 @@ export function useAuth() {
     profile: null,
     loading: true,
     error: null,
+    isDemo: false,
   });
 
   const supabase = createClient();
@@ -46,10 +76,25 @@ export function useAuth() {
 
   // Initialize auth state
   useEffect(() => {
-    // Skip when Supabase is not configured (local dev without env vars)
+    // Check for demo session first (works even without Supabase)
+    const demoSession = getDemoSession();
+    if (demoSession.user && demoSession.profile) {
+      queueMicrotask(() => {
+        setState({
+          user: demoSession.user,
+          profile: demoSession.profile,
+          loading: false,
+          error: null,
+          isDemo: true,
+        });
+      });
+      return;
+    }
+
+    // Skip Supabase when not configured (local dev without env vars)
     if (!supabaseConfigured) {
       queueMicrotask(() => {
-        setState({ user: null, profile: null, loading: false, error: null });
+        setState({ user: null, profile: null, loading: false, error: null, isDemo: false });
       });
       return;
     }
@@ -62,9 +107,9 @@ export function useAuth() {
 
         if (user) {
           const profile = await fetchProfile(user.id);
-          setState({ user, profile, loading: false, error: null });
+          setState({ user, profile, loading: false, error: null, isDemo: false });
         } else {
-          setState({ user: null, profile: null, loading: false, error: null });
+          setState({ user: null, profile: null, loading: false, error: null, isDemo: false });
         }
       } catch {
         setState((prev) => ({
@@ -88,6 +133,7 @@ export function useAuth() {
           profile,
           loading: false,
           error: null,
+          isDemo: false,
         });
       } else if (event === 'SIGNED_OUT') {
         setState({
@@ -95,6 +141,7 @@ export function useAuth() {
           profile: null,
           loading: false,
           error: null,
+          isDemo: false,
         });
       }
     });
@@ -163,8 +210,14 @@ export function useAuth() {
 
   // Sign out
   const signOut = useCallback(async () => {
+    // Clear demo session if in demo mode
+    if (state.isDemo) {
+      clearDemoSession();
+      setState({ user: null, profile: null, loading: false, error: null, isDemo: false });
+      return;
+    }
     await supabase.auth.signOut();
-  }, [supabase]);
+  }, [supabase, state.isDemo]);
 
   // Reset password
   const resetPassword = useCallback(
@@ -189,5 +242,6 @@ export function useAuth() {
     signOut,
     resetPassword,
     isAuthenticated: !!state.user,
+    isDemo: state.isDemo,
   };
 }
