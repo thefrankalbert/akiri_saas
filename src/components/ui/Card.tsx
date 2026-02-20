@@ -1,14 +1,16 @@
 import { cn } from '@/lib/utils';
 
 export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
-  variant?: 'default' | 'bordered' | 'elevated';
+  variant?: 'default' | 'bordered' | 'elevated' | 'interactive';
   padding?: 'none' | 'sm' | 'md' | 'lg';
+  hover?: boolean;
 }
 
 const variantStyles: Record<string, string> = {
   default: 'bg-white shadow-card rounded-xl',
   bordered: 'bg-white border border-neutral-200 rounded-xl',
   elevated: 'bg-white shadow-soft rounded-xl',
+  interactive: 'bg-white shadow-card rounded-xl cursor-pointer',
 };
 
 const paddingStyles: Record<string, string> = {
@@ -22,11 +24,22 @@ export function Card({
   className,
   variant = 'default',
   padding = 'md',
+  hover = false,
   children,
   ...props
 }: CardProps) {
   return (
-    <div className={cn(variantStyles[variant], paddingStyles[padding], className)} {...props}>
+    <div
+      className={cn(
+        variantStyles[variant],
+        paddingStyles[padding],
+        hover && 'transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg',
+        variant === 'interactive' &&
+          'transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.99]',
+        className
+      )}
+      {...props}
+    >
       {children}
     </div>
   );
