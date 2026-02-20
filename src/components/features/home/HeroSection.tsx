@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ArrowRight, Shield, Globe, Package, CheckCircle2, Zap, ArrowDown } from 'lucide-react';
-import { Button } from '@/components/ui';
 import { cn } from '@/lib/utils';
 
 export function HeroSection() {
@@ -85,27 +84,22 @@ export function HeroSection() {
         {/* CTA */}
         <div
           className={cn(
-            'mt-10 flex flex-col items-center gap-4 transition-all delay-500 duration-1000 sm:flex-row',
+            'mt-10 flex flex-col items-center gap-4 transition-all delay-150 duration-500 sm:flex-row',
             heroVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
           )}
         >
-          <Link href="/annonces">
-            <Button
-              size="lg"
-              className="animate-glow shadow-primary-500/25 h-14 rounded-xl px-8 text-base font-semibold shadow-lg"
-              rightIcon={<ArrowRight className="h-5 w-5" />}
-            >
-              Trouver un voyageur
-            </Button>
+          <Link
+            href="/annonces"
+            className="bg-primary-500 hover:bg-primary-600 shadow-primary-500/25 inline-flex h-14 items-center gap-2 rounded-xl px-8 text-base font-semibold text-white shadow-lg transition-colors"
+          >
+            Trouver un voyageur
+            <ArrowRight className="h-5 w-5" />
           </Link>
-          <Link href="/register">
-            <Button
-              variant="outline"
-              size="lg"
-              className="h-14 rounded-xl border-white/20 bg-white/5 px-8 text-base font-semibold text-white backdrop-blur-sm hover:bg-white/10"
-            >
-              Je suis voyageur
-            </Button>
+          <Link
+            href="/register"
+            className="inline-flex h-14 items-center rounded-xl border border-white/20 bg-white/5 px-8 text-base font-semibold text-white backdrop-blur-sm transition-colors hover:bg-white/10"
+          >
+            Je suis voyageur
           </Link>
         </div>
 

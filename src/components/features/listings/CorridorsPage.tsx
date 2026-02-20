@@ -431,7 +431,7 @@ export function CorridorsPage() {
                   <CardContent className="p-4 sm:p-5">
                     {/* Route header */}
                     <div className="flex items-center gap-2">
-                      <span className="text-2xl">{corridor.fromCountry.flag}</span>
+                      <span className="shrink-0 text-2xl">{corridor.fromCountry.flag}</span>
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-sm font-semibold text-neutral-900">
                           {corridor.departureCity}
@@ -443,7 +443,7 @@ export function CorridorsPage() {
                           {corridor.arrivalCity}
                         </p>
                       </div>
-                      <span className="text-2xl">{corridor.toCountry.flag}</span>
+                      <span className="shrink-0 text-2xl">{corridor.toCountry.flag}</span>
                     </div>
 
                     {/* Stats row */}
@@ -575,7 +575,7 @@ export function CorridorsPage() {
       </div>
 
       {/* ===== CTA Banner ===== */}
-      <div className="from-primary-500 to-primary-600 rounded-2xl bg-gradient-to-r p-6 text-center text-white sm:p-8">
+      <div className="from-primary-500 to-primary-600 rounded-xl bg-gradient-to-r p-6 text-center text-white sm:p-8">
         <h2 className="text-xl font-bold">Votre corridor n&apos;est pas listé ?</h2>
         <p className="text-primary-100 mt-2">
           Publiez une annonce et ouvrez un nouveau corridor pour la communauté !

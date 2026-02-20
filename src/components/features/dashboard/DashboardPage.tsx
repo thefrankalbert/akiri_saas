@@ -389,9 +389,9 @@ export function DashboardPage() {
                         >
                           <Icon className={`h-6 w-6 ${action.iconColor}`} />
                         </div>
-                        <div className="flex-1">
-                          <p className="font-semibold text-neutral-900">{action.label}</p>
-                          <p className="text-sm text-neutral-500">{action.description}</p>
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate font-semibold text-neutral-900">{action.label}</p>
+                          <p className="truncate text-sm text-neutral-500">{action.description}</p>
                         </div>
                         <ArrowRight className="h-5 w-5 text-neutral-300 transition-transform group-hover:translate-x-1" />
                       </div>

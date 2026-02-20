@@ -28,12 +28,14 @@ export function LiveTicker() {
   return (
     <section className="relative overflow-hidden border-b border-neutral-200 bg-white py-3">
       <div className="flex items-center">
-        <div className="z-10 flex shrink-0 items-center gap-2 bg-white pr-3 pl-4">
+        <div className="z-10 flex shrink-0 items-center gap-1.5 bg-white pr-2 pl-3 sm:gap-2 sm:pr-3 sm:pl-4">
           <span className="relative flex h-2 w-2">
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75" />
             <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500" />
           </span>
-          <span className="text-xs font-bold tracking-wider text-green-600 uppercase">Live</span>
+          <span className="text-[10px] font-bold tracking-wider text-green-600 uppercase sm:text-xs">
+            Live
+          </span>
         </div>
 
         <div className="relative min-w-0 flex-1 overflow-hidden">
