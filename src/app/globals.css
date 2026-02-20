@@ -1,59 +1,59 @@
 @import 'tailwindcss';
 
 @theme {
-  /* Akiri Brand Colors */
-  --color-primary-50: #fff7ed;
-  --color-primary-100: #ffedd5;
-  --color-primary-200: #fed7aa;
-  --color-primary-300: #fdba74;
-  --color-primary-400: #fb923c;
-  --color-primary-500: #f97316;
-  --color-primary-600: #ea580c;
-  --color-primary-700: #c2410c;
-  --color-primary-800: #9a3412;
-  --color-primary-900: #7c2d12;
-  --color-primary-950: #431407;
+  /* Akiri Brand Colors — Afro-contemporain */
+  --color-primary-50: #fff8f1;
+  --color-primary-100: #feecdc;
+  --color-primary-200: #fcd5b8;
+  --color-primary-300: #f9b384;
+  --color-primary-400: #f58a4b;
+  --color-primary-500: #e8680f;
+  --color-primary-600: #c2540a;
+  --color-primary-700: #a14508;
+  --color-primary-800: #7d360a;
+  --color-primary-900: #5e2a0b;
+  --color-primary-950: #331405;
 
-  --color-secondary-50: #f0fdf4;
-  --color-secondary-100: #dcfce7;
-  --color-secondary-200: #bbf7d0;
-  --color-secondary-300: #86efac;
-  --color-secondary-400: #4ade80;
-  --color-secondary-500: #22c55e;
-  --color-secondary-600: #16a34a;
-  --color-secondary-700: #15803d;
-  --color-secondary-800: #166534;
-  --color-secondary-900: #14532d;
-  --color-secondary-950: #052e16;
+  --color-secondary-50: #eef2ff;
+  --color-secondary-100: #e0e7ff;
+  --color-secondary-200: #c7d2fe;
+  --color-secondary-300: #a5b4fc;
+  --color-secondary-400: #818cf8;
+  --color-secondary-500: #6366f1;
+  --color-secondary-600: #4f46e5;
+  --color-secondary-700: #3730a3;
+  --color-secondary-800: #2e2a82;
+  --color-secondary-900: #272368;
+  --color-secondary-950: #1a1650;
 
-  --color-accent-50: #fffbeb;
-  --color-accent-100: #fef3c7;
-  --color-accent-200: #fde68a;
-  --color-accent-300: #fcd34d;
-  --color-accent-400: #fbbf24;
-  --color-accent-500: #f59e0b;
-  --color-accent-600: #d97706;
-  --color-accent-700: #b45309;
-  --color-accent-800: #92400e;
-  --color-accent-900: #78350f;
-  --color-accent-950: #451a03;
+  --color-accent-50: #fefce8;
+  --color-accent-100: #fef9c3;
+  --color-accent-200: #fef08a;
+  --color-accent-300: #fde047;
+  --color-accent-400: #facc15;
+  --color-accent-500: #eab308;
+  --color-accent-600: #ca8a04;
+  --color-accent-700: #a16207;
+  --color-accent-800: #854d0e;
+  --color-accent-900: #713f12;
+  --color-accent-950: #422006;
 
-  --color-neutral-50: #fafafa;
-  --color-neutral-100: #f5f5f5;
-  --color-neutral-200: #e5e5e5;
-  --color-neutral-300: #d4d4d4;
-  --color-neutral-400: #a3a3a3;
-  --color-neutral-500: #737373;
-  --color-neutral-600: #525252;
-  --color-neutral-700: #404040;
-  --color-neutral-800: #262626;
-  --color-neutral-900: #171717;
-  --color-neutral-950: #0a0a0a;
+  --color-neutral-50: #fafaf9;
+  --color-neutral-100: #f5f5f4;
+  --color-neutral-200: #e7e5e4;
+  --color-neutral-300: #d6d3d1;
+  --color-neutral-400: #a8a29e;
+  --color-neutral-500: #78716c;
+  --color-neutral-600: #57534e;
+  --color-neutral-700: #44403c;
+  --color-neutral-800: #292524;
+  --color-neutral-900: #1c1917;
+  --color-neutral-950: #0c0a09;
 
-  --color-success: #22c55e;
-  --color-warning: #f59e0b;
-  --color-error: #ef4444;
-  --color-info: #3b82f6;
+  --color-success: #059669;
+  --color-warning: #ca8a04;
+  --color-error: #dc2626;
+  --color-info: #4f46e5;
 
   /* Font family */
   --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
@@ -66,8 +66,9 @@
   --radius-2xl: 1.5rem;
 
   /* Shadows */
-  --shadow-soft: 0 2px 15px -3px rgb(0 0 0 / 0.07), 0 10px 20px -2px rgb(0 0 0 / 0.04);
-  --shadow-card: 0 0 0 1px rgb(0 0 0 / 0.05), 0 1px 3px 0 rgb(0 0 0 / 0.1);
+  --shadow-soft: 0 4px 24px -4px rgb(0 0 0 / 0.12), 0 12px 28px -6px rgb(0 0 0 / 0.08);
+  --shadow-card: 0 0 0 1px rgb(0 0 0 / 0.06), 0 2px 8px 0 rgb(0 0 0 / 0.12);
+  --shadow-bold: 0 8px 32px -8px rgb(194 84 10 / 0.18), 0 4px 12px -2px rgb(0 0 0 / 0.08);
 }
 
 /* Base styles */
@@ -216,10 +217,10 @@
 @keyframes glow {
   0%,
   100% {
-    box-shadow: 0 0 20px rgba(249, 115, 22, 0.15);
+    box-shadow: 0 0 20px rgba(194, 84, 10, 0.15);
   }
   50% {
-    box-shadow: 0 0 40px rgba(249, 115, 22, 0.3);
+    box-shadow: 0 0 40px rgba(194, 84, 10, 0.3);
   }
 }
 

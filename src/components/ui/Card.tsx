@@ -3,20 +3,21 @@
 import { cn } from '@/lib/utils';
 
 export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
-  variant?: 'default' | 'bordered' | 'elevated' | 'interactive' | 'gradient' | 'glass';
+  variant?: 'default' | 'bordered' | 'elevated' | 'interactive' | 'gradient' | 'glass' | 'tinted';
   padding?: 'none' | 'sm' | 'md' | 'lg';
   hover?: boolean;
   glow?: boolean;
 }
 
 const variantStyles: Record<string, string> = {
-  default: 'bg-white shadow-card rounded-2xl',
-  bordered: 'bg-white border border-neutral-200 rounded-2xl',
-  elevated: 'bg-white shadow-soft rounded-2xl',
-  interactive: 'bg-white shadow-card rounded-2xl cursor-pointer',
+  default: 'bg-white shadow-card rounded-xl',
+  bordered: 'bg-white border border-neutral-200 rounded-xl',
+  elevated: 'bg-white shadow-soft rounded-xl',
+  interactive: 'bg-white shadow-card rounded-xl cursor-pointer',
   gradient:
-    'bg-white rounded-2xl relative before:absolute before:inset-0 before:rounded-2xl before:p-[1px] before:bg-gradient-to-br before:from-primary-200 before:via-transparent before:to-secondary-200 before:-z-10',
+    'bg-white rounded-xl relative before:absolute before:inset-0 before:rounded-xl before:p-[1px] before:bg-gradient-to-br before:from-primary-200 before:via-transparent before:to-secondary-200 before:-z-10',
   glass: 'bg-white/70 backdrop-blur-lg border border-white/20 rounded-2xl shadow-lg',
+  tinted: 'bg-primary-50/40 border border-primary-100 rounded-xl',
 };
 
 const paddingStyles: Record<string, string> = {
@@ -114,6 +115,39 @@ export function CardFooter({
   );
 }
 
+// Gradient Header sub-component
+interface CardGradientHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
+  gradient?: 'terracotta' | 'indigo' | 'gold' | 'emerald' | 'terracotta-indigo';
+}
+
+const gradientStyles: Record<string, string> = {
+  terracotta: 'from-primary-500 to-primary-600',
+  indigo: 'from-secondary-600 to-secondary-700',
+  gold: 'from-accent-500 to-accent-600',
+  emerald: 'from-emerald-500 to-emerald-600',
+  'terracotta-indigo': 'from-primary-500 via-primary-600 to-secondary-700',
+};
+
+export function CardGradientHeader({
+  gradient = 'terracotta',
+  className,
+  children,
+  ...props
+}: CardGradientHeaderProps) {
+  return (
+    <div
+      className={cn(
+        'rounded-t-xl bg-gradient-to-r px-5 py-4 text-white',
+        gradientStyles[gradient],
+        className
+      )}
+      {...props}
+    >
+      {children}
+    </div>
+  );
+}
+
 // Animated Stats Card for dashboard-style displays
 interface StatsCardProps extends React.HTMLAttributes<HTMLDivElement> {
   title: string;
@@ -127,26 +161,37 @@ interface StatsCardProps extends React.HTMLAttributes<HTMLDivElement> {
   variant?: 'default' | 'primary' | 'secondary' | 'accent';
 }
 
-const statsVariantStyles: Record<string, { bg: string; iconBg: string; iconColor: string }> = {
+const statsVariantStyles: Record<
+  string,
+  { bg: string; iconBg: string; iconColor: string; iconShape: string; borderColor: string }
+> = {
   default: {
     bg: 'bg-white',
     iconBg: 'bg-neutral-100',
     iconColor: 'text-neutral-600',
+    iconShape: 'rounded-xl',
+    borderColor: '',
   },
   primary: {
     bg: 'bg-white',
-    iconBg: 'bg-primary-50',
+    iconBg: 'bg-primary-50/30',
     iconColor: 'text-primary-500',
+    iconShape: 'rounded-lg',
+    borderColor: 'border-l-4 border-l-primary-500',
   },
   secondary: {
     bg: 'bg-white',
-    iconBg: 'bg-secondary-50',
+    iconBg: 'bg-secondary-50/30',
     iconColor: 'text-secondary-500',
+    iconShape: 'rounded-2xl',
+    borderColor: 'border-l-4 border-l-secondary-500',
   },
   accent: {
     bg: 'bg-white',
-    iconBg: 'bg-amber-50',
-    iconColor: 'text-amber-500',
+    iconBg: 'bg-accent-50/30',
+    iconColor: 'text-accent-500',
+    iconShape: 'rounded-full',
+    borderColor: 'border-l-4 border-l-accent-500',
   },
 };
 
@@ -167,7 +212,7 @@ export function StatsCard({
       variant="elevated"
       padding="lg"
       hover
-      className={cn('group', styles.bg, className)}
+      className={cn('group', styles.bg, styles.borderColor, className)}
       {...props}
     >
       <div className="flex items-start justify-between">
@@ -190,7 +235,8 @@ export function StatsCard({
         {icon && (
           <div
             className={cn(
-              'flex h-12 w-12 shrink-0 items-center justify-center rounded-xl transition-transform duration-300 group-hover:scale-110',
+              'flex h-12 w-12 shrink-0 items-center justify-center transition-transform duration-300 group-hover:scale-110',
+              styles.iconShape,
               styles.iconBg
             )}
           >

@@ -10,20 +10,29 @@ import {
   Package,
   Star,
   ChevronDown,
+  ChevronUp,
 } from 'lucide-react';
-import { Button } from '@/components/ui';
-import { Input } from '@/components/ui';
-import { Card, CardContent } from '@/components/ui';
-import { Badge } from '@/components/ui';
-import { Avatar } from '@/components/ui';
-import { Skeleton } from '@/components/ui';
+import { Button, Input, Card, CardContent, Badge, Avatar, Skeleton, Select } from '@/components/ui';
+import { StaggerContainer, StaggerItem } from '@/components/ui';
 import { useListings } from '@/lib/hooks';
 import { SUPPORTED_COUNTRIES } from '@/constants';
 import { formatCurrency, formatDate } from '@/lib/utils';
 
+function findCountryFlag(countryName: string): string {
+  const country = SUPPORTED_COUNTRIES.find((c) => c.name === countryName);
+  return country?.flag ?? '';
+}
+
 export function ListingsPage() {
   const [showFilters, setShowFilters] = useState(false);
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const { listings, loading, totalPages, currentPage, updateFilters, goToPage } = useListings();
+
+  const toggleSortOrder = () => {
+    const newOrder = sortOrder === 'desc' ? 'asc' : 'desc';
+    setSortOrder(newOrder);
+    updateFilters({ sort_order: newOrder });
+  };
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
@@ -60,45 +69,31 @@ export function ListingsPage() {
         {showFilters && (
           <Card>
             <CardContent className="grid gap-4 p-4 sm:grid-cols-2 lg:grid-cols-4">
+              <Select
+                label="Pays de d&eacute;part"
+                onChange={(e) => updateFilters({ departure_country: e.target.value || undefined })}
+              >
+                <option value="">Tous</option>
+                {SUPPORTED_COUNTRIES.map((c) => (
+                  <option key={c.code} value={c.code}>
+                    {c.flag} {c.name}
+                  </option>
+                ))}
+              </Select>
+              <Select
+                label="Pays d'arriv&eacute;e"
+                onChange={(e) => updateFilters({ arrival_country: e.target.value || undefined })}
+              >
+                <option value="">Tous</option>
+                {SUPPORTED_COUNTRIES.map((c) => (
+                  <option key={c.code} value={c.code}>
+                    {c.flag} {c.name}
+                  </option>
+                ))}
+              </Select>
               <div>
-                <label className="mb-1.5 block text-sm font-medium text-neutral-700">
-                  Pays de départ
-                </label>
-                <select
-                  className="flex h-10 w-full rounded-lg border border-neutral-300 bg-white px-3 text-sm"
-                  onChange={(e) =>
-                    updateFilters({ departure_country: e.target.value || undefined })
-                  }
-                >
-                  <option value="">Tous</option>
-                  {SUPPORTED_COUNTRIES.map((c) => (
-                    <option key={c.code} value={c.code}>
-                      {c.flag} {c.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="mb-1.5 block text-sm font-medium text-neutral-700">
-                  Pays d&apos;arriv&eacute;e
-                </label>
-                <select
-                  className="flex h-10 w-full rounded-lg border border-neutral-300 bg-white px-3 text-sm"
-                  onChange={(e) => updateFilters({ arrival_country: e.target.value || undefined })}
-                >
-                  <option value="">Tous</option>
-                  {SUPPORTED_COUNTRIES.map((c) => (
-                    <option key={c.code} value={c.code}>
-                      {c.flag} {c.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="mb-1.5 block text-sm font-medium text-neutral-700">
-                  Poids minimum (kg)
-                </label>
                 <Input
+                  label="Poids minimum (kg)"
                   type="number"
                   placeholder="0"
                   onChange={(e) =>
@@ -107,10 +102,8 @@ export function ListingsPage() {
                 />
               </div>
               <div>
-                <label className="mb-1.5 block text-sm font-medium text-neutral-700">
-                  Prix max (/kg)
-                </label>
                 <Input
+                  label="Prix max (/kg)"
                   type="number"
                   placeholder="50"
                   onChange={(e) =>
@@ -128,32 +121,33 @@ export function ListingsPage() {
       {/* Sort */}
       <div className="mb-4 flex items-center justify-between">
         <p className="text-sm text-neutral-500">
-          {loading ? 'Chargement...' : `${listings.length} annonce(s) trouvée(s)`}
+          {loading ? 'Chargement...' : `${listings.length} annonce(s) trouv\u00e9e(s)`}
         </p>
         <div className="flex items-center gap-2">
           <span className="text-sm text-neutral-500">Trier par</span>
-          <select
-            className="rounded-lg border border-neutral-300 px-2 py-1 text-sm"
+          <Select
+            className="w-auto"
             onChange={(e) =>
               updateFilters({
                 sort_by: e.target.value as 'departure_date' | 'price_per_kg',
               })
             }
           >
-            <option value="departure_date">Date de départ</option>
+            <option value="departure_date">Date de d&eacute;part</option>
             <option value="price_per_kg">Prix/kg</option>
             <option value="available_kg">Kilos disponibles</option>
-            <option value="created_at">Plus récent</option>
-          </select>
+            <option value="created_at">Plus r&eacute;cent</option>
+          </Select>
           <button
-            className="text-neutral-400 hover:text-neutral-600"
-            onClick={() =>
-              updateFilters({
-                sort_order: 'desc',
-              })
-            }
+            className="rounded-md p-1 text-neutral-400 transition-colors hover:bg-neutral-100 hover:text-neutral-600"
+            onClick={toggleSortOrder}
+            aria-label={sortOrder === 'desc' ? 'Tri d\u00e9croissant' : 'Tri croissant'}
           >
-            <ChevronDown className="h-4 w-4" />
+            {sortOrder === 'desc' ? (
+              <ChevronDown className="h-4 w-4" />
+            ) : (
+              <ChevronUp className="h-4 w-4" />
+            )}
           </button>
         </div>
       </div>
@@ -171,83 +165,97 @@ export function ListingsPage() {
             <Package className="mx-auto h-12 w-12 text-neutral-300" />
             <h3 className="mt-4 text-lg font-semibold text-neutral-700">Aucune annonce</h3>
             <p className="mt-2 text-sm text-neutral-500">
-              Aucune annonce ne correspond à vos critères de recherche.
+              Aucune annonce ne correspond &agrave; vos crit&egrave;res de recherche.
             </p>
           </CardContent>
         </Card>
       ) : (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <StaggerContainer className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {listings.map((listing) => (
-            <Link key={listing.id} href={`/annonces/${listing.id}`}>
-              <Card className="h-full transition-shadow hover:shadow-md">
-                <CardContent className="p-5">
-                  {/* Route */}
-                  <div className="flex items-center gap-2 text-sm">
-                    <MapPin className="text-primary-500 h-4 w-4" />
-                    <span className="font-medium text-neutral-900">{listing.departure_city}</span>
-                    <span className="text-neutral-400">&rarr;</span>
-                    <span className="font-medium text-neutral-900">{listing.arrival_city}</span>
-                  </div>
-
-                  {/* Date */}
-                  <div className="mt-2 flex items-center gap-2 text-sm text-neutral-500">
-                    <Calendar className="h-4 w-4" />
-                    {formatDate(listing.departure_date)}
-                  </div>
-
-                  {/* Details */}
-                  <div className="mt-4 flex items-center gap-4">
-                    <Badge variant="default">{listing.available_kg} kg disponibles</Badge>
-                    <span className="text-primary-600 text-lg font-bold">
-                      {formatCurrency(listing.price_per_kg)}/kg
-                    </span>
-                  </div>
-
-                  {/* Categories */}
-                  {listing.accepted_items.length > 0 && (
-                    <div className="mt-3 flex flex-wrap gap-1">
-                      {listing.accepted_items.slice(0, 3).map((item) => (
-                        <Badge key={item} variant="outline" size="sm">
-                          {item}
-                        </Badge>
-                      ))}
-                      {listing.accepted_items.length > 3 && (
-                        <Badge variant="outline" size="sm">
-                          +{listing.accepted_items.length - 3}
-                        </Badge>
-                      )}
+            <StaggerItem key={listing.id}>
+              <Link href={`/annonces/${listing.id}`}>
+                <Card
+                  className="group h-full overflow-hidden transition-shadow hover:shadow-md"
+                  padding="none"
+                >
+                  {/* Gradient bar */}
+                  <div className="from-primary-400 to-secondary-500 h-[3px] bg-gradient-to-r" />
+                  <CardContent className="p-5">
+                    {/* Route */}
+                    <div className="flex items-center gap-2 text-sm">
+                      <MapPin className="text-primary-500 h-4 w-4" />
+                      <span className="font-medium text-neutral-900">
+                        {findCountryFlag(listing.departure_country)} {listing.departure_city}
+                      </span>
+                      <span className="text-neutral-400">&rarr;</span>
+                      <span className="font-medium text-neutral-900">
+                        {findCountryFlag(listing.arrival_country)} {listing.arrival_city}
+                      </span>
                     </div>
-                  )}
 
-                  {/* Traveler */}
-                  {listing.traveler && (
-                    <div className="mt-4 flex items-center gap-2 border-t border-neutral-100 pt-3">
-                      <Avatar
-                        src={listing.traveler.avatar_url}
-                        firstName={listing.traveler.first_name}
-                        lastName={listing.traveler.last_name}
-                        size="sm"
-                      />
-                      <div className="flex-1">
-                        <p className="text-sm font-medium text-neutral-700">
-                          {listing.traveler.first_name} {listing.traveler.last_name.charAt(0)}.
-                        </p>
+                    {/* Date */}
+                    <div className="mt-2 flex items-center gap-2 text-sm text-neutral-500">
+                      <Calendar className="h-4 w-4" />
+                      {formatDate(listing.departure_date)}
+                    </div>
+
+                    {/* Details */}
+                    <div className="mt-4 flex items-center gap-3">
+                      <Badge variant="primary">{listing.available_kg} kg</Badge>
+                      {listing.accepted_items.length > 0 && (
+                        <Badge variant="accent">{listing.accepted_items.length} cat.</Badge>
+                      )}
+                      <span className="text-primary-600 ml-auto text-lg font-bold">
+                        {formatCurrency(listing.price_per_kg)}/kg
+                      </span>
+                    </div>
+
+                    {/* Categories */}
+                    {listing.accepted_items.length > 0 && (
+                      <div className="mt-3 flex flex-wrap gap-1">
+                        {listing.accepted_items.slice(0, 3).map((item) => (
+                          <Badge key={item} variant="outline" size="sm">
+                            {item}
+                          </Badge>
+                        ))}
+                        {listing.accepted_items.length > 3 && (
+                          <Badge variant="outline" size="sm">
+                            +{listing.accepted_items.length - 3}
+                          </Badge>
+                        )}
                       </div>
-                      {listing.traveler.rating > 0 && (
-                        <div className="flex items-center gap-1">
-                          <Star className="fill-accent-500 text-accent-500 h-3.5 w-3.5" />
-                          <span className="text-sm font-medium text-neutral-700">
-                            {listing.traveler.rating.toFixed(1)}
-                          </span>
+                    )}
+
+                    {/* Traveler */}
+                    {listing.traveler && (
+                      <div className="mt-4 flex items-center gap-2 border-t border-neutral-100 pt-3">
+                        <Avatar
+                          src={listing.traveler.avatar_url}
+                          firstName={listing.traveler.first_name}
+                          lastName={listing.traveler.last_name}
+                          size="sm"
+                        />
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-neutral-700">
+                            {listing.traveler.first_name} {listing.traveler.last_name.charAt(0)}.
+                          </p>
                         </div>
-                      )}
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </Link>
+                        {listing.traveler.rating > 0 && (
+                          <div className="flex items-center gap-1">
+                            <Star className="fill-accent-500 text-accent-500 h-3.5 w-3.5" />
+                            <span className="text-sm font-medium text-neutral-700">
+                              {listing.traveler.rating.toFixed(1)}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </Link>
+            </StaggerItem>
           ))}
-        </div>
+        </StaggerContainer>
       )}
 
       {/* Pagination */}
@@ -259,7 +267,7 @@ export function ListingsPage() {
             disabled={currentPage <= 1}
             onClick={() => goToPage(currentPage - 1)}
           >
-            Précédent
+            Pr&eacute;c&eacute;dent
           </Button>
           <span className="flex items-center px-3 text-sm text-neutral-500">
             Page {currentPage} / {totalPages}

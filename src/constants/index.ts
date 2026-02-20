@@ -64,15 +64,28 @@ export const REQUEST_STATUS_LABELS: Record<string, string> = {
   cancelled: 'Annul\u00e9e',
 };
 
-// Request status colors
+// Request status colors (semantic tokens)
 export const REQUEST_STATUS_COLORS: Record<string, string> = {
-  pending: 'bg-yellow-100 text-yellow-800',
-  accepted: 'bg-blue-100 text-blue-800',
-  paid: 'bg-green-100 text-green-800',
-  collected: 'bg-purple-100 text-purple-800',
-  in_transit: 'bg-indigo-100 text-indigo-800',
-  delivered: 'bg-teal-100 text-teal-800',
-  confirmed: 'bg-green-100 text-green-800',
+  pending: 'bg-accent-100 text-accent-800',
+  accepted: 'bg-secondary-100 text-secondary-800',
+  paid: 'bg-success/15 text-emerald-800',
+  collected: 'bg-secondary-100 text-secondary-800',
+  in_transit: 'bg-secondary-100 text-secondary-800',
+  delivered: 'bg-success/15 text-emerald-800',
+  confirmed: 'bg-success/15 text-emerald-800',
   disputed: 'bg-red-100 text-red-800',
-  cancelled: 'bg-gray-100 text-gray-800',
+  cancelled: 'bg-neutral-100 text-neutral-700',
+};
+
+// Request status → Badge variant mapping
+export const REQUEST_STATUS_BADGE_VARIANT: Record<string, string> = {
+  pending: 'warning',
+  accepted: 'info',
+  paid: 'success',
+  collected: 'info',
+  in_transit: 'info',
+  delivered: 'success',
+  confirmed: 'success',
+  disputed: 'error',
+  cancelled: 'default',
 };

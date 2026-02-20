@@ -37,7 +37,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
               'transition-colors duration-150',
               'focus:border-primary-500 focus:ring-primary-500/20 focus:ring-2 focus:outline-none',
               'disabled:cursor-not-allowed disabled:bg-neutral-50 disabled:opacity-50',
-              error ? 'border-error focus:border-error focus:ring-error/20' : 'border-neutral-300',
+              error ? 'border-error focus:border-error focus:ring-error/20' : 'border-neutral-200',
               leftIcon && 'pl-10',
               rightIcon && 'pr-10',
               className

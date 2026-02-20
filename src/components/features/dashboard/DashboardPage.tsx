@@ -104,9 +104,9 @@ const activityIcons = {
 };
 
 const statusColors = {
-  success: 'bg-success/10 text-success',
-  pending: 'bg-amber-100 text-amber-600',
-  info: 'bg-blue-100 text-blue-600',
+  success: 'bg-success/15 text-emerald-700',
+  pending: 'bg-accent-100 text-accent-700',
+  info: 'bg-secondary-100 text-secondary-700',
 };
 
 export function DashboardPage() {
@@ -219,7 +219,9 @@ export function DashboardPage() {
       value: stats.activeListings,
       icon: Plane,
       gradient: 'from-primary-500 to-primary-600',
-      lightBg: 'bg-primary-50',
+      lightBg: 'bg-primary-100',
+      borderColor: 'border-l-4 border-l-primary-500',
+      iconShape: 'rounded-xl',
       href: '/annonces',
     },
     {
@@ -227,15 +229,19 @@ export function DashboardPage() {
       value: stats.pendingRequests,
       icon: Package,
       gradient: 'from-secondary-500 to-secondary-600',
-      lightBg: 'bg-secondary-50',
+      lightBg: 'bg-secondary-100',
+      borderColor: 'border-l-4 border-l-secondary-500',
+      iconShape: 'rounded-2xl',
       href: '/demandes',
     },
     {
       label: 'Messages',
       value: stats.unreadMessages,
       icon: MessageCircle,
-      gradient: 'from-blue-500 to-blue-600',
-      lightBg: 'bg-blue-50',
+      gradient: 'from-secondary-500 to-secondary-600',
+      lightBg: 'bg-secondary-100',
+      borderColor: 'border-l-4 border-l-secondary-400',
+      iconShape: 'rounded-full',
       href: '/messages',
     },
     {
@@ -243,9 +249,11 @@ export function DashboardPage() {
       value: stats.totalEarnings,
       icon: TrendingUp,
       gradient: 'from-accent-500 to-accent-600',
-      lightBg: 'bg-amber-50',
+      lightBg: 'bg-accent-100',
+      borderColor: 'border-l-4 border-l-accent-500',
+      iconShape: 'rounded-lg',
       href: '/transactions',
-      suffix: ' €',
+      suffix: ' \u20AC',
     },
   ];
 
@@ -327,14 +335,14 @@ export function DashboardPage() {
                   <Card
                     variant="elevated"
                     padding="none"
-                    className="group relative overflow-hidden"
+                    className={`group relative overflow-hidden ${stat.borderColor}`}
                   >
                     <div
-                      className={`absolute inset-0 bg-gradient-to-br ${stat.gradient} opacity-0 transition-opacity duration-300 group-hover:opacity-5`}
+                      className={`absolute inset-0 bg-gradient-to-br ${stat.gradient} opacity-0 transition-opacity duration-300 group-hover:opacity-10`}
                     />
                     <CardContent className="flex items-center gap-4 p-5">
                       <div
-                        className={`flex h-14 w-14 items-center justify-center rounded-2xl ${stat.lightBg} transition-transform duration-300 group-hover:scale-110`}
+                        className={`flex h-14 w-14 items-center justify-center ${stat.iconShape} ${stat.lightBg} transition-transform duration-300 group-hover:scale-110`}
                       >
                         <Icon
                           className={`h-7 w-7 bg-gradient-to-br ${stat.gradient} bg-clip-text text-transparent`}
@@ -383,7 +391,7 @@ export function DashboardPage() {
                 return (
                   <Link key={action.href} href={action.href} className="block">
                     <HoverScale scale={1.01}>
-                      <div className="flex items-center gap-4 rounded-xl border border-neutral-100 bg-white p-4 shadow-sm transition-all hover:border-neutral-200 hover:shadow-md">
+                      <div className="hover:bg-primary-50/40 flex items-center gap-4 rounded-xl bg-neutral-50/50 p-4 transition-all">
                         <div
                           className={`flex h-12 w-12 items-center justify-center rounded-xl ${action.iconBg}`}
                         >
@@ -466,7 +474,7 @@ export function DashboardPage() {
       {/* Verification Banner */}
       {profile && !profile.is_verified && (
         <FadeIn delay={0.4}>
-          <Card className="mt-6 overflow-hidden border-0 bg-gradient-to-r from-amber-50 to-orange-50">
+          <Card className="from-accent-50 to-primary-50 mt-6 overflow-hidden border-0 bg-gradient-to-r">
             <CardContent className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex items-start gap-4">
                 <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-amber-100">
