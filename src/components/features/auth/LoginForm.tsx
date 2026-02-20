@@ -73,23 +73,31 @@ export function LoginForm() {
       return;
     }
 
-    const supabase = createClient();
-    const { error } = await supabase.auth.signInWithPassword({
-      email: data.email,
-      password: data.password,
-    });
+    try {
+      const supabase = createClient();
+      const { error } = await supabase.auth.signInWithPassword({
+        email: data.email,
+        password: data.password,
+      });
 
-    if (error) {
+      if (error) {
+        setServerError(
+          error.message === 'Invalid login credentials'
+            ? 'Email ou mot de passe incorrect'
+            : error.message
+        );
+        return;
+      }
+
+      router.push(redirectTo);
+      router.refresh();
+    } catch (err) {
+      // Network error or Supabase not configured properly
+      console.error('Login error:', err);
       setServerError(
-        error.message === 'Invalid login credentials'
-          ? 'Email ou mot de passe incorrect'
-          : error.message
+        'Impossible de se connecter au serveur. Vérifiez votre connexion ou utilisez le mode démo.'
       );
-      return;
     }
-
-    router.push(redirectTo);
-    router.refresh();
   };
 
   return (
@@ -107,16 +115,26 @@ export function LoginForm() {
               <div className="flex-1">
                 <p className="font-medium text-amber-800">Mode Démonstration</p>
                 <p className="mt-1 text-sm text-amber-700">
-                  Supabase n&apos;est pas configuré. Utilisez les identifiants de démo pour tester
+                  Supabase n&apos;est pas configuré. Utilisez le mode démo pour tester
                   l&apos;application.
                 </p>
-                <button
-                  type="button"
-                  onClick={fillDemoCredentials}
-                  className="mt-2 text-sm font-medium text-amber-800 underline hover:text-amber-900"
-                >
-                  Remplir avec les identifiants de démo →
-                </button>
+                <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+                  <Button
+                    type="button"
+                    onClick={handleDemoLogin}
+                    className="bg-amber-600 hover:bg-amber-700"
+                    size="sm"
+                  >
+                    Connexion Démo Rapide
+                  </Button>
+                  <button
+                    type="button"
+                    onClick={fillDemoCredentials}
+                    className="text-sm font-medium text-amber-800 underline hover:text-amber-900"
+                  >
+                    ou remplir le formulaire
+                  </button>
+                </div>
               </div>
             </div>
           </div>
