@@ -1,0 +1,59 @@
+'use client';
+
+import { useMemo } from 'react';
+import { Badge } from '@/components/ui';
+import { mockListings } from '@/lib/mock-data';
+
+interface LiveFeedItem {
+  travelerName: string;
+  departure: string;
+  arrival: string;
+  kg: number;
+  price: number;
+}
+
+export function LiveTicker() {
+  const liveFeedItems: LiveFeedItem[] = useMemo(() => {
+    return mockListings.slice(0, 10).map((listing) => ({
+      travelerName: listing.traveler
+        ? `${listing.traveler.first_name} ${listing.traveler.last_name?.charAt(0)}.`
+        : 'Voyageur',
+      departure: listing.departure_city,
+      arrival: listing.arrival_city,
+      kg: listing.available_kg,
+      price: listing.price_per_kg,
+    }));
+  }, []);
+
+  return (
+    <section className="relative overflow-hidden border-b border-neutral-200 bg-white py-3">
+      <div className="flex items-center">
+        <div className="z-10 flex shrink-0 items-center gap-2 bg-white pr-3 pl-4">
+          <span className="relative flex h-2 w-2">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75" />
+            <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500" />
+          </span>
+          <span className="text-xs font-bold tracking-wider text-green-600 uppercase">Live</span>
+        </div>
+
+        <div className="relative min-w-0 flex-1 overflow-hidden">
+          <div className="animate-marquee flex gap-8 whitespace-nowrap">
+            {[...liveFeedItems, ...liveFeedItems].map((item, i) => (
+              <span key={i} className="inline-flex items-center gap-2 text-sm text-neutral-600">
+                <span className="font-semibold text-neutral-900">{item.travelerName}</span>
+                <span className="text-primary-500">→</span>
+                <span>
+                  {item.departure} → {item.arrival}
+                </span>
+                <Badge variant="outline" size="sm">
+                  {item.kg}kg
+                </Badge>
+                <span className="text-primary-600 font-medium">{item.price}€/kg</span>
+              </span>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}

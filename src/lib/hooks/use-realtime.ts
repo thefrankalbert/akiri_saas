@@ -45,8 +45,12 @@ export function useRealtime({
 
     const channelName = `${schema}:${table}${filter ? `:${filter}` : ''}`;
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const channelConfig: any = {
+    const channelConfig: {
+      event: RealtimeEvent;
+      schema: string;
+      table: string;
+      filter?: string;
+    } = {
       event,
       schema,
       table,

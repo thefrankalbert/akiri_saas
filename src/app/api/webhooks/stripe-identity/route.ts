@@ -47,7 +47,7 @@ export async function POST(request: Request) {
       }
 
       default:
-        console.log(`Unhandled Stripe Identity event: ${event.type}`);
+      // Unhandled event type — no action needed
     }
   } catch (err) {
     console.error('Stripe Identity webhook processing error:', err);

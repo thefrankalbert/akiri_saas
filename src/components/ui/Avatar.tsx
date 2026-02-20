@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import { cn, getInitials } from '@/lib/utils';
 
 export interface AvatarProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -31,11 +32,15 @@ export function Avatar({
   return (
     <div className={cn('relative inline-flex shrink-0', className)} {...props}>
       {src ? (
-        <img
-          src={src}
-          alt={alt || `${firstName} ${lastName}`}
-          className={cn('rounded-full object-cover', sizeStyles[size])}
-        />
+        <div className={cn('relative overflow-hidden rounded-full', sizeStyles[size])}>
+          <Image
+            src={src}
+            alt={alt || `${firstName} ${lastName}`}
+            fill
+            sizes="64px"
+            className="object-cover"
+          />
+        </div>
       ) : (
         <div
           className={cn(

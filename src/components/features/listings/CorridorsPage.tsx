@@ -96,7 +96,7 @@ const ACTIVITY_CONFIG: Record<
 export function CorridorsPage() {
   // --- State ---
   const [visibleEvents, setVisibleEvents] = useState<MockActivityEvent[]>([]);
-  const [currentEventIndex, setCurrentEventIndex] = useState(0);
+  const [, setCurrentEventIndex] = useState(0);
   const [displayedStats, setDisplayedStats] = useState({
     listings: 0,
     kg: 0,

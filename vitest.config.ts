@@ -10,7 +10,13 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       reporter: ['text', 'text-summary'],
-      include: ['src/lib/utils/index.ts', 'src/lib/validations/index.ts', 'src/constants/index.ts'],
+      include: [
+        'src/lib/utils/index.ts',
+        'src/lib/validations/index.ts',
+        'src/constants/index.ts',
+        'src/lib/services/transactions.ts',
+        'src/lib/services/verification.ts',
+      ],
     },
   },
   resolve: {

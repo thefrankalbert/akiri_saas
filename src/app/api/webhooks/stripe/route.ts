@@ -142,8 +142,7 @@ export async function POST(request: Request) {
       }
 
       default:
-        // Unhandled event type — log for debugging
-        console.log(`Unhandled Stripe event: ${event.type}`);
+      // Unhandled event type — no action needed
     }
   } catch (err) {
     console.error('Stripe webhook processing error:', err);

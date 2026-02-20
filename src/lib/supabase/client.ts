@@ -20,8 +20,7 @@ export const supabaseConfigured =
   supabaseKey !== 'your_supabase_anon_key';
 
 // Module-level singleton — same reference across renders, safe for useEffect deps
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-let cachedClient: any = null;
+let cachedClient: ReturnType<typeof createBrowserClient> | null = null;
 
 export function createClient() {
   if (cachedClient) return cachedClient;

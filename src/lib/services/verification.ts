@@ -29,13 +29,14 @@ export async function sendPhoneOtp(
   const otpCode = generateOtpCode();
   const expiresAt = new Date(Date.now() + OTP_EXPIRATION_MINUTES * 60 * 1000).toISOString();
 
-  // In mock mode, log the OTP to console
+  // In mock mode, log the OTP only in development
   if (KYC_MODE === 'mock') {
-    console.log(`[MOCK OTP] Phone: ${phone}, Code: ${otpCode}`);
+    if (process.env.NODE_ENV === 'development') {
+      console.info(`[MOCK OTP] Phone: ${phone}, Code: ${otpCode}`);
+    }
   } else {
     // In production, send via Twilio or other SMS provider
     // TODO: Implement Twilio SMS sending
-    console.log(`[SMS] Would send OTP ${otpCode} to ${phone}`);
   }
 
   // Store the OTP session in the database
