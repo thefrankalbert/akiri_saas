@@ -15,7 +15,7 @@ interface ListingGridProps {
 export function ListingGrid({ listings, loading }: ListingGridProps) {
   if (loading) {
     return (
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
         {Array.from({ length: 8 }).map((_, i) => (
           <Skeleton key={i} className="h-36 w-full rounded-2xl" />
         ))}
@@ -36,7 +36,7 @@ export function ListingGrid({ listings, loading }: ListingGridProps) {
   }
 
   return (
-    <StaggerContainer className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
+    <StaggerContainer className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
       {listings.map((listing) => (
         <StaggerItem key={listing.id}>
           <Link href={`/annonces/${listing.id}`}>

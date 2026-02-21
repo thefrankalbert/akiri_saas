@@ -9,7 +9,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
       <Sidebar />
       <Header />
       <main className="min-w-0 flex-1 overflow-x-hidden pb-24 md:pb-0 md:pl-16 lg:pl-60">
-        {children}
+        <div className="mx-auto max-w-[1800px]">{children}</div>
       </main>
       <BottomNav />
       <ServiceWorkerRegistration />
