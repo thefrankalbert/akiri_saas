@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod/v4';
-import { Mail, ArrowLeft, CheckCircle } from 'lucide-react';
+import { Envelope, ArrowLeft, CheckCircle } from '@phosphor-icons/react';
 import { Button } from '@/components/ui';
 import { Input } from '@/components/ui';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui';
@@ -50,7 +50,7 @@ export function ResetPassword() {
       <Card className="border-neutral-200/60">
         <CardHeader className="text-center">
           <div className="bg-secondary-100 mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full">
-            <CheckCircle className="text-secondary-500 h-8 w-8" />
+            <CheckCircle className="text-secondary-500" size={32} />
           </div>
           <CardTitle className="text-2xl">Email envoyé !</CardTitle>
           <CardDescription>
@@ -60,11 +60,7 @@ export function ResetPassword() {
         </CardHeader>
         <CardContent>
           <Link href="/login">
-            <Button
-              variant="outline"
-              className="w-full"
-              leftIcon={<ArrowLeft className="h-4 w-4" />}
-            >
+            <Button variant="outline" className="w-full" leftIcon={<ArrowLeft size={16} />}>
               Retour à la connexion
             </Button>
           </Link>
@@ -92,7 +88,7 @@ export function ResetPassword() {
             label="Email"
             type="email"
             placeholder="vous@exemple.com"
-            leftIcon={<Mail className="h-4 w-4" />}
+            leftIcon={<Envelope size={16} />}
             error={errors.email?.message}
             autoComplete="email"
             {...register('email')}
@@ -107,7 +103,7 @@ export function ResetPassword() {
               href="/login"
               className="text-primary-600 hover:text-primary-500 inline-flex items-center gap-1 text-sm font-medium"
             >
-              <ArrowLeft className="h-4 w-4" />
+              <ArrowLeft size={16} />
               Retour à la connexion
             </Link>
           </div>

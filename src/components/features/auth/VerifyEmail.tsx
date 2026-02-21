@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { Mail, ArrowLeft, RefreshCw } from 'lucide-react';
+import { Envelope, ArrowLeft, ArrowsClockwise } from '@phosphor-icons/react';
 import { Button } from '@/components/ui';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui';
 import { createClient } from '@/lib/supabase/client';
@@ -55,7 +55,7 @@ export function VerifyEmail() {
     <Card className="border-neutral-200/60">
       <CardHeader className="text-center">
         <div className="bg-primary-100 mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full">
-          <Mail className="text-primary-500 h-8 w-8" />
+          <Envelope className="text-primary-500" size={32} />
         </div>
         <CardTitle className="text-2xl">Vérifiez votre email</CardTitle>
         <CardDescription>
@@ -77,7 +77,7 @@ export function VerifyEmail() {
           className="w-full"
           onClick={handleResend}
           isLoading={resending}
-          leftIcon={<RefreshCw className="h-4 w-4" />}
+          leftIcon={<ArrowsClockwise size={16} />}
         >
           Renvoyer l&apos;email
         </Button>
@@ -93,7 +93,7 @@ export function VerifyEmail() {
             href="/login"
             className="text-primary-600 hover:text-primary-500 inline-flex items-center gap-1 text-sm font-medium"
           >
-            <ArrowLeft className="h-4 w-4" />
+            <ArrowLeft size={16} />
             Retour à la connexion
           </Link>
         </div>

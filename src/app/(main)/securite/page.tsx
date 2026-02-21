@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Shield, Lock, CreditCard, Eye, UserCheck, AlertTriangle } from 'lucide-react';
+import { ShieldCheck, Lock, CreditCard, Eye, UserCheck, Warning } from '@phosphor-icons/react/ssr';
 import { Card, CardContent } from '@/components/ui';
 
 export const metadata: Metadata = {
@@ -37,14 +37,14 @@ const securityFeatures = [
     color: 'text-accent-600 bg-accent-100',
   },
   {
-    icon: AlertTriangle,
+    icon: Warning,
     title: 'Système de litiges',
     description:
       "En cas de problème, notre système de litiges permet de bloquer le paiement et d'arbitrer la situation. L'argent reste protégé en escrow.",
     color: 'text-red-600 bg-red-100',
   },
   {
-    icon: Shield,
+    icon: ShieldCheck,
     title: 'Code de confirmation',
     description:
       "La livraison est validée par un code unique à 6 chiffres. Seul l'expéditeur connaît ce code. Sans ce code, le paiement ne peut pas être libéré.",
@@ -71,7 +71,7 @@ export default function Securite() {
                 <div
                   className={`inline-flex h-10 w-10 items-center justify-center rounded-xl ${feature.color}`}
                 >
-                  <Icon className="h-5 w-5" />
+                  <Icon size={20} />
                 </div>
                 <h3 className="mt-3 text-base font-semibold text-neutral-900">{feature.title}</h3>
                 <p className="mt-1.5 text-sm leading-relaxed text-neutral-600">

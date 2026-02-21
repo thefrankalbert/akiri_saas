@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, Mail, Phone, ShieldCheck, Lock, Info } from 'lucide-react';
+import { ArrowLeft, Envelope, Phone, ShieldCheck, Lock, Info } from '@phosphor-icons/react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, Badge } from '@/components/ui';
 import { useAuth } from '@/lib/hooks';
 import { cn } from '@/lib/utils';
@@ -40,7 +40,7 @@ function VerificationLevelCard({
       {isLocked && (
         <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/50 backdrop-blur-sm">
           <div className="flex items-center gap-2 rounded-full bg-neutral-100 px-4 py-2 text-sm text-neutral-600">
-            <Lock className="h-4 w-4" />
+            <Lock size={16} />
             <span>Complétez le niveau précédent</span>
           </div>
         </div>
@@ -54,7 +54,7 @@ function VerificationLevelCard({
                 isComplete ? 'bg-green-100' : 'bg-neutral-100'
               )}
             >
-              <Icon className={cn('h-5 w-5', isComplete ? 'text-green-600' : 'text-neutral-500')} />
+              <Icon size={20} className={cn(isComplete ? 'text-green-600' : 'text-neutral-500')} />
             </div>
             <div>
               <CardTitle className="flex items-center gap-2">
@@ -121,7 +121,7 @@ export function VerificationPage() {
             href="/dashboard"
             className="mb-4 inline-flex items-center gap-1 text-sm text-neutral-600 hover:text-neutral-900"
           >
-            <ArrowLeft className="h-4 w-4" />
+            <ArrowLeft size={16} />
             Retour au tableau de bord
           </Link>
           <h1 className="text-2xl font-bold text-neutral-900">Vérification du compte</h1>
@@ -152,12 +152,12 @@ export function VerificationPage() {
             level={1}
             title="Email vérifié"
             description="Votre adresse email a été vérifiée lors de votre inscription."
-            icon={Mail}
+            icon={Envelope}
             isComplete={true}
             isLocked={false}
           >
             <div className="flex items-center gap-2 rounded-lg bg-green-100 px-3 py-2 text-sm text-green-700">
-              <Mail className="h-4 w-4" />
+              <Envelope size={16} />
               <span>{profile?.user_id ? 'Email vérifié' : 'Vérifié automatiquement'}</span>
             </div>
           </VerificationLevelCard>
@@ -194,7 +194,7 @@ export function VerificationPage() {
         {/* Info Card */}
         <Card className="mt-6 border-blue-200 bg-blue-50">
           <CardContent className="flex gap-3">
-            <Info className="h-5 w-5 shrink-0 text-blue-600" />
+            <Info size={20} className="shrink-0 text-blue-600" />
             <div className="text-sm text-blue-800">
               <p className="mb-2 font-medium">Pourquoi se faire vérifier ?</p>
               <ul className="list-inside list-disc space-y-1 text-blue-700">

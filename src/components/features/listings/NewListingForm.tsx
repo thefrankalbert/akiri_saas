@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Plane, MapPin, Calendar, Package, Plus, X } from 'lucide-react';
+import { AirplaneTilt, MapPin, CalendarBlank, Package, Plus, X } from '@phosphor-icons/react';
 import { Button } from '@/components/ui';
 import { Input } from '@/components/ui';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui';
@@ -94,7 +94,7 @@ export function NewListingForm() {
         <CardHeader>
           <div className="flex items-center gap-3">
             <div className="bg-primary-100 flex h-10 w-10 items-center justify-center rounded-xl">
-              <Plane className="text-primary-600 h-5 w-5" />
+              <AirplaneTilt className="text-primary-600" size={20} />
             </div>
             <div>
               <CardTitle className="text-xl">Publier une annonce</CardTitle>
@@ -115,7 +115,7 @@ export function NewListingForm() {
             {/* Route */}
             <div>
               <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold text-neutral-800">
-                <MapPin className="h-4 w-4" />
+                <MapPin size={16} />
                 Itinéraire
               </h3>
               <div className="grid gap-3 sm:grid-cols-2">
@@ -175,7 +175,7 @@ export function NewListingForm() {
             {/* Dates */}
             <div>
               <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold text-neutral-800">
-                <Calendar className="h-4 w-4" />
+                <CalendarBlank size={16} />
                 Dates
               </h3>
               <div className="grid gap-3 sm:grid-cols-2">
@@ -197,7 +197,7 @@ export function NewListingForm() {
             {/* Weight & Price */}
             <div>
               <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold text-neutral-800">
-                <Package className="h-4 w-4" />
+                <Package size={16} />
                 Kilos et prix
               </h3>
               <div className="grid gap-3 sm:grid-cols-2">
@@ -264,7 +264,7 @@ export function NewListingForm() {
                         onClick={() => removeCollectionPoint(i)}
                         className="rounded-lg p-2 text-neutral-400 hover:bg-neutral-100 hover:text-neutral-600"
                       >
-                        <X className="h-4 w-4" />
+                        <X size={16} />
                       </button>
                     )}
                   </div>
@@ -275,7 +275,7 @@ export function NewListingForm() {
                 onClick={addCollectionPoint}
                 className="text-primary-600 hover:text-primary-500 mt-2 inline-flex items-center gap-1 text-sm font-medium"
               >
-                <Plus className="h-4 w-4" />
+                <Plus size={16} />
                 Ajouter un point
               </button>
               {errors.collection_points && (

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Download, X } from 'lucide-react';
+import { DownloadSimple, X } from '@phosphor-icons/react';
 import { Button } from '@/components/ui';
 
 interface BeforeInstallPromptEvent extends Event {
@@ -59,7 +59,7 @@ export function InstallPrompt() {
       <div className="rounded-2xl border border-gray-200 bg-white p-4">
         <div className="flex items-start gap-3">
           <div className="bg-primary/10 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl">
-            <Download className="text-primary h-5 w-5" />
+            <DownloadSimple className="text-primary" size={20} />
           </div>
           <div className="flex-1">
             <h3 className="font-semibold text-gray-900">Installer Akiri</h3>
@@ -80,7 +80,7 @@ export function InstallPrompt() {
             onClick={handleDismiss}
             className="shrink-0 rounded-lg p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
           >
-            <X className="h-4 w-4" />
+            <X size={16} />
           </button>
         </div>
       </div>

@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
-import { X } from 'lucide-react';
+import { X } from '@phosphor-icons/react';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -94,7 +94,7 @@ const SheetContent = React.forwardRef<
           {children}
           {showClose && (
             <SheetClose className="absolute top-4 right-4 rounded-lg p-1.5 text-neutral-400 opacity-70 transition-all hover:bg-neutral-100 hover:text-neutral-600 hover:opacity-100 focus:ring-2 focus:ring-neutral-300 focus:ring-offset-2 focus:outline-none disabled:pointer-events-none">
-              <X className="h-5 w-5" />
+              <X size={20} />
               <span className="sr-only">Fermer</span>
             </SheetClose>
           )}

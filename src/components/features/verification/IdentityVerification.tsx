@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { ShieldCheck, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
+import { ShieldCheck, CheckCircle, WarningCircle, SpinnerGap } from '@phosphor-icons/react';
 import { Button, Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui';
 import { cn } from '@/lib/utils';
 
@@ -60,7 +60,7 @@ export function IdentityVerification({
       <Card className={cn('border-green-200 bg-green-50', className)}>
         <CardContent className="flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-100">
-            <CheckCircle2 className="h-5 w-5 text-green-600" />
+            <CheckCircle className="text-green-600" size={20} />
           </div>
           <div>
             <p className="font-medium text-green-800">Identité vérifiée</p>
@@ -77,7 +77,7 @@ export function IdentityVerification({
       <Card className={cn('border-amber-200 bg-amber-50', className)}>
         <CardContent className="flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-amber-100">
-            <Loader2 className="h-5 w-5 animate-spin text-amber-600" />
+            <SpinnerGap className="animate-spin text-amber-600" size={20} />
           </div>
           <div>
             <p className="font-medium text-amber-800">Vérification en cours</p>
@@ -97,7 +97,7 @@ export function IdentityVerification({
         <CardHeader>
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-100">
-              <AlertCircle className="h-5 w-5 text-red-600" />
+              <WarningCircle className="text-red-600" size={20} />
             </div>
             <div>
               <CardTitle className="text-red-800">Vérification échouée</CardTitle>
@@ -125,7 +125,7 @@ export function IdentityVerification({
       <CardHeader>
         <div className="flex items-center gap-3">
           <div className="bg-primary-100 flex h-10 w-10 items-center justify-center rounded-full">
-            <ShieldCheck className="text-primary-600 h-5 w-5" />
+            <ShieldCheck className="text-primary-600" size={20} />
           </div>
           <div>
             <CardTitle>Vérifier votre identité</CardTitle>

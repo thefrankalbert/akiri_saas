@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Mail, MessageCircle, MapPin } from 'lucide-react';
+import { Envelope, ChatCircle, MapPin } from '@phosphor-icons/react/ssr';
 import { Card, CardContent } from '@/components/ui';
 
 export const metadata: Metadata = {
@@ -18,21 +18,21 @@ export default function Contact() {
       <div className="grid gap-4 sm:grid-cols-3">
         <Card>
           <CardContent className="p-6 text-center">
-            <Mail className="text-primary-500 mx-auto h-8 w-8" />
+            <Envelope className="text-primary-500 mx-auto" size={32} />
             <h3 className="mt-3 text-sm font-semibold text-neutral-900">Email</h3>
             <p className="mt-1 text-sm text-neutral-500">support@akiri.app</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-6 text-center">
-            <MessageCircle className="text-secondary-500 mx-auto h-8 w-8" />
+            <ChatCircle className="text-secondary-500 mx-auto" size={32} />
             <h3 className="mt-3 text-sm font-semibold text-neutral-900">Chat</h3>
             <p className="mt-1 text-sm text-neutral-500">Lun-Ven, 9h-18h</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-6 text-center">
-            <MapPin className="text-accent-500 mx-auto h-8 w-8" />
+            <MapPin className="text-accent-500 mx-auto" size={32} />
             <h3 className="mt-3 text-sm font-semibold text-neutral-900">Adresse</h3>
             <p className="mt-1 text-sm text-neutral-500">Paris, France</p>
           </CardContent>

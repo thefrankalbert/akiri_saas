@@ -2,7 +2,15 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Plane, Package, MessageCircle, TrendingUp, Star, Clock, ArrowLeft } from 'lucide-react';
+import {
+  AirplaneTilt,
+  Package,
+  ChatCircle,
+  TrendUp,
+  Star,
+  Clock,
+  ArrowLeft,
+} from '@phosphor-icons/react';
 import {
   Card,
   CardContent,
@@ -119,10 +127,10 @@ const mockActivities: ActivityItem[] = [
 ];
 
 const activityIcons = {
-  plane: Plane,
+  plane: AirplaneTilt,
   package: Package,
-  message: MessageCircle,
-  payment: TrendingUp,
+  message: ChatCircle,
+  payment: TrendUp,
   star: Star,
 };
 
@@ -158,7 +166,7 @@ export function ActivityFeedPage() {
             href="/dashboard"
             className="mb-4 inline-flex items-center gap-1.5 text-sm font-medium text-neutral-500 transition-colors hover:text-neutral-900"
           >
-            <ArrowLeft className="h-4 w-4" />
+            <ArrowLeft size={16} />
             Retour au tableau de bord
           </Link>
           <h1 className="text-2xl font-bold text-neutral-900 sm:text-3xl">Activité</h1>
@@ -192,7 +200,7 @@ export function ActivityFeedPage() {
         <Card variant="elevated" padding="none">
           <CardHeader className="border-b border-neutral-100 px-6 py-4">
             <CardTitle className="flex items-center gap-2 text-lg">
-              <Clock className="h-5 w-5 text-neutral-400" />
+              <Clock className="text-neutral-400" size={20} />
               Historique
             </CardTitle>
           </CardHeader>
@@ -207,7 +215,7 @@ export function ActivityFeedPage() {
                         <div
                           className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${statusColors[activity.status || 'info']}`}
                         >
-                          <Icon className="h-5 w-5" />
+                          <Icon size={20} />
                         </div>
                         <div className="min-w-0 flex-1">
                           <p className="font-medium text-neutral-900">{activity.title}</p>
@@ -226,7 +234,7 @@ export function ActivityFeedPage() {
             ) : (
               <div className="flex flex-col items-center justify-center py-12 text-center">
                 <div className="flex h-16 w-16 items-center justify-center rounded-full bg-neutral-100">
-                  <Clock className="h-8 w-8 text-neutral-300" />
+                  <Clock className="text-neutral-300" size={32} />
                 </div>
                 <p className="mt-4 font-medium text-neutral-600">Aucune activité</p>
                 <p className="mt-1 text-sm text-neutral-400">

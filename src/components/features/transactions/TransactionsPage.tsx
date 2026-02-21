@@ -1,6 +1,12 @@
 'use client';
 
-import { ArrowUpRight, ArrowDownLeft, Clock, CheckCircle2, Shield } from 'lucide-react';
+import {
+  ArrowUpRight,
+  ArrowDownLeft,
+  Clock,
+  CheckCircle,
+  ShieldCheck,
+} from '@phosphor-icons/react';
 import { Card, CardContent } from '@/components/ui';
 import { Badge } from '@/components/ui';
 import { formatCurrency, formatDate } from '@/lib/utils';
@@ -11,8 +17,8 @@ const statusConfig: Record<
   { label: string; variant: 'success' | 'warning' | 'info' | 'default'; icon: typeof Clock }
 > = {
   pending: { label: 'En attente', variant: 'warning', icon: Clock },
-  held: { label: 'En escrow', variant: 'info', icon: Shield },
-  released: { label: 'Payé', variant: 'success', icon: CheckCircle2 },
+  held: { label: 'En escrow', variant: 'info', icon: ShieldCheck },
+  released: { label: 'Payé', variant: 'success', icon: CheckCircle },
   refunded: { label: 'Remboursé', variant: 'default', icon: ArrowDownLeft },
   disputed: { label: 'Litige', variant: 'warning', icon: Clock },
 };
@@ -83,9 +89,9 @@ export function TransactionsPage() {
                   }`}
                 >
                   {txn.status === 'released' ? (
-                    <ArrowDownLeft className="h-5 w-5 text-green-600" />
+                    <ArrowDownLeft className="text-green-600" size={20} />
                   ) : (
-                    <ArrowUpRight className="h-5 w-5 text-blue-600" />
+                    <ArrowUpRight className="text-blue-600" size={20} />
                   )}
                 </div>
 
@@ -109,7 +115,7 @@ export function TransactionsPage() {
                 <div className="shrink-0 text-right">
                   <p className="text-sm font-bold text-neutral-900">{formatCurrency(txn.amount)}</p>
                   <Badge variant={config.variant} size="sm">
-                    <StatusIcon className="mr-1 h-3 w-3" />
+                    <StatusIcon className="mr-1" size={12} />
                     {config.label}
                   </Badge>
                 </div>

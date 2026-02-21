@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Mail, Lock, Eye, EyeOff, AlertTriangle } from 'lucide-react';
+import { Envelope, Lock, Eye, EyeSlash, Warning } from '@phosphor-icons/react';
 import { Button } from '@/components/ui';
 import { Input } from '@/components/ui';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui';
@@ -111,7 +111,7 @@ export function LoginForm() {
         {!supabaseConfigured && (
           <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 p-4">
             <div className="flex items-start gap-3">
-              <AlertTriangle className="h-5 w-5 shrink-0 text-amber-600" />
+              <Warning size={20} className="shrink-0 text-amber-600" />
               <div className="flex-1">
                 <p className="font-medium text-amber-800">Mode Démonstration</p>
                 <p className="mt-1 text-sm text-amber-700">
@@ -149,7 +149,7 @@ export function LoginForm() {
             label="Email"
             type="email"
             placeholder="vous@exemple.com"
-            leftIcon={<Mail className="h-4 w-4" />}
+            leftIcon={<Envelope size={16} />}
             error={errors.email?.message}
             autoComplete="email"
             {...register('email')}
@@ -160,7 +160,7 @@ export function LoginForm() {
               label="Mot de passe"
               type={showPassword ? 'text' : 'password'}
               placeholder="Votre mot de passe"
-              leftIcon={<Lock className="h-4 w-4" />}
+              leftIcon={<Lock size={16} />}
               rightIcon={
                 <button
                   type="button"
@@ -168,7 +168,7 @@ export function LoginForm() {
                   className="text-neutral-400 hover:text-neutral-600"
                   tabIndex={-1}
                 >
-                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  {showPassword ? <EyeSlash size={16} /> : <Eye size={16} />}
                 </button>
               }
               error={errors.password?.message}

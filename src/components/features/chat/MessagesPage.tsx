@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { MessageCircle, Search, Send } from 'lucide-react';
+import { ChatCircle, MagnifyingGlass, PaperPlaneRight } from '@phosphor-icons/react';
 import { Card, CardContent } from '@/components/ui';
 import { Input } from '@/components/ui';
 import { Avatar } from '@/components/ui';
@@ -70,7 +70,7 @@ export function MessagesPage() {
         <div className="lg:col-span-1">
           <Input
             placeholder="Rechercher..."
-            leftIcon={<Search className="h-4 w-4" />}
+            leftIcon={<MagnifyingGlass size={16} />}
             className="mb-4"
           />
 
@@ -197,7 +197,7 @@ export function MessagesPage() {
                         }
                       }}
                     >
-                      <Send className="h-4 w-4" />
+                      <PaperPlaneRight size={16} />
                     </button>
                   </div>
                 </div>
@@ -205,7 +205,7 @@ export function MessagesPage() {
             ) : (
               <CardContent className="flex h-full items-center justify-center">
                 <div className="text-center">
-                  <MessageCircle className="mx-auto h-16 w-16 text-neutral-200" />
+                  <ChatCircle className="mx-auto text-neutral-200" size={64} />
                   <h3 className="mt-4 font-semibold text-neutral-700">
                     Sélectionnez une conversation
                   </h3>

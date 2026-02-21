@@ -2,7 +2,14 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Star, Shield, Calendar, ArrowLeft, Package, Plane } from 'lucide-react';
+import {
+  Star,
+  ShieldCheck,
+  CalendarBlank,
+  ArrowLeft,
+  Package,
+  AirplaneTilt,
+} from '@phosphor-icons/react';
 import { Card, CardContent } from '@/components/ui';
 import { Button } from '@/components/ui';
 import { Badge } from '@/components/ui';
@@ -83,7 +90,7 @@ export function ProfilePage({ userId }: ProfilePageProps) {
       <div className="mx-auto max-w-3xl px-4 py-16 text-center sm:px-6 lg:px-8">
         <h2 className="text-xl font-semibold text-neutral-700">Profil introuvable</h2>
         <Link href="/annonces" className="mt-4 inline-block">
-          <Button variant="outline" leftIcon={<ArrowLeft className="h-4 w-4" />}>
+          <Button variant="outline" leftIcon={<ArrowLeft size={16} />}>
             Retour aux annonces
           </Button>
         </Link>
@@ -97,7 +104,7 @@ export function ProfilePage({ userId }: ProfilePageProps) {
         href="/annonces"
         className="mb-6 inline-flex items-center gap-1 text-sm font-medium text-neutral-500 hover:text-neutral-700"
       >
-        <ArrowLeft className="h-4 w-4" />
+        <ArrowLeft size={16} />
         Retour
       </Link>
 
@@ -119,20 +126,20 @@ export function ProfilePage({ userId }: ProfilePageProps) {
               <div className="mt-1 flex flex-wrap items-center gap-2">
                 {profile.rating > 0 && (
                   <div className="flex items-center gap-1">
-                    <Star className="fill-accent-500 text-accent-500 h-4 w-4" />
+                    <Star className="fill-accent-500 text-accent-500" size={16} />
                     <span className="text-sm font-medium">{profile.rating.toFixed(1)}</span>
                     <span className="text-xs text-neutral-400">({profile.total_reviews} avis)</span>
                   </div>
                 )}
                 {profile.is_verified && (
                   <Badge variant="success" size="sm">
-                    <Shield className="mr-1 h-3 w-3" />
+                    <ShieldCheck className="mr-1" size={12} />
                     Vérifié
                   </Badge>
                 )}
               </div>
               <p className="mt-1 text-xs text-neutral-400">
-                <Calendar className="mr-1 inline h-3 w-3" />
+                <CalendarBlank className="mr-1 inline" size={12} />
                 Membre depuis {formatDate(profile.created_at)}
               </p>
             </div>
@@ -145,17 +152,17 @@ export function ProfilePage({ userId }: ProfilePageProps) {
           {/* Stats */}
           <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3">
             <div className="rounded-lg bg-neutral-50 p-3 text-center">
-              <Plane className="text-primary-500 mx-auto h-5 w-5" />
+              <AirplaneTilt className="text-primary-500 mx-auto" size={20} />
               <p className="mt-1 text-lg font-bold text-neutral-900">{profile.total_trips}</p>
               <p className="text-xs text-neutral-500">Trajets</p>
             </div>
             <div className="rounded-lg bg-neutral-50 p-3 text-center">
-              <Package className="text-secondary-500 mx-auto h-5 w-5" />
+              <Package className="text-secondary-500 mx-auto" size={20} />
               <p className="mt-1 text-lg font-bold text-neutral-900">{profile.total_shipments}</p>
               <p className="text-xs text-neutral-500">Envois</p>
             </div>
             <div className="rounded-lg bg-neutral-50 p-3 text-center">
-              <Star className="text-accent-500 mx-auto h-5 w-5" />
+              <Star className="text-accent-500 mx-auto" size={20} />
               <p className="mt-1 text-lg font-bold text-neutral-900">{profile.total_reviews}</p>
               <p className="text-xs text-neutral-500">Avis</p>
             </div>
@@ -169,7 +176,7 @@ export function ProfilePage({ userId }: ProfilePageProps) {
         {reviews.length === 0 ? (
           <Card>
             <CardContent className="py-8 text-center">
-              <Star className="mx-auto h-10 w-10 text-neutral-300" />
+              <Star className="mx-auto text-neutral-300" size={40} />
               <p className="mt-3 text-sm text-neutral-500">Aucun avis pour le moment</p>
             </CardContent>
           </Card>
@@ -198,11 +205,12 @@ export function ProfilePage({ userId }: ProfilePageProps) {
                           {Array.from({ length: 5 }).map((_, i) => (
                             <Star
                               key={i}
-                              className={`h-3.5 w-3.5 ${
+                              size={14}
+                              className={
                                 i < review.rating
                                   ? 'fill-accent-500 text-accent-500'
                                   : 'text-neutral-200'
-                              }`}
+                              }
                             />
                           ))}
                         </div>

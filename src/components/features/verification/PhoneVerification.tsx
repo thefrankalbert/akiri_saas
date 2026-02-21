@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Phone, CheckCircle2, ArrowLeft, Loader2 } from 'lucide-react';
+import { Phone, CheckCircle, ArrowLeft, SpinnerGap } from '@phosphor-icons/react';
 import {
   Button,
   Input,
@@ -134,7 +134,7 @@ export function PhoneVerification({
       <Card className={cn('border-green-200 bg-green-50', className)}>
         <CardContent className="flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-100">
-            <CheckCircle2 className="h-5 w-5 text-green-600" />
+            <CheckCircle className="text-green-600" size={20} />
           </div>
           <div>
             <p className="font-medium text-green-800">Téléphone vérifié</p>
@@ -155,7 +155,7 @@ export function PhoneVerification({
               onClick={handleGoBack}
               className="rounded-lg p-1 text-neutral-500 hover:bg-neutral-100"
             >
-              <ArrowLeft className="h-5 w-5" />
+              <ArrowLeft size={20} />
             </button>
           )}
           <div>
@@ -183,7 +183,7 @@ export function PhoneVerification({
               label="Numéro de téléphone"
               type="tel"
               placeholder="+33 6 12 34 56 78"
-              leftIcon={<Phone className="h-4 w-4" />}
+              leftIcon={<Phone size={16} />}
               error={phoneForm.formState.errors.phone?.message}
               hint="Format international avec indicatif pays"
               {...phoneForm.register('phone')}
@@ -230,7 +230,7 @@ export function PhoneVerification({
             >
               {phoneForm.formState.isSubmitting ? (
                 <span className="inline-flex items-center gap-1">
-                  <Loader2 className="h-3 w-3 animate-spin" />
+                  <SpinnerGap className="animate-spin" size={12} />
                   Envoi en cours...
                 </span>
               ) : (

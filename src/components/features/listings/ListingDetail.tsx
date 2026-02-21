@@ -4,15 +4,15 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import {
   MapPin,
-  Calendar,
+  CalendarBlank,
   Package,
   Star,
-  Shield,
-  MessageCircle,
+  ShieldCheck,
+  ChatCircle,
   ArrowLeft,
   Clock,
   CheckCircle,
-} from 'lucide-react';
+} from '@phosphor-icons/react';
 import { Button } from '@/components/ui';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui';
 import { Badge } from '@/components/ui';
@@ -87,12 +87,12 @@ export function ListingDetail({ listingId }: ListingDetailProps) {
   if (error || !listing) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-16 text-center sm:px-6 lg:px-8">
-        <Package className="mx-auto h-16 w-16 text-neutral-300" />
+        <Package className="mx-auto text-neutral-300" size={64} />
         <h2 className="mt-4 text-xl font-semibold text-neutral-700">
           {error || 'Annonce introuvable'}
         </h2>
         <Link href="/annonces" className="mt-4 inline-block">
-          <Button variant="outline" leftIcon={<ArrowLeft className="h-4 w-4" />}>
+          <Button variant="outline" leftIcon={<ArrowLeft size={16} />}>
             Retour aux annonces
           </Button>
         </Link>
@@ -109,7 +109,7 @@ export function ListingDetail({ listingId }: ListingDetailProps) {
         href="/annonces"
         className="mb-6 inline-flex items-center gap-1 text-sm font-medium text-neutral-500 hover:text-neutral-700"
       >
-        <ArrowLeft className="h-4 w-4" />
+        <ArrowLeft size={16} />
         Retour aux annonces
       </Link>
 
@@ -120,7 +120,7 @@ export function ListingDetail({ listingId }: ListingDetailProps) {
             <CardContent className="p-6">
               {/* Route */}
               <div className="flex items-center gap-3">
-                <MapPin className="text-primary-500 h-5 w-5" />
+                <MapPin className="text-primary-500" size={20} />
                 <div>
                   <h1 className="truncate text-xl font-bold text-neutral-900">
                     {listing.departure_city}, {listing.departure_country}
@@ -135,7 +135,7 @@ export function ListingDetail({ listingId }: ListingDetailProps) {
               {/* Date & Status */}
               <div className="mt-4 flex flex-wrap gap-3">
                 <Badge variant="info" size="md">
-                  <Calendar className="mr-1 h-3.5 w-3.5" />
+                  <CalendarBlank className="mr-1" size={14} />
                   {formatDate(listing.departure_date)}
                 </Badge>
                 <Badge variant={listing.status === 'active' ? 'success' : 'default'} size="md">
@@ -146,7 +146,7 @@ export function ListingDetail({ listingId }: ListingDetailProps) {
               {/* Key info */}
               <div className="mt-6 grid grid-cols-2 gap-4">
                 <div className="rounded-lg bg-neutral-50 p-4 text-center">
-                  <Package className="text-primary-500 mx-auto h-6 w-6" />
+                  <Package className="text-primary-500 mx-auto" size={24} />
                   <p className="mt-2 text-2xl font-bold text-neutral-900">
                     {listing.available_kg} kg
                   </p>
@@ -177,7 +177,7 @@ export function ListingDetail({ listingId }: ListingDetailProps) {
                   <div className="mt-2 flex flex-wrap gap-2">
                     {listing.accepted_items.map((item) => (
                       <Badge key={item} variant="outline">
-                        <CheckCircle className="text-secondary-500 mr-1 h-3 w-3" />
+                        <CheckCircle className="text-secondary-500 mr-1" size={12} />
                         {item}
                       </Badge>
                     ))}
@@ -192,7 +192,7 @@ export function ListingDetail({ listingId }: ListingDetailProps) {
                   <ul className="mt-2 space-y-1">
                     {listing.collection_points.map((point, i) => (
                       <li key={i} className="flex items-center gap-2 text-sm text-neutral-600">
-                        <MapPin className="h-3.5 w-3.5 text-neutral-400" />
+                        <MapPin className="text-neutral-400" size={14} />
                         {point}
                       </li>
                     ))}
@@ -203,7 +203,7 @@ export function ListingDetail({ listingId }: ListingDetailProps) {
               {/* Published date */}
               <div className="mt-6 border-t border-neutral-100 pt-4">
                 <p className="flex items-center gap-1 text-xs text-neutral-400">
-                  <Clock className="h-3.5 w-3.5" />
+                  <Clock size={14} />
                   Publiée {formatRelativeDate(listing.created_at)}
                 </p>
               </div>
@@ -245,11 +245,7 @@ export function ListingDetail({ listingId }: ListingDetailProps) {
                   </Button>
                 </SendRequestModal>
                 <Link href="/messages" className="block">
-                  <Button
-                    variant="outline"
-                    className="w-full"
-                    leftIcon={<MessageCircle className="h-4 w-4" />}
-                  >
+                  <Button variant="outline" className="w-full" leftIcon={<ChatCircle size={16} />}>
                     Contacter le voyageur
                   </Button>
                 </Link>
@@ -275,7 +271,7 @@ export function ListingDetail({ listingId }: ListingDetailProps) {
                     </p>
                     {listing.traveler.rating > 0 && (
                       <div className="flex items-center gap-1">
-                        <Star className="fill-accent-500 text-accent-500 h-4 w-4" />
+                        <Star className="fill-accent-500 text-accent-500" size={16} />
                         <span className="text-sm font-medium">
                           {listing.traveler.rating.toFixed(1)}
                         </span>
@@ -309,11 +305,11 @@ export function ListingDetail({ listingId }: ListingDetailProps) {
           <Card>
             <CardContent className="space-y-2 p-4">
               <div className="flex items-center gap-2 text-sm text-neutral-600">
-                <Shield className="text-secondary-500 h-4 w-4" />
+                <ShieldCheck className="text-secondary-500" size={16} />
                 Paiement sécurisé par Stripe
               </div>
               <div className="flex items-center gap-2 text-sm text-neutral-600">
-                <Shield className="text-secondary-500 h-4 w-4" />
+                <ShieldCheck className="text-secondary-500" size={16} />
                 Argent bloqué jusqu&apos;à la livraison
               </div>
             </CardContent>

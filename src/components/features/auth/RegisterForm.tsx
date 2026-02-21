@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Mail, Lock, Eye, EyeOff, User } from 'lucide-react';
+import { Envelope, Lock, Eye, EyeSlash, User } from '@phosphor-icons/react';
 import { Button } from '@/components/ui';
 import { Input } from '@/components/ui';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui';
@@ -78,7 +78,7 @@ export function RegisterForm() {
             <Input
               label="Prénom"
               placeholder="Jean"
-              leftIcon={<User className="h-4 w-4" />}
+              leftIcon={<User size={16} />}
               error={errors.first_name?.message}
               autoComplete="given-name"
               {...registerField('first_name')}
@@ -96,7 +96,7 @@ export function RegisterForm() {
             label="Email"
             type="email"
             placeholder="vous@exemple.com"
-            leftIcon={<Mail className="h-4 w-4" />}
+            leftIcon={<Envelope size={16} />}
             error={errors.email?.message}
             autoComplete="email"
             {...registerField('email')}
@@ -106,7 +106,7 @@ export function RegisterForm() {
             label="Mot de passe"
             type={showPassword ? 'text' : 'password'}
             placeholder="Min. 8 caractères"
-            leftIcon={<Lock className="h-4 w-4" />}
+            leftIcon={<Lock size={16} />}
             rightIcon={
               <button
                 type="button"
@@ -114,7 +114,7 @@ export function RegisterForm() {
                 className="text-neutral-400 hover:text-neutral-600"
                 tabIndex={-1}
               >
-                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                {showPassword ? <EyeSlash size={16} /> : <Eye size={16} />}
               </button>
             }
             error={errors.password?.message}
@@ -127,7 +127,7 @@ export function RegisterForm() {
             label="Confirmer le mot de passe"
             type={showPassword ? 'text' : 'password'}
             placeholder="Retapez votre mot de passe"
-            leftIcon={<Lock className="h-4 w-4" />}
+            leftIcon={<Lock size={16} />}
             error={errors.confirm_password?.message}
             autoComplete="new-password"
             {...registerField('confirm_password')}

@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
-import { X } from 'lucide-react';
+import { X } from '@phosphor-icons/react';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -66,7 +66,7 @@ const ModalContent = React.forwardRef<
       {children}
       {showCloseButton && (
         <DialogPrimitive.Close className="focus:ring-primary-500 absolute top-4 right-4 rounded-lg p-1 text-neutral-400 transition-colors hover:bg-neutral-100 hover:text-neutral-600 focus:ring-2 focus:ring-offset-2 focus:outline-none">
-          <X className="h-5 w-5" />
+          <X size={20} />
           <span className="sr-only">Fermer</span>
         </DialogPrimitive.Close>
       )}
@@ -143,7 +143,7 @@ const AnimatedModalContent = React.forwardRef<
             {children}
             {showCloseButton && (
               <DialogPrimitive.Close className="focus:ring-primary-500 absolute top-4 right-4 rounded-lg p-1 text-neutral-400 transition-colors hover:bg-neutral-100 hover:text-neutral-600 focus:ring-2 focus:ring-offset-2 focus:outline-none">
-                <X className="h-5 w-5" />
+                <X size={20} />
                 <span className="sr-only">Fermer</span>
               </DialogPrimitive.Close>
             )}
