@@ -91,7 +91,7 @@ export function DemandesPage() {
       <div className="mx-auto max-w-5xl px-4 py-6">
         <Shimmer className="mb-6 h-8 w-48" />
         <Shimmer className="mb-4 h-10 w-full" />
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3">
           {Array.from({ length: 4 }).map((_, i) => (
             <Shimmer key={i} className="h-48 w-full rounded-2xl" />
           ))}
@@ -109,7 +109,7 @@ export function DemandesPage() {
       <FadeIn key={activeTab}>
         <div className="mt-6">
           {displayedRequests.length > 0 ? (
-            <StaggerContainer className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            <StaggerContainer className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3">
               {displayedRequests.map((request) => (
                 <StaggerItem key={request.id}>
                   <RequestCard request={request} role={currentRole} />

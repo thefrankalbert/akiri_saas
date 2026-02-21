@@ -67,9 +67,9 @@ export function MessagesPage() {
       <h1 className="mb-6 text-2xl font-bold text-neutral-100">Messages</h1>
 
       <FadeIn>
-        <div className="grid gap-6 lg:grid-cols-3">
+        <div className="grid gap-6 md:grid-cols-3">
           {/* Conversations list */}
-          <div className="lg:col-span-1">
+          <div className="md:col-span-1">
             <Input
               placeholder="Rechercher..."
               leftIcon={<MagnifyingGlass size={16} />}
@@ -122,7 +122,7 @@ export function MessagesPage() {
           </div>
 
           {/* Chat area */}
-          <div className="lg:col-span-2">
+          <div className="md:col-span-2">
             <Card className="flex h-[calc(100vh-16rem)] min-h-[400px] flex-col">
               {selectedId && otherParticipant ? (
                 <>

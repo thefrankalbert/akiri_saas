@@ -260,7 +260,7 @@ export function CorridorsPage() {
 
       {/* ===== STATS BAR ===== */}
       <FadeIn>
-        <div className="mb-8 grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <div className="mb-8 grid grid-cols-2 gap-3 md:grid-cols-4">
           {[
             {
               icon: Package,
@@ -320,9 +320,9 @@ export function CorridorsPage() {
       </FadeIn>
 
       {/* ===== MAIN CONTENT: 2-column layout on desktop ===== */}
-      <div className="mb-8 grid gap-6 lg:grid-cols-3">
+      <div className="mb-8 grid gap-6 md:grid-cols-3">
         {/* LEFT: Corridors populaires (2/3) */}
-        <div className="lg:col-span-2">
+        <div className="md:col-span-2">
           <h2 className="mb-4 text-lg font-semibold text-neutral-100">Corridors populaires</h2>
           <StaggerContainer className="grid gap-2.5 sm:grid-cols-2 xl:grid-cols-3">
             {corridors.map((corridor) => {
@@ -479,9 +479,9 @@ export function CorridorsPage() {
       </div>
 
       {/* ===== BOTTOM: Departures + Countries side by side ===== */}
-      <div className="mb-8 grid gap-6 lg:grid-cols-5">
+      <div className="mb-8 grid gap-6 md:grid-cols-5">
         {/* LEFT: Prochains départs (3/5) */}
-        <div className="lg:col-span-3">
+        <div className="md:col-span-3">
           <div className="mb-3 flex items-center gap-2">
             <AirplaneTilt weight="duotone" size={18} className="text-primary-400" />
             <h2 className="text-sm font-semibold text-neutral-100">Prochains départs</h2>
@@ -551,7 +551,7 @@ export function CorridorsPage() {
         </div>
 
         {/* RIGHT: Tous les pays (2/5) */}
-        <div className="lg:col-span-2">
+        <div className="md:col-span-2">
           <h2 className="mb-3 text-sm font-semibold text-neutral-100">Tous les pays</h2>
           <Card padding="none">
             <CardContent className="flex flex-wrap gap-2 p-4">

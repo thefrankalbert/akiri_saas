@@ -11,7 +11,6 @@ import {
   SignOut,
   TestTube,
   ArrowLeft,
-  GearSix,
 } from '@phosphor-icons/react';
 import { useState } from 'react';
 import { Avatar } from '@/components/ui';
@@ -31,7 +30,7 @@ export function Header() {
   };
 
   return (
-    <header className="bg-surface-950/80 sticky top-0 z-50 border-b border-white/[0.06] backdrop-blur-xl">
+    <header className="bg-surface-950/80 sticky top-0 z-50 border-b border-white/[0.06] backdrop-blur-xl md:ml-16 lg:ml-60">
       {/* Demo Mode Banner */}
       {isDemo && (
         <div className="border-warning/20 bg-warning/10 text-warning border-b px-4 py-1.5 text-center text-sm font-medium">
@@ -45,7 +44,7 @@ export function Header() {
         <div className="flex items-center gap-1">
           <button
             onClick={() => router.back()}
-            className="text-surface-200 hover:bg-surface-800 rounded-lg p-2 transition-colors duration-150 hover:text-neutral-100"
+            className="text-surface-200 hover:bg-surface-800 rounded-lg p-2 transition-colors duration-150 hover:text-neutral-100 md:hidden"
             aria-label="Retour"
           >
             <ArrowLeft weight="bold" size={20} />
@@ -58,81 +57,16 @@ export function Header() {
           </Link>
         </div>
 
-        {/* Desktop Navigation */}
-        <nav className="hidden items-center gap-1 md:flex">
-          <Link
-            href="/annonces"
-            className="text-surface-100 rounded-lg px-3 py-2 text-sm font-medium transition-colors duration-150 hover:text-neutral-100"
-          >
-            Annonces
-          </Link>
-          <Link
-            href="/demandes"
-            className="text-surface-100 rounded-lg px-3 py-2 text-sm font-medium transition-colors duration-150 hover:text-neutral-100"
-          >
-            Demandes
-          </Link>
-          <Link
-            href="/corridors"
-            className="text-surface-100 rounded-lg px-3 py-2 text-sm font-medium transition-colors duration-150 hover:text-neutral-100"
-          >
-            Corridors
-          </Link>
-        </nav>
-
-        {/* Desktop Actions */}
+        {/* Desktop Actions (simplified — sidebar handles main nav) */}
         <div className="hidden items-center gap-2 md:flex">
           <button className="text-surface-200 hover:bg-surface-800 rounded-lg p-2 transition-colors duration-150 hover:text-neutral-100">
             <MagnifyingGlass weight="duotone" size={20} />
           </button>
-          {isAuthenticated ? (
+          <button className="text-surface-100 hover:bg-surface-800 relative rounded-lg p-2 transition-colors duration-150 hover:text-neutral-100">
+            <Bell weight="duotone" size={20} />
+          </button>
+          {!isAuthenticated && (
             <>
-              <Link
-                href="/messages"
-                className="text-surface-100 hover:bg-surface-800 relative rounded-lg p-2 transition-colors duration-150 hover:text-neutral-100"
-              >
-                <ChatCircle weight="duotone" size={20} />
-              </Link>
-              <button className="text-surface-100 hover:bg-surface-800 relative rounded-lg p-2 transition-colors duration-150 hover:text-neutral-100">
-                <Bell weight="duotone" size={20} />
-              </button>
-              <Link
-                href="/parametres"
-                className="text-surface-100 hover:bg-surface-800 relative rounded-lg p-2 transition-colors duration-150 hover:text-neutral-100"
-              >
-                <GearSix weight="duotone" size={20} />
-              </Link>
-              <div className="mx-2 h-6 w-px bg-white/[0.06]" />
-              <Link href="/dashboard" className="flex items-center gap-2">
-                <div className="ring-primary-500/30 rounded-full ring-2">
-                  <Avatar
-                    src={profile?.avatar_url}
-                    firstName={profile?.first_name}
-                    lastName={profile?.last_name}
-                    isVerified={profile?.verification_level === 3}
-                    size="sm"
-                  />
-                </div>
-                <span className="text-sm font-medium text-neutral-200">
-                  {profile?.first_name || user?.email?.split('@')[0]}
-                </span>
-              </Link>
-              <button
-                onClick={handleSignOut}
-                className="text-surface-100 hover:bg-error/10 hover:text-error rounded-lg p-2 transition-colors duration-150"
-                title="Deconnexion"
-              >
-                <SignOut weight="duotone" size={20} />
-              </button>
-            </>
-          ) : (
-            <>
-              <button className="text-surface-100 hover:bg-surface-800 relative rounded-lg p-2 transition-colors duration-150 hover:text-neutral-100">
-                <Bell weight="duotone" size={20} />
-              </button>
-              <button className="text-surface-100 hover:bg-surface-800 rounded-lg p-2 transition-colors duration-150 hover:text-neutral-100">
-                <ChatCircle weight="duotone" size={20} />
-              </button>
               <div className="mx-2 h-6 w-px bg-white/[0.06]" />
               <Link
                 href="/login"

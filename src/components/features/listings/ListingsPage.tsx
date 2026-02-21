@@ -60,7 +60,7 @@ export function ListingsPage() {
 
         {showFilters && (
           <div className="bg-surface-800 rounded-xl border border-white/[0.08] p-4">
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-4">
               <div>
                 <label className="text-surface-50 mb-1.5 block text-sm font-medium">
                   Pays de départ
@@ -161,7 +161,7 @@ export function ListingsPage() {
 
       {/* Listings Grid */}
       {loading ? (
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
           {Array.from({ length: 8 }).map((_, i) => (
             <Skeleton key={i} className="h-36 w-full rounded-2xl" />
           ))}
@@ -175,7 +175,7 @@ export function ListingsPage() {
           </p>
         </div>
       ) : (
-        <StaggerContainer className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <StaggerContainer className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
           {listings.map((listing) => (
             <StaggerItem key={listing.id}>
               <Link href={`/annonces/${listing.id}`}>
