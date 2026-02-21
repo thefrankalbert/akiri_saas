@@ -17,3 +17,6 @@ export * from './notifications';
 export * from './corridors';
 export * from './transactions';
 export * from './verification';
+export * from './parcels';
+export * from './offers';
+export * from './matching';
