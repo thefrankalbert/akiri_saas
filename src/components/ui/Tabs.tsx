@@ -14,7 +14,7 @@ const TabsList = React.forwardRef<
   <TabsPrimitive.List
     ref={ref}
     className={cn(
-      'inline-flex h-10 items-center justify-center rounded-xl bg-neutral-100 p-1',
+      'bg-surface-800 inline-flex h-10 items-center justify-center rounded-xl p-1',
       className
     )}
     {...props}
@@ -30,10 +30,10 @@ const TabsTrigger = React.forwardRef<
     ref={ref}
     className={cn(
       'inline-flex items-center justify-center rounded-lg px-3 py-1.5 text-sm font-medium whitespace-nowrap transition-all',
-      'focus-visible:ring-primary-500 ring-offset-white focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none',
+      'focus-visible:ring-primary-500 ring-offset-surface-800 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none',
       'disabled:pointer-events-none disabled:opacity-50',
-      'data-[state=active]:bg-white data-[state=active]:text-neutral-900',
-      'data-[state=inactive]:text-neutral-500 data-[state=inactive]:hover:text-neutral-700',
+      'data-[state=active]:bg-surface-600 data-[state=active]:text-neutral-100 data-[state=active]:shadow-sm',
+      'data-[state=inactive]:text-surface-100 data-[state=inactive]:hover:text-neutral-200',
       className
     )}
     {...props}
@@ -48,7 +48,7 @@ const TabsContent = React.forwardRef<
   <TabsPrimitive.Content
     ref={ref}
     className={cn(
-      'focus-visible:ring-primary-500 mt-4 ring-offset-white focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none',
+      'focus-visible:ring-primary-500 ring-offset-surface-800 mt-4 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none',
       className
     )}
     {...props}
@@ -70,7 +70,7 @@ function AnimatedTabs({ tabs, activeTab, onChange, className }: AnimatedTabsProp
   return (
     <div
       className={cn(
-        'relative inline-flex h-11 items-center rounded-xl bg-neutral-100 p-1',
+        'bg-surface-800 relative inline-flex h-11 items-center rounded-xl p-1',
         className
       )}
     >
@@ -86,7 +86,7 @@ function AnimatedTabs({ tabs, activeTab, onChange, className }: AnimatedTabsProp
             onMouseLeave={() => setHoveredTab(null)}
             className={cn(
               'relative z-10 inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium whitespace-nowrap transition-colors',
-              isActive ? 'text-neutral-900' : 'text-neutral-500 hover:text-neutral-700'
+              isActive ? 'text-neutral-100' : 'text-surface-100 hover:text-neutral-200'
             )}
           >
             {tab.icon}
@@ -94,14 +94,14 @@ function AnimatedTabs({ tabs, activeTab, onChange, className }: AnimatedTabsProp
             {isActive && (
               <motion.div
                 layoutId="activeTabIndicator"
-                className="absolute inset-0 z-[-1] rounded-lg bg-white"
+                className="bg-surface-600 absolute inset-0 z-[-1] rounded-lg shadow-sm"
                 transition={{ type: 'spring', bounce: 0.2, duration: 0.4 }}
               />
             )}
             {isHovered && !isActive && (
               <motion.div
                 layoutId="hoveredTabIndicator"
-                className="absolute inset-0 z-[-1] rounded-lg bg-neutral-200/50"
+                className="bg-surface-700 absolute inset-0 z-[-1] rounded-lg"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
@@ -125,7 +125,7 @@ interface UnderlineTabsProps {
 
 function UnderlineTabs({ tabs, activeTab, onChange, className }: UnderlineTabsProps) {
   return (
-    <div className={cn('relative border-b border-neutral-200', className)}>
+    <div className={cn('relative border-b border-white/[0.08]', className)}>
       <div className="flex gap-8">
         {tabs.map((tab) => {
           const isActive = tab.id === activeTab;
@@ -136,7 +136,7 @@ function UnderlineTabs({ tabs, activeTab, onChange, className }: UnderlineTabsPr
               onClick={() => onChange(tab.id)}
               className={cn(
                 'relative inline-flex items-center gap-2 pb-3 text-sm font-medium transition-colors',
-                isActive ? 'text-primary-600' : 'text-neutral-500 hover:text-neutral-700'
+                isActive ? 'text-primary-400' : 'text-surface-100 hover:text-neutral-200'
               )}
             >
               {tab.icon}
@@ -145,7 +145,7 @@ function UnderlineTabs({ tabs, activeTab, onChange, className }: UnderlineTabsPr
                 <span
                   className={cn(
                     'rounded-full px-2 py-0.5 text-xs',
-                    isActive ? 'bg-primary-100 text-primary-700' : 'bg-neutral-100 text-neutral-600'
+                    isActive ? 'bg-primary-500/10 text-primary-400' : 'text-surface-100 bg-white/10'
                   )}
                 >
                   {tab.count}
@@ -154,7 +154,7 @@ function UnderlineTabs({ tabs, activeTab, onChange, className }: UnderlineTabsPr
               {isActive && (
                 <motion.div
                   layoutId="underlineIndicator"
-                  className="bg-primary-600 absolute right-0 bottom-0 left-0 h-0.5"
+                  className="bg-primary-500 absolute right-0 bottom-0 left-0 h-0.5"
                   transition={{ type: 'spring', bounce: 0.2, duration: 0.4 }}
                 />
               )}

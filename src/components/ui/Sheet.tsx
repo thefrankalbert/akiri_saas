@@ -49,10 +49,10 @@ const slideVariants = {
 };
 
 const sideStyles: Record<SheetSide, string> = {
-  top: 'inset-x-0 top-0 border-b',
-  bottom: 'inset-x-0 bottom-0 border-t',
-  left: 'inset-y-0 left-0 h-full w-3/4 border-r sm:max-w-sm',
-  right: 'inset-y-0 right-0 h-full w-3/4 border-l sm:max-w-sm',
+  top: 'inset-x-0 top-0 border-b border-white/[0.08]',
+  bottom: 'inset-x-0 bottom-0 border-t border-white/[0.08]',
+  left: 'inset-y-0 left-0 h-full w-3/4 border-r border-white/[0.08] sm:max-w-sm',
+  right: 'inset-y-0 right-0 h-full w-3/4 border-l border-white/[0.08] sm:max-w-sm',
 };
 
 interface SheetContentProps extends React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> {
@@ -76,7 +76,7 @@ const SheetContent = React.forwardRef<
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
-          className="bg-black/50 backdrop-blur-sm"
+          className="bg-black/60 backdrop-blur-md"
         />
       </SheetOverlay>
       <DialogPrimitive.Content ref={ref} asChild {...props}>
@@ -85,15 +85,14 @@ const SheetContent = React.forwardRef<
           animate={variants.animate}
           exit={variants.exit}
           transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-          className={cn(
-            'fixed z-50 gap-4 border-neutral-200 bg-white p-6',
-            sideStyles[side],
-            className
-          )}
+          className={cn('bg-surface-800 fixed z-50 gap-4 p-6', sideStyles[side], className)}
         >
+          {side === 'bottom' && (
+            <div className="bg-surface-400 mx-auto mt-2 mb-4 h-1 w-10 rounded-full" />
+          )}
           {children}
           {showClose && (
-            <SheetClose className="absolute top-4 right-4 rounded-lg p-1.5 text-neutral-400 opacity-70 transition-all hover:bg-neutral-100 hover:text-neutral-600 hover:opacity-100 focus:ring-2 focus:ring-neutral-300 focus:ring-offset-2 focus:outline-none disabled:pointer-events-none">
+            <SheetClose className="text-surface-200 hover:bg-surface-700 focus:ring-primary-500 focus:ring-offset-surface-800 absolute top-4 right-4 rounded-lg p-1.5 transition-all hover:text-neutral-100 focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:pointer-events-none">
               <X size={20} />
               <span className="sr-only">Fermer</span>
             </SheetClose>
@@ -124,7 +123,7 @@ function SheetTitle({
 }: React.ComponentPropsWithoutRef<typeof DialogPrimitive.Title>) {
   return (
     <DialogPrimitive.Title
-      className={cn('text-lg font-semibold text-neutral-900', className)}
+      className={cn('text-lg font-semibold text-neutral-100', className)}
       {...props}
     />
   );
@@ -135,7 +134,7 @@ function SheetDescription({
   ...props
 }: React.ComponentPropsWithoutRef<typeof DialogPrimitive.Description>) {
   return (
-    <DialogPrimitive.Description className={cn('text-sm text-neutral-500', className)} {...props} />
+    <DialogPrimitive.Description className={cn('text-surface-100 text-sm', className)} {...props} />
   );
 }
 

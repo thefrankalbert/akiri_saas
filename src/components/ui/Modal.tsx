@@ -18,7 +18,7 @@ const ModalOverlay = React.forwardRef<
   <DialogPrimitive.Overlay
     ref={ref}
     className={cn(
-      'fixed inset-0 z-50 bg-black/50 backdrop-blur-sm',
+      'fixed inset-0 z-50 bg-black/60 backdrop-blur-md',
       'data-[state=open]:animate-in data-[state=closed]:animate-out',
       'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
       className
@@ -51,7 +51,7 @@ const ModalContent = React.forwardRef<
       ref={ref}
       className={cn(
         'fixed top-1/2 left-1/2 z-50 w-full -translate-x-1/2 -translate-y-1/2',
-        'rounded-2xl border border-neutral-200 bg-white p-6',
+        'bg-surface-800 rounded-2xl border border-white/[0.08] p-6 shadow-xl',
         'data-[state=open]:animate-in data-[state=closed]:animate-out',
         'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
         'data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
@@ -65,7 +65,7 @@ const ModalContent = React.forwardRef<
     >
       {children}
       {showCloseButton && (
-        <DialogPrimitive.Close className="focus:ring-primary-500 absolute top-4 right-4 rounded-lg p-1 text-neutral-400 transition-colors hover:bg-neutral-100 hover:text-neutral-600 focus:ring-2 focus:ring-offset-2 focus:outline-none">
+        <DialogPrimitive.Close className="text-surface-200 hover:bg-surface-700 focus:ring-primary-500 focus:ring-offset-surface-800 absolute top-4 right-4 rounded-lg p-1.5 transition-colors hover:text-neutral-100 focus:ring-2 focus:ring-offset-2 focus:outline-none">
           <X size={20} />
           <span className="sr-only">Fermer</span>
         </DialogPrimitive.Close>
@@ -86,7 +86,7 @@ const ModalTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <DialogPrimitive.Title
     ref={ref}
-    className={cn('text-lg font-semibold text-neutral-900', className)}
+    className={cn('text-lg font-semibold text-neutral-100', className)}
     {...props}
   />
 ));
@@ -98,7 +98,7 @@ const ModalDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <DialogPrimitive.Description
     ref={ref}
-    className={cn('text-sm text-neutral-500', className)}
+    className={cn('text-surface-100 text-sm', className)}
     {...props}
   />
 ));
@@ -125,7 +125,7 @@ const AnimatedModalContent = React.forwardRef<
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.15 }}
-          className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm"
+          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-md"
         />
         <DialogPrimitive.Content ref={ref} asChild {...props}>
           <motion.div
@@ -135,14 +135,14 @@ const AnimatedModalContent = React.forwardRef<
             transition={{ duration: 0.2, ease: 'easeOut' }}
             className={cn(
               'fixed top-1/2 left-1/2 z-50 w-full -translate-x-1/2 -translate-y-1/2',
-              'rounded-2xl border border-neutral-200 bg-white p-6',
+              'bg-surface-800 rounded-2xl border border-white/[0.08] p-6 shadow-xl',
               sizeClasses[size],
               className
             )}
           >
             {children}
             {showCloseButton && (
-              <DialogPrimitive.Close className="focus:ring-primary-500 absolute top-4 right-4 rounded-lg p-1 text-neutral-400 transition-colors hover:bg-neutral-100 hover:text-neutral-600 focus:ring-2 focus:ring-offset-2 focus:outline-none">
+              <DialogPrimitive.Close className="text-surface-200 hover:bg-surface-700 focus:ring-primary-500 focus:ring-offset-surface-800 absolute top-4 right-4 rounded-lg p-1.5 transition-colors hover:text-neutral-100 focus:ring-2 focus:ring-offset-2 focus:outline-none">
                 <X size={20} />
                 <span className="sr-only">Fermer</span>
               </DialogPrimitive.Close>
