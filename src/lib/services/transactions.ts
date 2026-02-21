@@ -58,38 +58,43 @@ export async function createCheckoutSession(
   // Determine currency
   const currency = (request.listing?.currency || 'EUR').toLowerCase();
 
-  // Create Stripe Checkout Session
-  const session = await getStripe().checkout.sessions.create({
-    mode: 'payment',
-    payment_intent_data: {
-      capture_method: 'manual', // Escrow: hold funds until delivery confirmed
+  // Create Stripe Checkout Session with idempotency key to prevent duplicate charges
+  const session = await getStripe().checkout.sessions.create(
+    {
+      mode: 'payment',
+      payment_intent_data: {
+        capture_method: 'manual', // Escrow: hold funds until delivery confirmed
+        metadata: {
+          request_id: requestId,
+          payer_id: userId,
+          payee_id: request.listing.traveler_id,
+        },
+      },
+      line_items: [
+        {
+          price_data: {
+            currency,
+            product_data: {
+              name: `Transport de colis - ${request.listing.departure_city} \u2192 ${request.listing.arrival_city}`,
+              description: `${request.weight_kg}kg - ${request.item_description.substring(0, 100)}`,
+            },
+            unit_amount: amountInCents,
+          },
+          quantity: 1,
+        },
+      ],
       metadata: {
         request_id: requestId,
         payer_id: userId,
         payee_id: request.listing.traveler_id,
       },
+      success_url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/transactions?payment=success`,
+      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/annonces/${request.listing_id}?payment=cancelled`,
     },
-    line_items: [
-      {
-        price_data: {
-          currency,
-          product_data: {
-            name: `Transport de colis - ${request.listing.departure_city} \u2192 ${request.listing.arrival_city}`,
-            description: `${request.weight_kg}kg - ${request.item_description.substring(0, 100)}`,
-          },
-          unit_amount: amountInCents,
-        },
-        quantity: 1,
-      },
-    ],
-    metadata: {
-      request_id: requestId,
-      payer_id: userId,
-      payee_id: request.listing.traveler_id,
-    },
-    success_url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/transactions?payment=success`,
-    cancel_url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/annonces/${request.listing_id}?payment=cancelled`,
-  });
+    {
+      idempotencyKey: `checkout_${requestId}_${userId}`,
+    }
+  );
 
   // Create or update transaction record
   const adminSupabase = await createAdminClient();
