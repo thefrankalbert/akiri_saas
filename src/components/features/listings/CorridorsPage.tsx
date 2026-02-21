@@ -1,21 +1,21 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import {
   ArrowRight,
-  Globe,
-  TrendingUp,
-  TrendingDown,
+  GlobeHemisphereWest,
+  TrendUp,
+  TrendDown,
   Minus,
-  Plane,
+  AirplaneTilt,
   Package,
-  Users,
-  Calendar,
+  UsersThree,
+  CalendarBlank,
   Star,
-  CheckCircle2,
-  Radio,
-} from 'lucide-react';
+  CheckCircle,
+  Broadcast,
+} from '@phosphor-icons/react';
 import { Card, CardContent, Badge, Avatar, Button } from '@/components/ui';
 import { SUPPORTED_COUNTRIES } from '@/constants';
 import { cn, formatDate } from '@/lib/utils';
@@ -82,11 +82,11 @@ function getTrend(index: number): 'up' | 'down' | 'stable' {
 
 const ACTIVITY_CONFIG: Record<
   ActivityEventType,
-  { badge: 'success' | 'warning' | 'info'; label: string; icon: typeof Plane }
+  { badge: 'success' | 'warning' | 'info'; label: string; icon: typeof AirplaneTilt }
 > = {
   new_listing: { badge: 'success', label: 'Nouvelle annonce', icon: Package },
-  departure_soon: { badge: 'warning', label: 'Départ imminent', icon: Plane },
-  delivery_confirmed: { badge: 'info', label: 'Livraison confirmée', icon: CheckCircle2 },
+  departure_soon: { badge: 'warning', label: 'Départ imminent', icon: AirplaneTilt },
+  delivery_confirmed: { badge: 'info', label: 'Livraison confirmée', icon: CheckCircle },
 };
 
 // ============================================
@@ -262,21 +262,21 @@ export function CorridorsPage() {
               bg: 'bg-primary-50',
             },
             {
-              icon: TrendingUp,
+              icon: TrendUp,
               label: 'Kilos disponibles',
               value: `${displayedStats.kg} kg`,
               color: 'text-secondary-500',
               bg: 'bg-secondary-50',
             },
             {
-              icon: Globe,
+              icon: GlobeHemisphereWest,
               label: 'Corridors actifs',
               value: displayedStats.corridors,
               color: 'text-accent-500',
               bg: 'bg-accent-50',
             },
             {
-              icon: Users,
+              icon: UsersThree,
               label: 'Voyageurs',
               value: displayedStats.travelers,
               color: 'text-info',
@@ -293,7 +293,7 @@ export function CorridorsPage() {
                       stat.bg
                     )}
                   >
-                    <Icon className={cn('h-5 w-5', stat.color)} />
+                    <Icon weight="duotone" size={20} className={stat.color} />
                   </div>
                   <div>
                     <p
@@ -314,7 +314,7 @@ export function CorridorsPage() {
       {/* ===== SECTION 2: Live Activity Feed ===== */}
       <div className="mb-8">
         <div className="mb-3 flex items-center gap-2">
-          <Radio className="animate-pulse-live h-4 w-4 text-red-500" />
+          <Broadcast weight="duotone" size={16} className="animate-pulse-live text-red-500" />
           <h2 className="text-lg font-semibold text-neutral-900">Activité en direct</h2>
         </div>
 
@@ -343,8 +343,9 @@ export function CorridorsPage() {
                     )}
                   >
                     <Icon
+                      weight="duotone"
+                      size={16}
                       className={cn(
-                        'h-4 w-4',
                         event.type === 'new_listing' && 'text-green-600',
                         event.type === 'departure_soon' && 'text-amber-600',
                         event.type === 'delivery_confirmed' && 'text-blue-600'
@@ -402,11 +403,7 @@ export function CorridorsPage() {
               corridor.nextDeparture && daysUntil(corridor.nextDeparture.departure_date) <= 7;
 
             const TrendIcon =
-              corridor.trend === 'up'
-                ? TrendingUp
-                : corridor.trend === 'down'
-                  ? TrendingDown
-                  : Minus;
+              corridor.trend === 'up' ? TrendUp : corridor.trend === 'down' ? TrendDown : Minus;
 
             const trendColor =
               corridor.trend === 'up'
@@ -437,7 +434,7 @@ export function CorridorsPage() {
                           {corridor.departureCity}
                         </p>
                       </div>
-                      <ArrowRight className="text-primary-400 h-4 w-4 shrink-0" />
+                      <ArrowRight weight="bold" size={16} className="text-primary-400 shrink-0" />
                       <div className="min-w-0 flex-1 text-right">
                         <p className="truncate text-sm font-semibold text-neutral-900">
                           {corridor.arrivalCity}
@@ -449,14 +446,14 @@ export function CorridorsPage() {
                     {/* Stats row */}
                     <div className="mt-3 flex items-center justify-between text-xs text-neutral-500">
                       <span className="flex items-center gap-1">
-                        <Package className="h-3.5 w-3.5" />
+                        <Package weight="duotone" size={14} />
                         {corridor.count} annonce{corridor.count > 1 ? 's' : ''}
                       </span>
                       <span className="text-primary-600 flex items-center gap-1 font-medium">
                         ~{corridor.avgPrice} €/kg
                       </span>
                       <span className="flex items-center gap-1">
-                        <TrendIcon className={cn('h-3.5 w-3.5', trendColor)} />
+                        <TrendIcon weight="duotone" size={14} className={trendColor} />
                       </span>
                     </div>
 
@@ -464,7 +461,7 @@ export function CorridorsPage() {
                     <div className="mt-3 flex items-center justify-between border-t border-neutral-100 pt-3">
                       {corridor.nextDeparture && (
                         <Badge variant={isImminentDeparture ? 'warning' : 'outline'} size="sm">
-                          <Calendar className="mr-1 h-3 w-3" />
+                          <CalendarBlank weight="duotone" size={12} className="mr-1" />
                           {formatDaysUntil(corridor.nextDeparture.departure_date)}
                         </Badge>
                       )}
@@ -477,7 +474,7 @@ export function CorridorsPage() {
                             isVerified={corridor.topTraveler.is_verified}
                           />
                           <div className="flex items-center gap-0.5">
-                            <Star className="fill-accent-500 text-accent-500 h-3 w-3" />
+                            <Star weight="fill" size={12} className="text-amber-400" />
                             <span className="text-xs font-medium">
                               {corridor.topTraveler.rating.toFixed(1)}
                             </span>
@@ -496,7 +493,7 @@ export function CorridorsPage() {
       {/* ===== SECTION 4: Prochains Départs ===== */}
       <div className="mb-8">
         <div className="mb-4 flex items-center gap-2">
-          <Plane className="text-primary-500 h-5 w-5" />
+          <AirplaneTilt weight="duotone" size={20} className="text-primary-500" />
           <h2 className="text-lg font-semibold text-neutral-900">Prochains départs</h2>
         </div>
 
@@ -535,11 +532,11 @@ export function CorridorsPage() {
                       </p>
                       <div className="mt-1 flex flex-wrap items-center gap-2">
                         <span className="flex items-center gap-1 text-xs text-neutral-500">
-                          <Calendar className="h-3 w-3" />
+                          <CalendarBlank weight="duotone" size={12} />
                           {formatDate(listing.departure_date)}
                         </span>
                         <span className="flex items-center gap-1 text-xs text-neutral-500">
-                          <Package className="h-3 w-3" />
+                          <Package weight="duotone" size={12} />
                           {listing.available_kg} kg
                         </span>
                         <span className="text-primary-600 text-xs font-medium">

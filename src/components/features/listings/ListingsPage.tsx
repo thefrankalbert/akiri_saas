@@ -3,14 +3,14 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import {
-  Search,
-  SlidersHorizontal,
+  MagnifyingGlass,
+  Sliders,
   MapPin,
-  Calendar,
+  CalendarBlank,
   Package,
   Star,
-  ChevronDown,
-} from 'lucide-react';
+  CaretDown,
+} from '@phosphor-icons/react';
 import { Button } from '@/components/ui';
 import { Input } from '@/components/ui';
 import { Card, CardContent } from '@/components/ui';
@@ -45,13 +45,13 @@ export function ListingsPage() {
         <div className="flex gap-2">
           <Input
             placeholder="Rechercher un trajet..."
-            leftIcon={<Search className="h-4 w-4" />}
+            leftIcon={<MagnifyingGlass weight="duotone" size={16} />}
             className="flex-1"
           />
           <Button
             variant="outline"
             onClick={() => setShowFilters(!showFilters)}
-            leftIcon={<SlidersHorizontal className="h-4 w-4" />}
+            leftIcon={<Sliders weight="duotone" size={16} />}
           >
             <span className="hidden sm:inline">Filtres</span>
           </Button>
@@ -153,7 +153,7 @@ export function ListingsPage() {
               })
             }
           >
-            <ChevronDown className="h-4 w-4" />
+            <CaretDown weight="bold" size={16} />
           </button>
         </div>
       </div>
@@ -168,7 +168,7 @@ export function ListingsPage() {
       ) : listings.length === 0 ? (
         <Card className="py-16 text-center">
           <CardContent>
-            <Package className="mx-auto h-12 w-12 text-neutral-300" />
+            <Package weight="duotone" size={48} className="mx-auto text-neutral-300" />
             <h3 className="mt-4 text-lg font-semibold text-neutral-700">Aucune annonce</h3>
             <p className="mt-2 text-sm text-neutral-500">
               Aucune annonce ne correspond à vos critères de recherche.
@@ -183,7 +183,7 @@ export function ListingsPage() {
                 <CardContent className="p-5">
                   {/* Route */}
                   <div className="flex items-center gap-2 text-sm">
-                    <MapPin className="text-primary-500 h-4 w-4" />
+                    <MapPin weight="duotone" size={16} className="text-primary-500" />
                     <span className="font-medium text-neutral-900">{listing.departure_city}</span>
                     <span className="text-neutral-400">&rarr;</span>
                     <span className="font-medium text-neutral-900">{listing.arrival_city}</span>
@@ -191,7 +191,7 @@ export function ListingsPage() {
 
                   {/* Date */}
                   <div className="mt-2 flex items-center gap-2 text-sm text-neutral-500">
-                    <Calendar className="h-4 w-4" />
+                    <CalendarBlank weight="duotone" size={16} />
                     {formatDate(listing.departure_date)}
                   </div>
 
@@ -235,7 +235,7 @@ export function ListingsPage() {
                       </div>
                       {listing.traveler.rating > 0 && (
                         <div className="flex items-center gap-1">
-                          <Star className="fill-accent-500 text-accent-500 h-3.5 w-3.5" />
+                          <Star weight="fill" size={14} className="text-amber-400" />
                           <span className="text-sm font-medium text-neutral-700">
                             {listing.traveler.rating.toFixed(1)}
                           </span>

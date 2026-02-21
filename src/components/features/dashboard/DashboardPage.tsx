@@ -4,19 +4,19 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import {
   Package,
-  Plane,
-  MessageCircle,
-  TrendingUp,
+  AirplaneTilt,
+  ChatCircle,
+  TrendUp,
   Plus,
   ArrowRight,
   Clock,
-  CheckCircle2,
-  AlertCircle,
+  CheckCircle,
+  WarningCircle,
   Star,
   ShieldCheck,
-  Sparkles,
-  ChevronRight,
-} from 'lucide-react';
+  Sparkle,
+  CaretRight,
+} from '@phosphor-icons/react';
 import {
   Card,
   CardContent,
@@ -29,8 +29,6 @@ import {
   SlideUp,
   StaggerContainer,
   StaggerItem,
-  HoverScale,
-  AnimatedCounter,
   Shimmer,
 } from '@/components/ui';
 import { createClient, supabaseConfigured } from '@/lib/supabase/client';
@@ -96,10 +94,10 @@ const mockActivities: ActivityItem[] = [
 ];
 
 const activityIcons = {
-  plane: Plane,
+  plane: AirplaneTilt,
   package: Package,
-  message: MessageCircle,
-  payment: TrendingUp,
+  message: ChatCircle,
+  payment: TrendUp,
   star: Star,
 };
 
@@ -202,12 +200,12 @@ export function DashboardPage() {
         </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {Array.from({ length: 4 }).map((_, i) => (
-            <Shimmer key={i} className="h-28 w-full rounded-2xl" />
+            <Shimmer key={i} className="h-28 w-full rounded-lg" />
           ))}
         </div>
         <div className="mt-8 grid gap-6 lg:grid-cols-2">
-          <Shimmer className="h-64 rounded-2xl" />
-          <Shimmer className="h-64 rounded-2xl" />
+          <Shimmer className="h-64 rounded-lg" />
+          <Shimmer className="h-64 rounded-lg" />
         </div>
       </div>
     );
@@ -217,8 +215,8 @@ export function DashboardPage() {
     {
       label: 'Annonces actives',
       value: stats.activeListings,
-      icon: Plane,
-      gradient: 'from-primary-500 to-primary-600',
+      icon: AirplaneTilt,
+      iconColor: 'text-primary-500',
       lightBg: 'bg-primary-50',
       href: '/annonces',
     },
@@ -226,23 +224,23 @@ export function DashboardPage() {
       label: 'Demandes en cours',
       value: stats.pendingRequests,
       icon: Package,
-      gradient: 'from-secondary-500 to-secondary-600',
+      iconColor: 'text-secondary-500',
       lightBg: 'bg-secondary-50',
       href: '/demandes',
     },
     {
       label: 'Messages',
       value: stats.unreadMessages,
-      icon: MessageCircle,
-      gradient: 'from-blue-500 to-blue-600',
+      icon: ChatCircle,
+      iconColor: 'text-blue-500',
       lightBg: 'bg-blue-50',
       href: '/messages',
     },
     {
       label: 'Gains totaux',
       value: stats.totalEarnings,
-      icon: TrendingUp,
-      gradient: 'from-accent-500 to-accent-600',
+      icon: TrendUp,
+      iconColor: 'text-accent-500',
       lightBg: 'bg-amber-50',
       href: '/transactions',
       suffix: ' €',
@@ -252,7 +250,7 @@ export function DashboardPage() {
   const quickActions = [
     {
       href: '/annonces/new',
-      icon: Plane,
+      icon: AirplaneTilt,
       iconColor: 'text-primary-500',
       iconBg: 'bg-primary-50',
       label: 'Publier une annonce',
@@ -268,7 +266,7 @@ export function DashboardPage() {
     },
     {
       href: '/messages',
-      icon: MessageCircle,
+      icon: ChatCircle,
       iconColor: 'text-blue-500',
       iconBg: 'bg-blue-50',
       label: 'Mes messages',
@@ -293,7 +291,7 @@ export function DashboardPage() {
                 />
                 {profile.is_verified && (
                   <div className="absolute -right-1 -bottom-1 rounded-full bg-white p-0.5 shadow-sm">
-                    <ShieldCheck className="text-success h-4 w-4" />
+                    <ShieldCheck weight="duotone" size={16} className="text-success" />
                   </div>
                 )}
               </div>
@@ -303,13 +301,13 @@ export function DashboardPage() {
                 Bonjour, {profile?.first_name || 'Utilisateur'} !
               </h1>
               <p className="mt-1 flex items-center gap-1.5 text-sm text-neutral-500">
-                <Sparkles className="h-4 w-4 text-amber-400" />
+                <Sparkle weight="duotone" size={16} className="text-amber-400" />
                 Voici un résumé de votre activité
               </p>
             </div>
           </div>
           <Link href="/annonces/new" className="shrink-0">
-            <Button size="lg" leftIcon={<Plus className="h-5 w-5" />}>
+            <Button size="lg" leftIcon={<Plus weight="bold" size={20} />}>
               Nouvelle annonce
             </Button>
           </Link>
@@ -323,43 +321,35 @@ export function DashboardPage() {
           return (
             <StaggerItem key={stat.label}>
               <Link href={stat.href}>
-                <HoverScale scale={1.02}>
-                  <Card
-                    variant="elevated"
-                    padding="none"
-                    className="group relative overflow-hidden"
-                  >
+                <Card
+                  variant="elevated"
+                  padding="none"
+                  className="group relative overflow-hidden transition-shadow duration-200 hover:shadow-md"
+                >
+                  <CardContent className="flex items-center gap-4 p-5">
                     <div
-                      className={`absolute inset-0 bg-gradient-to-br ${stat.gradient} opacity-0 transition-opacity duration-300 group-hover:opacity-5`}
-                    />
-                    <CardContent className="flex items-center gap-4 p-5">
-                      <div
-                        className={`flex h-14 w-14 items-center justify-center rounded-2xl ${stat.lightBg} transition-transform duration-300 group-hover:scale-110`}
-                      >
-                        <Icon
-                          className={`h-7 w-7 bg-gradient-to-br ${stat.gradient} bg-clip-text text-transparent`}
-                          style={{
-                            color: `var(--${stat.gradient.split('-')[1]}-500)`,
-                          }}
-                        />
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex items-baseline gap-1">
-                          <span className="text-3xl font-bold text-neutral-900">
-                            <AnimatedCounter value={stat.value} />
+                      className={`flex h-14 w-14 items-center justify-center rounded-2xl ${stat.lightBg} transition-transform duration-300 group-hover:scale-110`}
+                    >
+                      <Icon weight="duotone" size={28} className={stat.iconColor} />
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-baseline gap-1">
+                        <span className="text-3xl font-bold text-neutral-900">{stat.value}</span>
+                        {stat.suffix && (
+                          <span className="text-lg font-medium text-neutral-500">
+                            {stat.suffix}
                           </span>
-                          {stat.suffix && (
-                            <span className="text-lg font-medium text-neutral-500">
-                              {stat.suffix}
-                            </span>
-                          )}
-                        </div>
-                        <p className="text-sm text-neutral-500">{stat.label}</p>
+                        )}
                       </div>
-                      <ChevronRight className="h-5 w-5 text-neutral-300 transition-transform duration-200 group-hover:translate-x-1 group-hover:text-neutral-400" />
-                    </CardContent>
-                  </Card>
-                </HoverScale>
+                      <p className="text-sm text-neutral-500">{stat.label}</p>
+                    </div>
+                    <CaretRight
+                      weight="bold"
+                      size={20}
+                      className="text-neutral-300 transition-transform duration-200 group-hover:translate-x-1 group-hover:text-neutral-400"
+                    />
+                  </CardContent>
+                </Card>
               </Link>
             </StaggerItem>
           );
@@ -373,7 +363,7 @@ export function DashboardPage() {
           <Card variant="elevated" padding="none" className="h-full">
             <CardHeader className="border-b border-neutral-100 px-6 py-4">
               <CardTitle className="flex items-center gap-2 text-lg">
-                <Sparkles className="h-5 w-5 text-amber-400" />
+                <Sparkle weight="duotone" size={20} className="text-amber-400" />
                 Actions rapides
               </CardTitle>
             </CardHeader>
@@ -382,20 +372,22 @@ export function DashboardPage() {
                 const Icon = action.icon;
                 return (
                   <Link key={action.href} href={action.href} className="block">
-                    <HoverScale scale={1.01}>
-                      <div className="flex items-center gap-4 rounded-xl border border-neutral-100 bg-white p-4 shadow-sm transition-all hover:border-neutral-200 hover:shadow-md">
-                        <div
-                          className={`flex h-12 w-12 items-center justify-center rounded-xl ${action.iconBg}`}
-                        >
-                          <Icon className={`h-6 w-6 ${action.iconColor}`} />
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <p className="truncate font-semibold text-neutral-900">{action.label}</p>
-                          <p className="truncate text-sm text-neutral-500">{action.description}</p>
-                        </div>
-                        <ArrowRight className="h-5 w-5 text-neutral-300 transition-transform group-hover:translate-x-1" />
+                    <div className="flex items-center gap-4 rounded-xl border border-neutral-100 bg-white p-4 shadow-sm transition-all hover:border-neutral-200 hover:shadow-md">
+                      <div
+                        className={`flex h-12 w-12 items-center justify-center rounded-xl ${action.iconBg}`}
+                      >
+                        <Icon weight="duotone" size={24} className={action.iconColor} />
                       </div>
-                    </HoverScale>
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate font-semibold text-neutral-900">{action.label}</p>
+                        <p className="truncate text-sm text-neutral-500">{action.description}</p>
+                      </div>
+                      <ArrowRight
+                        weight="bold"
+                        size={20}
+                        className="text-neutral-300 transition-transform group-hover:translate-x-1"
+                      />
+                    </div>
                   </Link>
                 );
               })}
@@ -409,7 +401,7 @@ export function DashboardPage() {
             <CardHeader className="border-b border-neutral-100 px-6 py-4">
               <div className="flex items-center justify-between">
                 <CardTitle className="flex items-center gap-2 text-lg">
-                  <Clock className="h-5 w-5 text-neutral-400" />
+                  <Clock weight="duotone" size={20} className="text-neutral-400" />
                   Activité récente
                 </CardTitle>
                 <Link
@@ -431,7 +423,7 @@ export function DashboardPage() {
                           <div
                             className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${statusColors[activity.status || 'info']}`}
                           >
-                            <Icon className="h-5 w-5" />
+                            <Icon weight="duotone" size={20} />
                           </div>
                           <div className="min-w-0 flex-1">
                             <p className="font-medium text-neutral-900">{activity.title}</p>
@@ -450,7 +442,7 @@ export function DashboardPage() {
               ) : (
                 <div className="flex flex-col items-center justify-center py-12 text-center">
                   <div className="flex h-16 w-16 items-center justify-center rounded-full bg-neutral-100">
-                    <Clock className="h-8 w-8 text-neutral-300" />
+                    <Clock weight="duotone" size={32} className="text-neutral-300" />
                   </div>
                   <p className="mt-4 font-medium text-neutral-600">Aucune activité récente</p>
                   <p className="mt-1 text-sm text-neutral-400">
@@ -470,7 +462,7 @@ export function DashboardPage() {
             <CardContent className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex items-start gap-4">
                 <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-amber-100">
-                  <AlertCircle className="h-6 w-6 text-amber-600" />
+                  <WarningCircle weight="duotone" size={24} className="text-amber-600" />
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
@@ -488,7 +480,7 @@ export function DashboardPage() {
                 <Button
                   variant="primary"
                   size="md"
-                  rightIcon={<CheckCircle2 className="h-4 w-4" />}
+                  rightIcon={<CheckCircle weight="duotone" size={16} />}
                 >
                   Vérifier maintenant
                 </Button>
@@ -502,15 +494,15 @@ export function DashboardPage() {
       <FadeIn delay={0.5}>
         <div className="mt-8 flex flex-wrap items-center justify-center gap-6 text-sm text-neutral-400">
           <div className="flex items-center gap-2">
-            <ShieldCheck className="text-success h-5 w-5" />
+            <ShieldCheck weight="duotone" size={20} className="text-success" />
             <span>Paiements sécurisés</span>
           </div>
           <div className="flex items-center gap-2">
-            <Star className="h-5 w-5 text-amber-400" />
+            <Star weight="duotone" size={20} className="text-amber-400" />
             <span>Utilisateurs vérifiés</span>
           </div>
           <div className="flex items-center gap-2">
-            <MessageCircle className="h-5 w-5 text-blue-400" />
+            <ChatCircle weight="duotone" size={20} className="text-blue-400" />
             <span>Support 24/7</span>
           </div>
         </div>
