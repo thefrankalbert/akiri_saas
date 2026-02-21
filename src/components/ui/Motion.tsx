@@ -239,10 +239,10 @@ export function Shimmer({ className }: { className?: string }) {
   return (
     <div
       className={cn(
-        'relative overflow-hidden bg-neutral-200',
+        'bg-surface-700 relative overflow-hidden',
         'before:absolute before:inset-0 before:-translate-x-full',
         'before:animate-[shimmer_2s_infinite]',
-        'before:bg-gradient-to-r before:from-transparent before:via-white/60 before:to-transparent',
+        'before:bg-gradient-to-r before:from-transparent before:via-white/[0.08] before:to-transparent',
         className
       )}
     />

@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 
 function LoginFormFallback() {
   return (
-    <div className="space-y-4 rounded-xl border border-neutral-200/60 bg-white p-6">
+    <div className="bg-surface-800 space-y-4 rounded-xl border border-white/[0.08] p-6">
       <Skeleton className="mx-auto h-8 w-48" />
       <Skeleton className="mx-auto h-4 w-64" />
       <Skeleton className="h-10 w-full" />

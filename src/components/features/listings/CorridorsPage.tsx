@@ -17,6 +17,7 @@ import {
   Broadcast,
 } from '@phosphor-icons/react';
 import { Card, CardContent, Badge, Avatar } from '@/components/ui';
+import { StaggerContainer, StaggerItem, FadeIn } from '@/components/ui/Motion';
 import { SUPPORTED_COUNTRIES } from '@/constants';
 import { cn, formatDate } from '@/lib/utils';
 import {
@@ -258,71 +259,73 @@ export function CorridorsPage() {
       </div>
 
       {/* ===== STATS BAR ===== */}
-      <div className="mb-8 grid grid-cols-2 gap-3 lg:grid-cols-4">
-        {[
-          {
-            icon: Package,
-            label: 'Annonces actives',
-            value: displayedStats.listings,
-            color: 'text-primary-400',
-            bg: 'bg-primary-500/10',
-          },
-          {
-            icon: TrendUp,
-            label: 'Kilos disponibles',
-            value: `${displayedStats.kg} kg`,
-            color: 'text-success',
-            bg: 'bg-success/10',
-          },
-          {
-            icon: GlobeHemisphereWest,
-            label: 'Corridors actifs',
-            value: displayedStats.corridors,
-            color: 'text-accent-400',
-            bg: 'bg-accent-500/10',
-          },
-          {
-            icon: UsersThree,
-            label: 'Voyageurs',
-            value: displayedStats.travelers,
-            color: 'text-info',
-            bg: 'bg-info/10',
-          },
-        ].map((stat) => {
-          const Icon = stat.icon;
-          return (
-            <Card key={stat.label} padding="none">
-              <CardContent className="flex items-center gap-2.5 p-3">
-                <div
-                  className={cn(
-                    'flex h-8 w-8 shrink-0 items-center justify-center rounded-lg',
-                    stat.bg
-                  )}
-                >
-                  <Icon weight="duotone" size={16} className={stat.color} />
-                </div>
-                <div className="min-w-0">
-                  <p
-                    key={statPulseKey}
-                    className="animate-count-pulse font-mono text-base font-semibold text-neutral-100"
+      <FadeIn>
+        <div className="mb-8 grid grid-cols-2 gap-3 lg:grid-cols-4">
+          {[
+            {
+              icon: Package,
+              label: 'Annonces actives',
+              value: displayedStats.listings,
+              color: 'text-primary-400',
+              bg: 'bg-primary-500/10',
+            },
+            {
+              icon: TrendUp,
+              label: 'Kilos disponibles',
+              value: `${displayedStats.kg} kg`,
+              color: 'text-success',
+              bg: 'bg-success/10',
+            },
+            {
+              icon: GlobeHemisphereWest,
+              label: 'Corridors actifs',
+              value: displayedStats.corridors,
+              color: 'text-accent-400',
+              bg: 'bg-accent-500/10',
+            },
+            {
+              icon: UsersThree,
+              label: 'Voyageurs',
+              value: displayedStats.travelers,
+              color: 'text-info',
+              bg: 'bg-info/10',
+            },
+          ].map((stat) => {
+            const Icon = stat.icon;
+            return (
+              <Card key={stat.label} padding="none">
+                <CardContent className="flex items-center gap-2.5 p-3">
+                  <div
+                    className={cn(
+                      'flex h-8 w-8 shrink-0 items-center justify-center rounded-lg',
+                      stat.bg
+                    )}
                   >
-                    {stat.value}
-                  </p>
-                  <p className="text-surface-100 truncate text-[11px]">{stat.label}</p>
-                </div>
-              </CardContent>
-            </Card>
-          );
-        })}
-      </div>
+                    <Icon weight="duotone" size={16} className={stat.color} />
+                  </div>
+                  <div className="min-w-0">
+                    <p
+                      key={statPulseKey}
+                      className="animate-count-pulse font-mono text-base font-semibold text-neutral-100"
+                    >
+                      {stat.value}
+                    </p>
+                    <p className="text-surface-100 truncate text-[11px]">{stat.label}</p>
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
+      </FadeIn>
 
       {/* ===== MAIN CONTENT: 2-column layout on desktop ===== */}
       <div className="mb-8 grid gap-6 lg:grid-cols-3">
         {/* LEFT: Corridors populaires (2/3) */}
         <div className="lg:col-span-2">
           <h2 className="mb-4 text-lg font-semibold text-neutral-100">Corridors populaires</h2>
-          <div className="grid gap-2.5 sm:grid-cols-2 xl:grid-cols-3">
-            {corridors.map((corridor, index) => {
+          <StaggerContainer className="grid gap-2.5 sm:grid-cols-2 xl:grid-cols-3">
+            {corridors.map((corridor) => {
               const isImminentDeparture =
                 corridor.nextDeparture && daysUntil(corridor.nextDeparture.departure_date) <= 7;
 
@@ -337,75 +340,78 @@ export function CorridorsPage() {
                     : 'text-surface-300';
 
               return (
-                <Link
-                  key={corridor.key}
-                  href={`/annonces?from=${corridor.fromCountry.code}&to=${corridor.toCountry.code}`}
-                  className="animate-slide-in-up"
-                  style={{ animationDelay: `${index * 40}ms` }}
-                >
-                  <Card
-                    className={cn(
-                      'hover:bg-surface-700 h-full transition-all duration-200 hover:border-white/[0.15]',
-                      isImminentDeparture && 'ring-warning/30 ring-2'
-                    )}
+                <StaggerItem key={corridor.key}>
+                  <Link
+                    href={`/annonces?from=${corridor.fromCountry.code}&to=${corridor.toCountry.code}`}
                   >
-                    <CardContent className="p-3">
-                      {/* Route header */}
-                      <div className="flex items-center gap-1.5">
-                        <span className="shrink-0 text-base">{corridor.fromCountry.flag}</span>
-                        <p className="min-w-0 flex-1 truncate text-xs font-semibold text-neutral-100">
-                          {corridor.departureCity}
-                        </p>
-                        <ArrowRight weight="bold" size={12} className="text-primary-400 shrink-0" />
-                        <p className="min-w-0 flex-1 truncate text-right text-xs font-semibold text-neutral-100">
-                          {corridor.arrivalCity}
-                        </p>
-                        <span className="shrink-0 text-base">{corridor.toCountry.flag}</span>
-                      </div>
+                    <Card
+                      className={cn(
+                        'hover:bg-surface-700 h-full transition-all duration-200 hover:border-white/[0.15]',
+                        isImminentDeparture && 'ring-warning/30 ring-2'
+                      )}
+                    >
+                      <CardContent className="p-3">
+                        {/* Route header */}
+                        <div className="flex items-center gap-1.5">
+                          <span className="shrink-0 text-base">{corridor.fromCountry.flag}</span>
+                          <p className="min-w-0 flex-1 truncate text-xs font-semibold text-neutral-100">
+                            {corridor.departureCity}
+                          </p>
+                          <ArrowRight
+                            weight="bold"
+                            size={12}
+                            className="text-primary-400 shrink-0"
+                          />
+                          <p className="min-w-0 flex-1 truncate text-right text-xs font-semibold text-neutral-100">
+                            {corridor.arrivalCity}
+                          </p>
+                          <span className="shrink-0 text-base">{corridor.toCountry.flag}</span>
+                        </div>
 
-                      {/* Stats row */}
-                      <div className="text-surface-100 mt-2 flex items-center justify-between text-[11px]">
-                        <span className="flex items-center gap-1">
-                          <Package weight="duotone" size={11} />
-                          {corridor.count} annonce{corridor.count > 1 ? 's' : ''}
-                        </span>
-                        <span className="text-primary-400 font-mono font-medium">
-                          ~{corridor.avgPrice} €/kg
-                        </span>
-                        <TrendIcon weight="duotone" size={12} className={trendColor} />
-                      </div>
+                        {/* Stats row */}
+                        <div className="text-surface-100 mt-2 flex items-center justify-between text-[11px]">
+                          <span className="flex items-center gap-1">
+                            <Package weight="duotone" size={11} />
+                            {corridor.count} annonce{corridor.count > 1 ? 's' : ''}
+                          </span>
+                          <span className="text-primary-400 font-mono font-medium">
+                            ~{corridor.avgPrice} €/kg
+                          </span>
+                          <TrendIcon weight="duotone" size={12} className={trendColor} />
+                        </div>
 
-                      {/* Next departure + Top traveler */}
-                      <div className="mt-2 flex items-center justify-between border-t border-white/[0.06] pt-2">
-                        {corridor.nextDeparture && (
-                          <Badge variant={isImminentDeparture ? 'warning' : 'outline'} size="sm">
-                            <CalendarBlank weight="duotone" size={10} className="mr-0.5" />
-                            {formatDaysUntil(corridor.nextDeparture.departure_date)}
-                          </Badge>
-                        )}
-                        {corridor.topTraveler && (
-                          <div className="flex items-center gap-1">
-                            <Avatar
-                              firstName={corridor.topTraveler.first_name}
-                              lastName={corridor.topTraveler.last_name}
-                              size="sm"
-                              isVerified={corridor.topTraveler.is_verified}
-                            />
-                            <div className="flex items-center gap-0.5">
-                              <Star weight="fill" size={10} className="text-amber-400" />
-                              <span className="text-[11px] font-medium text-neutral-100">
-                                {corridor.topTraveler.rating.toFixed(1)}
-                              </span>
+                        {/* Next departure + Top traveler */}
+                        <div className="mt-2 flex items-center justify-between border-t border-white/[0.06] pt-2">
+                          {corridor.nextDeparture && (
+                            <Badge variant={isImminentDeparture ? 'warning' : 'outline'} size="sm">
+                              <CalendarBlank weight="duotone" size={10} className="mr-0.5" />
+                              {formatDaysUntil(corridor.nextDeparture.departure_date)}
+                            </Badge>
+                          )}
+                          {corridor.topTraveler && (
+                            <div className="flex items-center gap-1">
+                              <Avatar
+                                firstName={corridor.topTraveler.first_name}
+                                lastName={corridor.topTraveler.last_name}
+                                size="sm"
+                                isVerified={corridor.topTraveler.is_verified}
+                              />
+                              <div className="flex items-center gap-0.5">
+                                <Star weight="fill" size={10} className="text-amber-400" />
+                                <span className="text-[11px] font-medium text-neutral-100">
+                                  {corridor.topTraveler.rating.toFixed(1)}
+                                </span>
+                              </div>
                             </div>
-                          </div>
-                        )}
-                      </div>
-                    </CardContent>
-                  </Card>
-                </Link>
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </Link>
+                </StaggerItem>
               );
             })}
-          </div>
+          </StaggerContainer>
         </div>
 
         {/* RIGHT: Activity feed sidebar (1/3) */}

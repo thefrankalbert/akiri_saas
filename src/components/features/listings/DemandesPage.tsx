@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { PaperPlaneTilt, Package, Tray } from '@phosphor-icons/react';
-import { UnderlineTabs, Shimmer, FadeIn } from '@/components/ui';
+import { UnderlineTabs, Shimmer, FadeIn, StaggerContainer, StaggerItem } from '@/components/ui';
 import { createClient, supabaseConfigured } from '@/lib/supabase/client';
 import { mockRequests } from '@/lib/mock-data';
 import { RequestCard } from '@/components/features/requests/RequestCard';
@@ -109,11 +109,13 @@ export function DemandesPage() {
       <FadeIn key={activeTab}>
         <div className="mt-6">
           {displayedRequests.length > 0 ? (
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            <StaggerContainer className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {displayedRequests.map((request) => (
-                <RequestCard key={request.id} request={request} role={currentRole} />
+                <StaggerItem key={request.id}>
+                  <RequestCard request={request} role={currentRole} />
+                </StaggerItem>
               ))}
-            </div>
+            </StaggerContainer>
           ) : (
             <div className="py-16 text-center">
               <Package weight="duotone" size={40} className="text-surface-300 mx-auto" />

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { UnderlineTabs, Shimmer } from '@/components/ui';
+import { UnderlineTabs, Shimmer, FadeIn } from '@/components/ui';
 import { useAuth } from '@/lib/hooks';
 import { ProfileSettingsTab } from './ProfileSettingsTab';
 import { AccountSettingsTab } from './AccountSettingsTab';
@@ -34,21 +34,23 @@ export function SettingsPage() {
 
       <UnderlineTabs tabs={tabs} activeTab={activeTab} onChange={setActiveTab} />
 
-      <div className="mt-6">
-        {activeTab === 'profile' && <ProfileSettingsTab profile={profile} />}
+      <FadeIn key={activeTab}>
+        <div className="mt-6">
+          {activeTab === 'profile' && <ProfileSettingsTab profile={profile} />}
 
-        {activeTab === 'verification' && (
-          <div className="space-y-6">
-            <PhoneVerification
-              isVerified={profile?.phone_verified || false}
-              currentPhone={profile?.phone}
-            />
-            <IdentityVerification status={profile?.id_verification_status || 'none'} />
-          </div>
-        )}
+          {activeTab === 'verification' && (
+            <div className="space-y-6">
+              <PhoneVerification
+                isVerified={profile?.phone_verified || false}
+                currentPhone={profile?.phone}
+              />
+              <IdentityVerification status={profile?.id_verification_status || 'none'} />
+            </div>
+          )}
 
-        {activeTab === 'account' && <AccountSettingsTab email={user?.email || ''} />}
-      </div>
+          {activeTab === 'account' && <AccountSettingsTab email={user?.email || ''} />}
+        </div>
+      </FadeIn>
     </div>
   );
 }
