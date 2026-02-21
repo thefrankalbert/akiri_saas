@@ -61,7 +61,7 @@ export function TestimonialsSection() {
   const { inViewRef, inView } = useInView(0.1);
 
   return (
-    <section ref={inViewRef} className="relative overflow-hidden bg-white py-20 sm:py-28">
+    <section ref={inViewRef} className="bg-surface-950 relative overflow-hidden py-20 sm:py-28">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div
@@ -71,24 +71,24 @@ export function TestimonialsSection() {
           )}
         >
           <div>
-            <div className="flex items-center gap-2 text-sm font-medium text-amber-500">
+            <div className="text-warning flex items-center gap-2 text-sm font-medium">
               <Star weight="fill" size={16} />
               <span>Témoignages</span>
             </div>
-            <h2 className="mt-3 text-3xl font-bold tracking-tight text-neutral-900 sm:text-4xl lg:text-5xl">
+            <h2 className="mt-3 text-3xl font-bold tracking-tight text-neutral-100 sm:text-4xl lg:text-5xl">
               Ils nous font
               <br />
-              <span className="text-neutral-400">confiance.</span>
+              <span className="text-surface-200">confiance.</span>
             </h2>
           </div>
-          <div className="flex items-center gap-2 rounded-full border border-neutral-200 bg-neutral-50 px-4 py-2">
+          <div className="glass flex items-center gap-2 rounded-full px-4 py-2">
             <div className="flex gap-0.5">
               {Array.from({ length: 5 }).map((_, i) => (
-                <Star key={i} weight="fill" size={14} className="text-amber-400" />
+                <Star key={i} weight="fill" size={14} className="text-warning" />
               ))}
             </div>
-            <span className="text-sm font-bold text-neutral-900">4.8/5</span>
-            <span className="text-xs text-neutral-400">sur 2 500+ avis</span>
+            <span className="text-sm font-bold text-neutral-100">4.8/5</span>
+            <span className="text-surface-100 text-xs">sur 2 500+ avis</span>
           </div>
         </div>
 
@@ -98,21 +98,21 @@ export function TestimonialsSection() {
             <div
               key={i}
               className={cn(
-                'break-inside-avoid rounded-xl border p-5 transition-all duration-500',
-                t.highlight
-                  ? 'border-primary-200 bg-primary-50'
-                  : 'border-neutral-200 bg-white hover:border-neutral-300',
+                'glass break-inside-avoid rounded-xl p-5 transition-all duration-500',
+                t.highlight ? 'border-primary-500/20' : 'hover:border-white/[0.12]',
                 inView ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
               )}
               style={{ transitionDelay: `${i * 80}ms` }}
             >
               {/* Quote icon for highlighted */}
-              {t.highlight && <Quotes weight="fill" size={24} className="text-primary-300 mb-3" />}
+              {t.highlight && (
+                <Quotes weight="fill" size={24} className="text-primary-400/20 mb-3" />
+              )}
 
               {/* Stars */}
               <div className="mb-3 flex gap-0.5">
                 {Array.from({ length: t.rating }).map((_, j) => (
-                  <Star key={j} weight="fill" size={14} className="text-amber-400" />
+                  <Star key={j} weight="fill" size={14} className="text-warning" />
                 ))}
               </div>
 
@@ -120,7 +120,7 @@ export function TestimonialsSection() {
               <blockquote
                 className={cn(
                   'text-sm leading-relaxed',
-                  t.highlight ? 'text-base font-medium text-neutral-900' : 'text-neutral-600'
+                  t.highlight ? 'text-base font-medium text-neutral-100' : 'text-neutral-200'
                 )}
               >
                 &ldquo;{t.text}&rdquo;
@@ -135,15 +135,15 @@ export function TestimonialsSection() {
                   isVerified={t.profile.is_verified}
                 />
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-medium text-neutral-900">
+                  <p className="truncate text-sm font-medium text-neutral-100">
                     {t.profile.first_name} {t.profile.last_name.charAt(0)}.
                   </p>
-                  <p className="text-xs text-neutral-400">{t.role}</p>
+                  <p className="text-surface-100 text-xs">{t.role}</p>
                 </div>
               </div>
 
               {/* Corridor badge */}
-              <div className="mt-3 inline-flex items-center gap-1 rounded-full bg-neutral-100 px-2.5 py-1 text-[11px] font-medium text-neutral-500">
+              <div className="bg-surface-800 text-surface-100 mt-3 inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-medium">
                 <MapPin weight="duotone" size={10} />
                 {t.corridor}
               </div>

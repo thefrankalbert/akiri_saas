@@ -22,9 +22,10 @@ export function HeroSection() {
   }, []);
 
   return (
-    <section className="relative min-h-[92vh] overflow-hidden bg-neutral-950 sm:min-h-[88vh]">
-      {/* Subtle radial gradient */}
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(99,102,241,0.15),transparent_50%)]" />
+    <section className="bg-surface-950 relative min-h-dvh overflow-hidden sm:min-h-[88vh]">
+      {/* Gradient mesh — primary + accent */}
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(108,92,231,0.15),transparent_50%)]" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,rgba(139,92,246,0.1),transparent_60%)]" />
 
       {/* Subtle dot grid */}
       <div
@@ -43,13 +44,13 @@ export function HeroSection() {
             heroVisible ? 'translate-y-0 opacity-100' : '-translate-y-4 opacity-0'
           )}
         >
-          <div className="inline-flex items-center gap-2.5 rounded-full border border-white/10 bg-white/5 px-5 py-2 backdrop-blur-sm">
+          <div className="glass inline-flex items-center gap-2.5 rounded-full px-5 py-2">
             <span className="relative flex h-2.5 w-2.5">
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
               <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-400" />
             </span>
-            <span className="text-sm font-medium text-neutral-300">
-              <span className="font-bold text-white">+250</span> voyageurs cette semaine
+            <span className="text-surface-50 text-sm font-medium">
+              <span className="font-bold text-neutral-100">+250</span> voyageurs cette semaine
             </span>
           </div>
         </div>
@@ -61,11 +62,9 @@ export function HeroSection() {
             heroVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
           )}
         >
-          <span className="block text-4xl leading-[1.1] font-extrabold tracking-tight text-white sm:text-6xl lg:text-7xl">
-            Envoyez vos colis
-          </span>
-          <span className="mt-2 block text-4xl leading-[1.1] font-extrabold tracking-tight sm:text-6xl lg:text-7xl">
-            <span className="animate-gradient-x from-primary-400 via-accent-400 to-primary-400 bg-gradient-to-r bg-clip-text text-transparent">
+          <span className="text-display text-neutral-100">Envoyez vos colis</span>
+          <span className="text-display mt-2 block">
+            <span className="animate-gradient-x via-primary-300 to-accent-400 bg-gradient-to-r from-neutral-100 bg-clip-text text-transparent">
               avec la diaspora
             </span>
           </span>
@@ -73,12 +72,12 @@ export function HeroSection() {
 
         <p
           className={cn(
-            'mx-auto mt-6 max-w-xl text-center text-base leading-relaxed text-neutral-400 transition-all delay-400 duration-1000 sm:text-lg',
+            'text-surface-50 mx-auto mt-6 max-w-xl text-center text-base leading-relaxed transition-all delay-400 duration-1000 sm:text-lg',
             heroVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
           )}
         >
           Akiri connecte expéditeurs et voyageurs de la diaspora africaine. Économique. Sécurisé.{' '}
-          <span className="font-semibold text-white">Communautaire.</span>
+          <span className="font-semibold text-neutral-100">Communautaire.</span>
         </p>
 
         {/* CTA */}
@@ -90,14 +89,14 @@ export function HeroSection() {
         >
           <Link
             href="/annonces"
-            className="bg-primary-500 hover:bg-primary-600 inline-flex h-14 items-center gap-2 rounded-xl px-8 text-base font-semibold text-white transition-colors"
+            className="from-primary-500 to-primary-600 shadow-glow-primary inline-flex h-14 items-center gap-2 rounded-xl bg-gradient-to-r px-8 text-base font-semibold text-white transition-all hover:shadow-lg"
           >
             Trouver un voyageur
             <ArrowRight weight="bold" size={20} />
           </Link>
           <Link
             href="/register"
-            className="inline-flex h-14 items-center rounded-xl border border-white/20 bg-white/5 px-8 text-base font-semibold text-white backdrop-blur-sm transition-colors hover:bg-white/10"
+            className="glass inline-flex h-14 items-center rounded-xl px-8 text-base font-semibold text-neutral-100 transition-colors hover:bg-white/[0.06]"
           >
             Je suis voyageur
           </Link>
@@ -112,14 +111,14 @@ export function HeroSection() {
         >
           <Link
             href="/demandes"
-            className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm font-medium text-white/80 backdrop-blur-sm transition-all hover:bg-white/10 hover:text-white"
+            className="glass text-surface-50 inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium transition-all hover:bg-white/[0.06] hover:text-neutral-100"
           >
             <Package weight="duotone" size={14} />
             Voir les demandes
           </Link>
           <Link
             href="/corridors"
-            className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm font-medium text-white/80 backdrop-blur-sm transition-all hover:bg-white/10 hover:text-white"
+            className="glass text-surface-50 inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium transition-all hover:bg-white/[0.06] hover:text-neutral-100"
           >
             <GlobeHemisphereWest weight="duotone" size={14} />
             Hub des corridors
@@ -138,7 +137,7 @@ export function HeroSection() {
             { icon: CheckCircle, text: 'Profils vérifiés' },
             { icon: Lightning, text: 'Inscription gratuite' },
           ].map((item) => (
-            <span key={item.text} className="flex items-center gap-1.5 text-sm text-neutral-500">
+            <span key={item.text} className="text-surface-100 flex items-center gap-1.5 text-sm">
               <item.icon weight="duotone" size={14} className="text-primary-400" />
               {item.text}
             </span>
@@ -147,7 +146,7 @@ export function HeroSection() {
 
         {/* Scroll indicator */}
         <div className="animate-bounce-subtle mt-16 sm:mt-20">
-          <ArrowDown weight="bold" size={20} className="text-neutral-600" />
+          <ArrowDown weight="bold" size={20} className="text-surface-200" />
         </div>
       </div>
     </section>

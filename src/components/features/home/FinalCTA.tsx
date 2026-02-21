@@ -11,17 +11,17 @@ export function FinalCTA() {
   const { inViewRef, inView } = useInView(0.1);
 
   return (
-    <section ref={inViewRef} className="relative overflow-hidden bg-white py-20 sm:py-28">
+    <section ref={inViewRef} className="bg-surface-950 relative overflow-hidden py-20 sm:py-28">
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div
           className={cn(
-            'relative overflow-hidden rounded-3xl bg-neutral-950 px-6 py-16 sm:px-12 sm:py-20 lg:px-20',
+            'bg-surface-900 relative overflow-hidden rounded-3xl px-6 py-16 sm:px-12 sm:py-20 lg:px-20',
             'transition-all duration-700',
             inView ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
           )}
         >
           {/* Gradient effects */}
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(99,102,241,0.2),transparent_60%)]" />
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(108,92,231,0.2),transparent_60%)]" />
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(139,92,246,0.15),transparent_60%)]" />
           <div
             className="pointer-events-none absolute inset-0 opacity-[0.03]"
@@ -34,14 +34,14 @@ export function FinalCTA() {
           <div className="relative">
             {/* Badge */}
             <div className="flex justify-center">
-              <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-sm font-medium text-neutral-300 backdrop-blur-sm">
+              <div className="glass text-surface-50 inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-medium">
                 <Sparkle weight="fill" size={14} className="text-primary-400" />
                 Inscription gratuite en 2 minutes
               </div>
             </div>
 
             {/* Heading */}
-            <h2 className="mx-auto mt-6 max-w-3xl text-center text-3xl font-bold tracking-tight text-white sm:text-4xl lg:text-5xl">
+            <h2 className="mx-auto mt-6 max-w-3xl text-center text-3xl font-bold tracking-tight text-neutral-100 sm:text-4xl lg:text-5xl">
               Rejoignez des milliers de
               <br />
               <span className="from-primary-400 via-accent-400 to-primary-400 bg-gradient-to-r bg-clip-text text-transparent">
@@ -49,7 +49,7 @@ export function FinalCTA() {
               </span>
             </h2>
 
-            <p className="mx-auto mt-4 max-w-lg text-center text-base text-neutral-400">
+            <p className="text-surface-100 mx-auto mt-4 max-w-lg text-center text-base">
               Expéditeurs et voyageurs connectés sur les corridors Afrique-Europe. Rejoignez la
               communauté.
             </p>
@@ -63,17 +63,17 @@ export function FinalCTA() {
                       firstName={p.first_name}
                       lastName={p.last_name}
                       size="md"
-                      className="ring-2 ring-neutral-950"
+                      className="ring-surface-900 ring-2"
                     />
                   </div>
                 ))}
-                <div className="bg-primary-600 -ml-2.5 flex h-10 w-10 items-center justify-center rounded-full text-xs font-bold text-white ring-2 ring-neutral-950">
+                <div className="from-primary-500 to-primary-600 ring-surface-900 -ml-2.5 flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-r text-xs font-bold text-white ring-2">
                   +2k
                 </div>
               </div>
               <div className="ml-4 text-left">
-                <p className="text-sm font-semibold text-white">2 500+</p>
-                <p className="text-xs text-neutral-500">membres actifs</p>
+                <p className="text-sm font-semibold text-neutral-100">2 500+</p>
+                <p className="text-surface-100 text-xs">membres actifs</p>
               </div>
             </div>
 
@@ -81,7 +81,7 @@ export function FinalCTA() {
             <div className="mt-10 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
               <Link
                 href="/register"
-                className="group bg-primary-500 hover:bg-primary-600 inline-flex h-12 items-center gap-2 rounded-xl px-7 text-sm font-semibold text-white transition-colors"
+                className="group from-primary-500 to-primary-600 shadow-glow-primary inline-flex h-12 items-center gap-2 rounded-xl bg-gradient-to-r px-7 text-sm font-semibold text-white transition-all hover:shadow-lg"
               >
                 Créer mon compte gratuitement
                 <ArrowRight
@@ -92,7 +92,7 @@ export function FinalCTA() {
               </Link>
               <Link
                 href="/annonces"
-                className="inline-flex h-12 items-center rounded-xl border border-white/15 bg-white/5 px-7 text-sm font-semibold text-white backdrop-blur-sm transition-colors hover:bg-white/10"
+                className="glass inline-flex h-12 items-center rounded-xl px-7 text-sm font-semibold text-neutral-100 transition-colors hover:bg-white/[0.06]"
               >
                 Voir les annonces
               </Link>
@@ -107,7 +107,7 @@ export function FinalCTA() {
               ].map((item) => (
                 <span
                   key={item.text}
-                  className="flex items-center gap-1.5 text-xs text-neutral-500"
+                  className="text-surface-100 flex items-center gap-1.5 text-xs"
                 >
                   <item.icon weight="duotone" size={14} className="text-primary-400" />
                   {item.text}

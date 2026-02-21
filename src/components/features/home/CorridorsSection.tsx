@@ -66,9 +66,10 @@ export function CorridorsSection() {
   }, []);
 
   return (
-    <section ref={inViewRef} className="relative overflow-hidden bg-neutral-950 py-20 sm:py-28">
+    <section ref={inViewRef} className="bg-surface-900 relative overflow-hidden py-20 sm:py-28">
       {/* Radial gradient top */}
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(99,102,241,0.12),transparent_60%)]" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(108,92,231,0.12),transparent_60%)]" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(139,92,246,0.08),transparent_60%)]" />
       {/* Dot grid */}
       <div
         className="pointer-events-none absolute inset-0 opacity-[0.03]"
@@ -91,10 +92,10 @@ export function CorridorsSection() {
               <GlobeHemisphereWest weight="duotone" size={16} />
               <span>Corridors actifs</span>
             </div>
-            <h2 className="mt-3 text-3xl font-bold tracking-tight text-white sm:text-4xl lg:text-5xl">
+            <h2 className="mt-3 text-3xl font-bold tracking-tight text-neutral-100 sm:text-4xl lg:text-5xl">
               Les routes les
               <br />
-              <span className="text-neutral-500">plus populaires.</span>
+              <span className="text-surface-200">plus populaires.</span>
             </h2>
           </div>
           <Link
@@ -117,7 +118,7 @@ export function CorridorsSection() {
               key={i}
               href="/corridors"
               className={cn(
-                'group hover:border-primary-500/30 relative overflow-hidden rounded-xl border border-white/10 bg-white/5 p-5 backdrop-blur-sm transition-all duration-500 hover:bg-white/[0.08]',
+                'glass group hover:border-primary-500/20 relative overflow-hidden rounded-xl p-5 transition-all duration-500 hover:bg-white/[0.06]',
                 inView ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
               )}
               style={{ transitionDelay: `${i * 80}ms` }}
@@ -136,33 +137,33 @@ export function CorridorsSection() {
                 <ArrowRight
                   weight="bold"
                   size={14}
-                  className="group-hover:text-primary-400 ml-auto text-neutral-600 transition-all group-hover:translate-x-1"
+                  className="text-surface-200 group-hover:text-primary-400 ml-auto transition-all group-hover:translate-x-1"
                 />
               </div>
 
               {/* Route name */}
-              <p className="mt-3 text-sm font-semibold text-white">
+              <p className="mt-3 text-sm font-semibold text-neutral-100">
                 {corridor.from}
-                <span className="mx-1.5 text-neutral-500">&rarr;</span>
+                <span className="text-surface-200 mx-1.5">&rarr;</span>
                 {corridor.to}
               </p>
-              <p className="text-xs text-neutral-500">
+              <p className="text-surface-100 text-xs">
                 {corridor.fromCountry} &rarr; {corridor.toCountry}
               </p>
 
               {/* Stats row */}
               <div className="mt-4 flex items-center gap-4">
-                <div className="flex items-center gap-1.5 text-xs text-neutral-400">
+                <div className="text-surface-100 flex items-center gap-1.5 text-xs">
                   <Package weight="duotone" size={12} className="text-primary-400" />
                   <span>
-                    <span className="font-medium text-neutral-300">{corridor.count}</span> annonce
+                    <span className="font-medium text-neutral-200">{corridor.count}</span> annonce
                     {corridor.count > 1 ? 's' : ''}
                   </span>
                 </div>
-                <div className="flex items-center gap-1.5 text-xs text-neutral-400">
+                <div className="text-surface-100 flex items-center gap-1.5 text-xs">
                   <TrendUp weight="duotone" size={12} className="text-emerald-400" />
                   <span>
-                    <span className="font-medium text-neutral-300">{corridor.totalKg}kg</span> dispo
+                    <span className="font-medium text-neutral-200">{corridor.totalKg}kg</span> dispo
                   </span>
                 </div>
               </div>
@@ -177,7 +178,7 @@ export function CorridorsSection() {
         <div className="mt-10 flex flex-wrap justify-center gap-2">
           {SUPPORTED_COUNTRIES.map((country) => (
             <Link key={country.code} href={`/annonces?to=${country.code}`}>
-              <span className="hover:border-primary-500/30 inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-medium text-neutral-400 backdrop-blur-sm transition-all hover:bg-white/10 hover:text-white">
+              <span className="glass text-surface-100 hover:border-primary-500/20 inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-all hover:bg-white/[0.06] hover:text-neutral-100">
                 <span className="shrink-0">{country.flag}</span>
                 {country.name}
               </span>
@@ -190,7 +191,7 @@ export function CorridorsSection() {
             <Button
               variant="outline"
               size="lg"
-              className="rounded-xl border-white/20 text-white hover:bg-white/10"
+              className="rounded-xl border-white/[0.08] bg-white/[0.03] text-neutral-100 backdrop-blur-xl hover:bg-white/[0.06]"
               rightIcon={<ArrowRight weight="bold" size={16} />}
             >
               Explorer tous les corridors

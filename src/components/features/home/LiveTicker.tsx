@@ -26,9 +26,9 @@ export function LiveTicker() {
   }, []);
 
   return (
-    <section className="relative overflow-hidden border-b border-white/5 bg-neutral-950 py-3">
+    <section className="bg-surface-800 relative overflow-hidden border-y border-white/[0.06] py-3">
       <div className="flex items-center">
-        <div className="z-10 flex shrink-0 items-center gap-1.5 bg-neutral-950 pr-2 pl-3 sm:gap-2 sm:pr-3 sm:pl-4">
+        <div className="bg-surface-800 z-10 flex shrink-0 items-center gap-1.5 pr-2 pl-3 sm:gap-2 sm:pr-3 sm:pl-4">
           <span className="relative flex h-2 w-2">
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75" />
             <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500" />
@@ -41,8 +41,8 @@ export function LiveTicker() {
         <div className="relative min-w-0 flex-1 overflow-hidden">
           <div className="animate-marquee flex gap-8 whitespace-nowrap">
             {[...liveFeedItems, ...liveFeedItems].map((item, i) => (
-              <span key={i} className="inline-flex items-center gap-2 text-sm text-neutral-400">
-                <span className="font-semibold text-neutral-200">{item.travelerName}</span>
+              <span key={i} className="text-surface-100 inline-flex items-center gap-2 text-sm">
+                <span className="text-surface-50 font-semibold">{item.travelerName}</span>
                 <span className="text-primary-400">&rarr;</span>
                 <span>
                   {item.departure} &rarr; {item.arrival}
@@ -50,7 +50,7 @@ export function LiveTicker() {
                 <Badge
                   variant="outline"
                   size="sm"
-                  className="bg-white/5 text-neutral-400 ring-white/10"
+                  className="text-surface-100 bg-white/[0.03] ring-white/[0.08]"
                 >
                   {item.kg}kg
                 </Badge>
