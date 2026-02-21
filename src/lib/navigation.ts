@@ -3,6 +3,7 @@ import {
   House,
   MagnifyingGlass,
   Package,
+  Cube,
   GlobeHemisphereWest,
   ChatCircle,
   Plus,
@@ -58,6 +59,15 @@ export const NAVIGATION_ITEMS: NavItem[] = [
     showOnMobile: false,
     showOnDesktop: true,
     order: 4,
+  },
+  {
+    id: 'parcels',
+    label: 'Colis',
+    href: '/colis',
+    icon: Cube,
+    showOnMobile: false,
+    showOnDesktop: true,
+    order: 4.5,
   },
   {
     id: 'messages',
