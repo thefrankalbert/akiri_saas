@@ -4,25 +4,28 @@ import { AuthBackButton } from '@/components/layout/AuthBackButton';
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="from-primary-50 to-secondary-50 flex min-h-screen flex-col bg-gradient-to-br via-white">
+    <div className="bg-surface-950 relative flex min-h-screen flex-col">
+      {/* Radial gradient overlay */}
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(108,92,231,0.15),transparent_50%)]" />
+
       {/* Header */}
-      <header className="flex items-center gap-1 px-4 py-6 sm:px-6 lg:px-8">
+      <header className="relative z-10 flex items-center gap-1 px-4 py-6 sm:px-6 lg:px-8">
         <AuthBackButton />
         <Link href="/" className="inline-flex items-center gap-2">
-          <div className="bg-primary-500 flex h-8 w-8 items-center justify-center rounded-lg">
+          <div className="from-primary-500 to-primary-600 flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-r">
             <span className="text-lg font-bold text-white">A</span>
           </div>
-          <span className="text-xl font-bold text-neutral-900">{APP_NAME}</span>
+          <span className="text-xl font-bold text-neutral-100">{APP_NAME}</span>
         </Link>
       </header>
 
       {/* Content */}
-      <main className="flex flex-1 items-center justify-center px-4 py-8 sm:px-6 lg:px-8">
+      <main className="relative z-10 flex flex-1 items-center justify-center px-4 py-8 sm:px-6 lg:px-8">
         <div className="w-full max-w-md">{children}</div>
       </main>
 
       {/* Footer */}
-      <footer className="px-4 py-6 text-center text-sm text-neutral-400 sm:px-6 lg:px-8">
+      <footer className="text-surface-100 relative z-10 px-4 py-6 text-center text-sm sm:px-6 lg:px-8">
         &copy; {new Date().getFullYear()} {APP_NAME}. Tous droits r&eacute;serv&eacute;s.
       </footer>
     </div>

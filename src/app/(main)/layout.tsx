@@ -5,9 +5,9 @@ import { ServiceWorkerRegistration, InstallPrompt } from '@/components/features/
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex min-h-screen flex-col bg-neutral-50">
+    <div className="bg-surface-950 flex min-h-screen flex-col">
       <Header />
-      <main className="flex-1 pb-20 md:pb-0">{children}</main>
+      <main className="flex-1 pb-24 md:pb-0">{children}</main>
       <Footer />
       <BottomNav />
       <ServiceWorkerRegistration />

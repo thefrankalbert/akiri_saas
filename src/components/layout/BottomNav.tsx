@@ -2,15 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import {
-  House,
-  MagnifyingGlass,
-  PlusCircle,
-  GlobeHemisphereWest,
-  Package,
-  ChatCircle,
-  GearSix,
-} from '@phosphor-icons/react';
+import { House, MagnifyingGlass, Plus, ChatCircle, User } from '@phosphor-icons/react';
 import type { Icon as PhosphorIcon } from '@phosphor-icons/react';
 import { cn } from '@/lib/utils';
 
@@ -18,43 +10,40 @@ interface NavItem {
   href: string;
   label: string;
   icon: PhosphorIcon;
-  isAction?: boolean;
+  isCta?: boolean;
 }
 
 const navItems: NavItem[] = [
-  { href: '/', label: 'Accueil', icon: House },
-  { href: '/annonces', label: 'Annonces', icon: MagnifyingGlass },
-  { href: '/annonces/new', label: 'Publier', icon: PlusCircle, isAction: true },
-  { href: '/demandes', label: 'Demandes', icon: Package },
-  { href: '/corridors', label: 'Corridors', icon: GlobeHemisphereWest },
-];
-
-const secondaryItems: NavItem[] = [
+  { href: '/dashboard', label: 'Accueil', icon: House },
+  { href: '/annonces', label: 'Explorer', icon: MagnifyingGlass },
+  { href: '/annonces/new', label: 'Publier', icon: Plus, isCta: true },
   { href: '/messages', label: 'Messages', icon: ChatCircle },
-  { href: '/parametres', label: 'Compte', icon: GearSix },
+  { href: '/profil', label: 'Profil', icon: User },
 ];
 
 export function BottomNav() {
   const pathname = usePathname();
 
-  const allItems = [...navItems, ...secondaryItems];
-
   return (
-    <nav className="fixed right-0 bottom-0 left-0 z-50 border-t border-neutral-200 bg-white/95 backdrop-blur-sm md:hidden">
+    <nav className="safe-bottom bg-surface-950/90 fixed right-0 bottom-0 left-0 z-50 border-t border-white/[0.06] backdrop-blur-xl md:hidden">
       <div className="mx-auto flex h-16 max-w-lg items-center justify-around px-1">
-        {allItems.map((item) => {
-          const isActive = item.href === '/' ? pathname === '/' : pathname.startsWith(item.href);
+        {navItems.map((item) => {
+          const isActive =
+            item.href === '/dashboard'
+              ? pathname === '/dashboard'
+              : pathname.startsWith(item.href) && !item.isCta;
           const Icon = item.icon;
 
-          if (item.isAction) {
+          // Center CTA button
+          if (item.isCta) {
             return (
               <Link
                 key={item.href}
                 href={item.href}
-                className="flex flex-col items-center justify-center"
+                className="flex flex-col items-center justify-center transition-all duration-200"
               >
-                <div className="bg-primary-600 flex h-11 w-11 items-center justify-center rounded-full text-white">
-                  <Icon weight="bold" size={18} />
+                <div className="from-primary-500 to-primary-600 shadow-glow-primary -mt-3 flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-r">
+                  <Icon weight="bold" size={24} className="text-white" />
                 </div>
               </Link>
             );
@@ -65,12 +54,14 @@ export function BottomNav() {
               key={item.href}
               href={item.href}
               className={cn(
-                'flex min-w-[44px] flex-col items-center justify-center gap-0.5 px-2 py-2',
-                isActive ? 'text-primary-600' : 'text-neutral-400'
+                'flex min-w-[44px] flex-col items-center justify-center gap-0.5 px-2 py-2 transition-all duration-200',
+                isActive ? 'text-primary-400' : 'text-surface-200'
               )}
             >
-              <Icon weight={isActive ? 'fill' : 'duotone'} size={20} />
-              <span className="text-[9px] leading-tight font-medium">{item.label}</span>
+              <Icon weight={isActive ? 'fill' : 'regular'} size={22} />
+              {isActive && (
+                <span className="text-[10px] leading-tight font-medium">{item.label}</span>
+              )}
             </Link>
           );
         })}
