@@ -88,6 +88,60 @@ export interface ShipmentRequest {
   sender?: Profile;
 }
 
+// --- Parcel Posting (sender publishes a parcel) ---
+
+export type ParcelCategory =
+  | 'clothing'
+  | 'electronics'
+  | 'food'
+  | 'documents'
+  | 'cosmetics'
+  | 'other';
+
+export type UrgencyLevel = 'flexible' | 'within_2_weeks' | 'urgent';
+
+export type ParcelStatus = 'active' | 'matched' | 'in_progress' | 'completed' | 'cancelled';
+
+export type OfferStatus = 'pending' | 'accepted' | 'rejected' | 'cancelled';
+
+export interface ParcelPosting {
+  id: string;
+  sender_id: string;
+  departure_city: string;
+  departure_country: string;
+  arrival_city: string;
+  arrival_country: string;
+  weight_kg: number;
+  description: string;
+  category: ParcelCategory;
+  photos: string[];
+  budget_per_kg: number | null;
+  urgency: UrgencyLevel;
+  is_fragile: boolean;
+  desired_date: string | null;
+  status: ParcelStatus;
+  created_at: string;
+  updated_at: string;
+  // Joined
+  sender?: Profile;
+}
+
+export interface CarryOffer {
+  id: string;
+  parcel_id: string;
+  traveler_id: string;
+  listing_id: string | null;
+  proposed_price: number;
+  departure_date: string;
+  message: string | null;
+  status: OfferStatus;
+  created_at: string;
+  // Joined
+  parcel?: ParcelPosting;
+  traveler?: Profile;
+  listing?: Listing;
+}
+
 // --- Transaction ---
 export type TransactionStatus = 'pending' | 'held' | 'released' | 'refunded' | 'disputed';
 

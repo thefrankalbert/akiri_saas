@@ -51,6 +51,55 @@ export const ITEM_CATEGORIES = [
   'Autres',
 ] as const;
 
+// Parcel categories
+export const PARCEL_CATEGORIES = [
+  { value: 'clothing', label: 'Vetements' },
+  { value: 'electronics', label: 'Electronique' },
+  { value: 'food', label: 'Alimentaire' },
+  { value: 'documents', label: 'Documents' },
+  { value: 'cosmetics', label: 'Cosmetiques' },
+  { value: 'other', label: 'Autre' },
+] as const;
+
+export const URGENCY_LEVELS = [
+  { value: 'flexible', label: 'Flexible', color: 'text-surface-100' },
+  { value: 'within_2_weeks', label: '< 2 semaines', color: 'text-warning' },
+  { value: 'urgent', label: 'Urgent', color: 'text-error' },
+] as const;
+
+export const PARCEL_STATUS_LABELS: Record<string, string> = {
+  active: 'Actif',
+  matched: 'Matche',
+  in_progress: 'En cours',
+  completed: 'Termine',
+  cancelled: 'Annule',
+};
+
+export const PARCEL_STATUS_COLORS: Record<string, string> = {
+  active: 'bg-success/10 text-success',
+  matched: 'bg-primary-500/10 text-primary-400',
+  in_progress: 'bg-info/10 text-info',
+  completed: 'bg-surface-600 text-surface-200',
+  cancelled: 'bg-error/10 text-error',
+};
+
+export const OFFER_STATUS_LABELS: Record<string, string> = {
+  pending: 'En attente',
+  accepted: 'Acceptee',
+  rejected: 'Refusee',
+  cancelled: 'Annulee',
+};
+
+export const OFFER_STATUS_COLORS: Record<string, string> = {
+  pending: 'bg-yellow-100/10 text-warning',
+  accepted: 'bg-success/10 text-success',
+  rejected: 'bg-error/10 text-error',
+  cancelled: 'bg-surface-600 text-surface-200',
+};
+
+export const MAX_PARCEL_PHOTOS = 3;
+export const MAX_PARCEL_WEIGHT_KG = 30;
+
 // Request status labels (FR)
 export const REQUEST_STATUS_LABELS: Record<string, string> = {
   pending: 'En attente',

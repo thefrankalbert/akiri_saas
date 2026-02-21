@@ -3,7 +3,7 @@
 // ============================================
 
 import { z } from 'zod/v4';
-import { MAX_WEIGHT_KG, MIN_PRICE_PER_KG } from '@/constants';
+import { MAX_WEIGHT_KG, MIN_PRICE_PER_KG, MAX_PARCEL_WEIGHT_KG } from '@/constants';
 
 // ─── Auth Schemas ───────────────────────────────────────────
 
@@ -121,6 +121,79 @@ export const createRequestSchema = z.object({
 });
 
 export type CreateRequestInput = z.infer<typeof createRequestSchema>;
+
+// ─── Parcel Posting Schemas ─────────────────────────────────
+
+export const createParcelPostingSchema = z.object({
+  departure_city: z.string().min(2, 'Ville de depart requise'),
+  departure_country: z.string().min(2, 'Pays de depart requis'),
+  arrival_city: z.string().min(2, "Ville d'arrivee requise"),
+  arrival_country: z.string().min(2, "Pays d'arrivee requis"),
+  weight_kg: z
+    .number()
+    .min(0.5, 'Minimum 0.5 kg')
+    .max(MAX_PARCEL_WEIGHT_KG, `Maximum ${MAX_PARCEL_WEIGHT_KG} kg`),
+  description: z
+    .string()
+    .min(10, 'Decrivez votre colis en au moins 10 caracteres')
+    .max(500, 'Description trop longue'),
+  category: z.enum(['clothing', 'electronics', 'food', 'documents', 'cosmetics', 'other'], {
+    error: 'Categorie requise',
+  }),
+  photos: z.array(z.string().url()).max(3, 'Maximum 3 photos').optional().default([]),
+  budget_per_kg: z.number().min(1, 'Minimum 1 EUR/kg').nullable().optional(),
+  urgency: z.enum(['flexible', 'within_2_weeks', 'urgent']).default('flexible'),
+  is_fragile: z.boolean().default(false),
+  desired_date: z
+    .string()
+    .nullable()
+    .optional()
+    .refine(
+      (val) => {
+        if (!val) return true;
+        const date = new Date(val);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        return date >= today;
+      },
+      { message: 'La date souhaitee doit etre dans le futur' }
+    ),
+});
+
+export type CreateParcelPostingInput = z.infer<typeof createParcelPostingSchema>;
+
+export const createCarryOfferSchema = z.object({
+  parcel_id: z.string().uuid('ID de colis invalide'),
+  listing_id: z.string().uuid("ID d'annonce invalide").nullable().optional(),
+  proposed_price: z.number().min(1, 'Minimum 1 EUR'),
+  departure_date: z.string().refine(
+    (val) => {
+      const date = new Date(val);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      return date >= today;
+    },
+    { message: 'La date de depart doit etre dans le futur' }
+  ),
+  message: z.string().max(500, 'Message trop long').nullable().optional(),
+});
+
+export type CreateCarryOfferInput = z.infer<typeof createCarryOfferSchema>;
+
+export const searchParcelsSchema = z.object({
+  departure_country: z.string().optional(),
+  arrival_country: z.string().optional(),
+  min_kg: z.number().min(0).optional(),
+  max_kg: z.number().min(0).optional(),
+  category: z.string().optional(),
+  urgency: z.string().optional(),
+  page: z.number().int().min(1).default(1),
+  per_page: z.number().int().min(1).max(50).default(20),
+  sort_by: z.enum(['created_at', 'weight_kg', 'urgency', 'budget_per_kg']).default('created_at'),
+  sort_order: z.enum(['asc', 'desc']).default('desc'),
+});
+
+export type SearchParcelsInput = z.infer<typeof searchParcelsSchema>;
 
 // ─── Review Schemas ─────────────────────────────────────────
 
