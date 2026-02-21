@@ -44,16 +44,20 @@ export function ListingGrid({ listings, loading }: ListingGridProps) {
               className="h-full transition-all duration-200 hover:border-white/[0.15]"
               padding="none"
             >
-              <CardContent className="p-2.5">
+              <CardContent className="overflow-hidden p-2.5">
                 {/* Route + Date */}
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-1.5 text-sm">
-                    <MapPin weight="duotone" size={14} className="text-primary-400" />
-                    <span className="font-medium text-neutral-100">{listing.departure_city}</span>
-                    <span className="text-surface-300">&rarr;</span>
-                    <span className="font-medium text-neutral-100">{listing.arrival_city}</span>
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex min-w-0 items-center gap-1.5 text-sm">
+                    <MapPin weight="duotone" size={14} className="text-primary-400 shrink-0" />
+                    <span className="truncate font-medium text-neutral-100">
+                      {listing.departure_city}
+                    </span>
+                    <span className="text-surface-300 shrink-0">&rarr;</span>
+                    <span className="truncate font-medium text-neutral-100">
+                      {listing.arrival_city}
+                    </span>
                   </div>
-                  <span className="text-surface-200 flex items-center gap-1 text-xs">
+                  <span className="text-surface-200 flex shrink-0 items-center gap-1 text-xs">
                     <CalendarBlank weight="duotone" size={12} />
                     {formatDate(listing.departure_date)}
                   </span>
@@ -94,7 +98,7 @@ export function ListingGrid({ listings, loading }: ListingGridProps) {
                       lastName={listing.traveler.last_name}
                       size="sm"
                     />
-                    <p className="text-surface-50 flex-1 text-xs font-medium">
+                    <p className="text-surface-50 min-w-0 flex-1 truncate text-xs font-medium">
                       {listing.traveler.first_name} {listing.traveler.last_name.charAt(0)}.
                     </p>
                     {listing.traveler.rating > 0 && (

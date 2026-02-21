@@ -136,14 +136,14 @@ export function SendRequestModal({ listing, children }: SendRequestModalProps) {
           </div>
 
           {/* Dynamic price */}
-          <div className="bg-surface-700 flex items-center justify-between rounded-xl border border-white/[0.08] px-4 py-3">
-            <div className="text-surface-100 flex items-center gap-2 text-sm">
-              <Package weight="duotone" size={16} />
-              <span>
+          <div className="bg-surface-700 flex items-center justify-between gap-3 rounded-xl border border-white/[0.08] px-4 py-3">
+            <div className="text-surface-100 flex min-w-0 items-center gap-2 text-sm">
+              <Package weight="duotone" size={16} className="shrink-0" />
+              <span className="truncate">
                 {weightValue} kg × {formatCurrency(listing.price_per_kg)}/kg
               </span>
             </div>
-            <span className="text-primary-400 font-mono text-lg font-bold">
+            <span className="text-primary-400 shrink-0 font-mono text-lg font-bold">
               {formatCurrency(dynamicPrice)}
             </span>
           </div>

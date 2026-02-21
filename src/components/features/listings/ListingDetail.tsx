@@ -120,8 +120,8 @@ export function ListingDetail({ listingId }: ListingDetailProps) {
             <CardContent className="p-6">
               {/* Route */}
               <div className="flex items-center gap-3">
-                <MapPin className="text-primary-400" size={20} />
-                <div>
+                <MapPin className="text-primary-400 shrink-0" size={20} />
+                <div className="min-w-0 flex-1">
                   <h1 className="truncate text-xl font-bold text-neutral-100">
                     {listing.departure_city}, {listing.departure_country}
                   </h1>
@@ -147,13 +147,13 @@ export function ListingDetail({ listingId }: ListingDetailProps) {
               <div className="mt-6 grid grid-cols-2 gap-4">
                 <div className="bg-surface-700 rounded-xl p-4 text-center">
                   <Package className="text-primary-400 mx-auto" size={24} />
-                  <p className="mt-2 font-mono text-2xl font-bold text-neutral-100">
+                  <p className="mt-2 font-mono text-xl font-bold text-neutral-100 sm:text-2xl">
                     {listing.available_kg} kg
                   </p>
                   <p className="text-surface-100 text-sm">disponibles</p>
                 </div>
                 <div className="bg-surface-700 rounded-xl p-4 text-center">
-                  <span className="text-primary-400 font-mono text-2xl font-bold">
+                  <span className="text-primary-400 font-mono text-xl font-bold sm:text-2xl">
                     {formatCurrency(listing.price_per_kg)}
                   </span>
                   <p className="text-surface-100 text-sm">par kilo</p>

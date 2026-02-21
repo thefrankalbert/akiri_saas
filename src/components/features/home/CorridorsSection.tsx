@@ -169,7 +169,7 @@ export function CorridorsSection() {
               </div>
 
               {/* Glow on hover */}
-              <div className="bg-primary-500/0 group-hover:bg-primary-500/20 pointer-events-none absolute -right-8 -bottom-8 h-24 w-24 rounded-full blur-2xl transition-all duration-500" />
+              <div className="bg-primary-500/0 group-hover:bg-primary-500/20 pointer-events-none absolute -right-4 -bottom-4 h-20 w-20 rounded-full blur-2xl transition-all duration-500" />
             </Link>
           ))}
         </div>

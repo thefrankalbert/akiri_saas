@@ -16,9 +16,9 @@ export function DashboardHero({ profile, statItems }: DashboardHeroProps) {
       <div className="bg-surface-800 mb-6 rounded-2xl px-5 py-6">
         <div className="flex items-center justify-between gap-4">
           {/* Left: avatar + greeting */}
-          <div className="flex items-center gap-3">
+          <div className="flex min-w-0 items-center gap-3">
             {profile && (
-              <div className="ring-primary-500/30 rounded-full ring-2">
+              <div className="ring-primary-500/30 shrink-0 rounded-full ring-2">
                 <Avatar
                   src={profile.avatar_url}
                   firstName={profile.first_name}
@@ -28,8 +28,8 @@ export function DashboardHero({ profile, statItems }: DashboardHeroProps) {
                 />
               </div>
             )}
-            <div>
-              <h1 className="text-base font-semibold text-neutral-100 sm:text-lg">
+            <div className="min-w-0">
+              <h1 className="truncate text-base font-semibold text-neutral-100 sm:text-lg">
                 Bonjour, {profile?.first_name || 'Utilisateur'}
               </h1>
               <p className="text-surface-100 flex items-center gap-1.5 text-xs">

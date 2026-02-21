@@ -239,8 +239,8 @@ export function CorridorsPage() {
   return (
     <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 md:px-7 lg:px-8">
       {/* ===== PAGE HEADER ===== */}
-      <div className="mb-6 flex items-start justify-between">
-        <div>
+      <div className="mb-6 flex items-start justify-between gap-3">
+        <div className="min-w-0">
           <h1 className="text-2xl font-semibold tracking-tight text-neutral-100">
             Hub des corridors
           </h1>

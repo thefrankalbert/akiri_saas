@@ -80,11 +80,11 @@ export function RequestCard({ request, role, onAction }: RequestCardProps) {
 
           {/* Route */}
           {request.listing && (
-            <div className="text-surface-100 mt-1.5 flex items-center gap-1 text-xs">
-              <MapPin weight="duotone" size={12} />
-              <span>{request.listing.departure_city}</span>
-              <span>&rarr;</span>
-              <span>{request.listing.arrival_city}</span>
+            <div className="text-surface-100 mt-1.5 flex min-w-0 items-center gap-1 truncate text-xs">
+              <MapPin weight="duotone" size={12} className="shrink-0" />
+              <span className="truncate">{request.listing.departure_city}</span>
+              <span className="shrink-0">&rarr;</span>
+              <span className="truncate">{request.listing.arrival_city}</span>
             </div>
           )}
 

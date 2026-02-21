@@ -48,8 +48,8 @@ export function AccountSettingsTab({ email }: AccountSettingsTabProps) {
       {/* Password */}
       <div className="bg-surface-800 rounded-xl border border-white/[0.08] p-4">
         <div className="flex items-center gap-3">
-          <LockKey weight="duotone" size={20} className="text-surface-200" />
-          <div className="flex-1">
+          <LockKey weight="duotone" size={20} className="text-surface-200 shrink-0" />
+          <div className="min-w-0 flex-1">
             <h3 className="text-sm font-medium text-neutral-100">Mot de passe</h3>
             <p className="text-surface-100 text-xs">Réinitialisez votre mot de passe par email.</p>
           </div>
@@ -62,8 +62,8 @@ export function AccountSettingsTab({ email }: AccountSettingsTabProps) {
       {/* Delete account */}
       <div className="border-error/20 bg-error/5 rounded-xl border p-4">
         <div className="flex items-center gap-3">
-          <Trash weight="duotone" size={20} className="text-error" />
-          <div className="flex-1">
+          <Trash weight="duotone" size={20} className="text-error shrink-0" />
+          <div className="min-w-0 flex-1">
             <h3 className="text-sm font-medium text-neutral-100">Supprimer le compte</h3>
             <p className="text-surface-100 text-xs">Cette action est irréversible.</p>
           </div>

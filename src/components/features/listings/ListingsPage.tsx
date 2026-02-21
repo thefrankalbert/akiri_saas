@@ -16,14 +16,14 @@ export function ListingsPage() {
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 md:px-7 lg:px-8">
       {/* Header */}
-      <div className="mb-6 flex items-center justify-between">
-        <div>
+      <div className="mb-6 flex items-center justify-between gap-3">
+        <div className="min-w-0">
           <h1 className="text-2xl font-bold text-neutral-100">Annonces</h1>
-          <p className="text-surface-100 mt-1 text-sm">
+          <p className="text-surface-100 mt-1 truncate text-sm">
             Trouvez un voyageur pour transporter votre colis
           </p>
         </div>
-        <Link href="/annonces/new">
+        <Link href="/annonces/new" className="shrink-0">
           <Button size="sm">Publier</Button>
         </Link>
       </div>
@@ -35,12 +35,12 @@ export function ListingsPage() {
       />
 
       {/* Sort */}
-      <div className="mb-4 flex items-center justify-between">
-        <p className="text-surface-100 text-sm">
+      <div className="mb-4 flex items-center justify-between gap-2">
+        <p className="text-surface-100 min-w-0 truncate text-sm">
           {loading ? 'Chargement...' : `${listings.length} annonce(s) trouvée(s)`}
         </p>
-        <div className="flex items-center gap-2">
-          <span className="text-surface-100 text-sm">Trier par</span>
+        <div className="flex shrink-0 items-center gap-2">
+          <span className="text-surface-100 hidden text-sm sm:inline">Trier par</span>
           <select
             className="bg-surface-700 appearance-none rounded-lg border border-white/[0.08] px-2 py-1 pr-7 text-sm text-neutral-100"
             onChange={(e) =>

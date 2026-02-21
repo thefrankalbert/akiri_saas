@@ -61,8 +61,8 @@ export function RequestDetails({ request, role, counterparty, onCopyCode }: Requ
               size="md"
               isVerified={counterparty.is_verified}
             />
-            <div className="flex-1">
-              <p className="text-sm font-medium text-neutral-100">
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-medium text-neutral-100">
                 {counterparty.first_name} {counterparty.last_name}
               </p>
               {counterparty.rating > 0 && (

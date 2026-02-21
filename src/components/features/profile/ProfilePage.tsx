@@ -119,8 +119,8 @@ export function ProfilePage({ userId }: ProfilePageProps) {
               size="xl"
               isVerified={profile.is_verified}
             />
-            <div className="flex-1">
-              <h1 className="text-xl font-bold text-neutral-100">
+            <div className="min-w-0 flex-1">
+              <h1 className="truncate text-xl font-bold text-neutral-100">
                 {profile.first_name} {profile.last_name}
               </h1>
               <div className="mt-1 flex flex-wrap items-center gap-2">
@@ -196,14 +196,14 @@ export function ProfilePage({ userId }: ProfilePageProps) {
                         size="sm"
                       />
                     )}
-                    <div className="flex-1">
-                      <div className="flex items-center justify-between">
-                        <p className="text-sm font-medium text-neutral-100">
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center justify-between gap-2">
+                        <p className="min-w-0 truncate text-sm font-medium text-neutral-100">
                           {review.reviewer
                             ? `${review.reviewer.first_name} ${review.reviewer.last_name.charAt(0)}.`
                             : 'Utilisateur'}
                         </p>
-                        <div className="flex items-center gap-0.5">
+                        <div className="flex shrink-0 items-center gap-0.5">
                           {Array.from({ length: 5 }).map((_, i) => (
                             <Star
                               key={i}

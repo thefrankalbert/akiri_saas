@@ -43,7 +43,7 @@ export function ImageLightbox({ src, onClose }: ImageLightboxProps) {
             exit={{ scale: 0.9, opacity: 0 }}
             src={src}
             alt="Image agrandie"
-            className="max-h-[70vh] max-w-[90vw] rounded-lg object-contain px-4 sm:max-h-[80vh] sm:px-0 lg:max-h-[85vh]"
+            className="max-h-[70vh] max-w-[90%] rounded-lg object-contain px-4 sm:max-h-[80vh] sm:px-0 lg:max-h-[85vh]"
             onClick={(e) => e.stopPropagation()}
           />
         </motion.div>

@@ -93,7 +93,7 @@ export function FeaturesSection() {
             </div>
 
             {/* Decorative gradient */}
-            <div className="pointer-events-none absolute -right-20 -bottom-20 h-64 w-64 rounded-full bg-emerald-500/5 blur-3xl transition-all duration-500 group-hover:bg-emerald-500/10" />
+            <div className="pointer-events-none absolute -right-8 -bottom-8 h-48 w-48 rounded-full bg-emerald-500/5 blur-3xl transition-all duration-500 group-hover:bg-emerald-500/10" />
           </div>
 
           {/* Card 2 — 15+ corridors */}
@@ -128,7 +128,7 @@ export function FeaturesSection() {
               </span>
             </div>
 
-            <div className="bg-primary-500/5 group-hover:bg-primary-500/10 pointer-events-none absolute -right-10 -bottom-10 h-32 w-32 rounded-full blur-2xl transition-all duration-500" />
+            <div className="bg-primary-500/5 group-hover:bg-primary-500/10 pointer-events-none absolute -right-4 -bottom-4 h-24 w-24 rounded-full blur-2xl transition-all duration-500" />
           </div>
 
           {/* Card 3 — Économies */}
@@ -209,7 +209,7 @@ export function FeaturesSection() {
               </div>
             </div>
 
-            <div className="pointer-events-none absolute -right-10 -bottom-10 h-32 w-32 rounded-full bg-rose-500/5 blur-2xl transition-all duration-500 group-hover:bg-rose-500/10" />
+            <div className="pointer-events-none absolute -right-4 -bottom-4 h-24 w-24 rounded-full bg-rose-500/5 blur-2xl transition-all duration-500 group-hover:bg-rose-500/10" />
           </div>
 
           {/* Card 5 — CTA card */}

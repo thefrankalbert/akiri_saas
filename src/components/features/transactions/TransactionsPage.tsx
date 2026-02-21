@@ -41,7 +41,7 @@ export function TransactionsPage() {
       <div className="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-3">
         <Card>
           <CardContent className="p-4 text-center">
-            <p className="font-mono text-2xl font-bold text-neutral-100">
+            <p className="font-mono text-xl font-bold text-neutral-100 sm:text-2xl">
               {formatCurrency(mockTransactions.reduce((sum, t) => sum + t.amount, 0))}
             </p>
             <p className="text-surface-100 text-xs">Total des transactions</p>
@@ -49,7 +49,7 @@ export function TransactionsPage() {
         </Card>
         <Card>
           <CardContent className="p-4 text-center">
-            <p className="text-success font-mono text-2xl font-bold">
+            <p className="text-success font-mono text-xl font-bold sm:text-2xl">
               {formatCurrency(
                 mockTransactions
                   .filter((t) => t.status === 'released')
@@ -61,7 +61,7 @@ export function TransactionsPage() {
         </Card>
         <Card className="col-span-2 sm:col-span-1">
           <CardContent className="p-4 text-center">
-            <p className="text-info font-mono text-2xl font-bold">
+            <p className="text-info font-mono text-xl font-bold sm:text-2xl">
               {formatCurrency(
                 mockTransactions
                   .filter((t) => t.status === 'held')
@@ -100,7 +100,7 @@ export function TransactionsPage() {
                   <p className="truncate text-sm font-medium text-neutral-100">
                     {txn.request?.item_description || 'Transaction'}
                   </p>
-                  <p className="text-surface-200 text-xs">
+                  <p className="text-surface-200 truncate text-xs">
                     {formatDate(txn.created_at)}
                     {txn.request?.listing && (
                       <>

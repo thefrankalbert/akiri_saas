@@ -34,7 +34,7 @@ export function RequestStatusStepper({ currentStatus }: RequestStatusStepperProp
           </span>
         </div>
       ) : (
-        <div className="flex items-center">
+        <div className="flex items-center overflow-x-auto">
           {STEPS.map((step, index) => {
             const isDone = index < currentIndex;
             const isActive = index === currentIndex;
