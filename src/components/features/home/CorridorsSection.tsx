@@ -92,7 +92,7 @@ export function CorridorsSection() {
               <GlobeHemisphereWest weight="duotone" size={16} />
               <span>Corridors actifs</span>
             </div>
-            <h2 className="mt-3 text-3xl font-bold tracking-tight text-neutral-100 sm:text-4xl lg:text-5xl">
+            <h2 className="mt-3 text-3xl font-bold tracking-tight text-neutral-100 sm:text-4xl md:text-[2.625rem] lg:text-5xl">
               Les routes les
               <br />
               <span className="text-surface-200">plus populaires.</span>

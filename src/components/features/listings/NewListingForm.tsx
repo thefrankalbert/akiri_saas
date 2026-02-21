@@ -89,7 +89,7 @@ export function NewListingForm() {
   };
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-8 sm:px-6 lg:px-8">
+    <div className="mx-auto max-w-2xl px-4 py-8 sm:px-6 md:px-7 lg:px-8">
       <Card>
         <CardHeader>
           <div className="flex items-center gap-3">

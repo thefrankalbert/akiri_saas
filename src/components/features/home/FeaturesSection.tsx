@@ -35,7 +35,7 @@ export function FeaturesSection() {
               <span>Pourquoi Akiri</span>
             </span>
           </div>
-          <h2 className="mt-4 text-3xl font-bold tracking-tight text-neutral-100 sm:text-4xl lg:text-5xl">
+          <h2 className="mt-4 text-3xl font-bold tracking-tight text-neutral-100 sm:text-4xl md:text-[2.625rem] lg:text-5xl">
             Conçu pour la
             <br />
             <span className="text-surface-200">confiance.</span>

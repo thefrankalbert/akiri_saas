@@ -75,7 +75,7 @@ export function TestimonialsSection() {
               <Star weight="fill" size={16} />
               <span>Témoignages</span>
             </div>
-            <h2 className="mt-3 text-3xl font-bold tracking-tight text-neutral-100 sm:text-4xl lg:text-5xl">
+            <h2 className="mt-3 text-3xl font-bold tracking-tight text-neutral-100 sm:text-4xl md:text-[2.625rem] lg:text-5xl">
               Ils nous font
               <br />
               <span className="text-surface-200">confiance.</span>

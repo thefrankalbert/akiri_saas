@@ -41,7 +41,7 @@ export function FinalCTA() {
             </div>
 
             {/* Heading */}
-            <h2 className="mx-auto mt-6 max-w-3xl text-center text-3xl font-bold tracking-tight text-neutral-100 sm:text-4xl lg:text-5xl">
+            <h2 className="mx-auto mt-6 max-w-3xl text-center text-3xl font-bold tracking-tight text-neutral-100 sm:text-4xl md:text-[2.625rem] lg:text-5xl">
               Rejoignez des milliers de
               <br />
               <span className="from-primary-400 via-accent-400 to-primary-400 bg-gradient-to-r bg-clip-text text-transparent">

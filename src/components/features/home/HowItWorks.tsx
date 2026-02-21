@@ -231,7 +231,7 @@ export function HowItWorks() {
               <span>Comment ça marche</span>
             </span>
           </div>
-          <h2 className="mt-4 text-3xl font-bold tracking-tight text-neutral-100 sm:text-4xl lg:text-5xl">
+          <h2 className="mt-4 text-3xl font-bold tracking-tight text-neutral-100 sm:text-4xl md:text-[2.625rem] lg:text-5xl">
             4 étapes simples.
             <br />
             <span className="text-surface-200">Zéro complication.</span>

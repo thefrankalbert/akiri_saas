@@ -177,7 +177,7 @@ export function DashboardPage() {
 
   if (loading) {
     return (
-      <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6 md:px-7 lg:px-8">
         <Shimmer className="mb-6 h-32 w-full rounded-2xl" />
         <div className="mb-6 flex gap-2">
           {Array.from({ length: 3 }).map((_, i) => (
@@ -224,7 +224,7 @@ export function DashboardPage() {
   ];
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6 lg:px-8">
+    <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6 md:px-7 lg:px-8">
       {/* ===== HERO: Welcome + Stats ===== */}
       <FadeIn>
         <div className="bg-surface-800 mb-6 rounded-2xl px-5 py-6">

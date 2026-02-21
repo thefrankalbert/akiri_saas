@@ -76,7 +76,7 @@ export function ListingDetail({ listingId }: ListingDetailProps) {
 
   if (loading) {
     return (
-      <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 md:px-7 lg:px-8">
         <Skeleton className="mb-4 h-6 w-32" />
         <Skeleton className="mb-6 h-8 w-64" />
         <Skeleton className="h-96 w-full rounded-2xl" />
@@ -86,7 +86,7 @@ export function ListingDetail({ listingId }: ListingDetailProps) {
 
   if (error || !listing) {
     return (
-      <div className="mx-auto max-w-3xl px-4 py-16 text-center sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-3xl px-4 py-16 text-center sm:px-6 md:px-7 lg:px-8">
         <Package className="text-surface-300 mx-auto" size={64} />
         <h2 className="mt-4 text-xl font-semibold text-neutral-100">
           {error || 'Annonce introuvable'}
@@ -103,7 +103,7 @@ export function ListingDetail({ listingId }: ListingDetailProps) {
   const totalCost = listing.available_kg * listing.price_per_kg;
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
+    <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 md:px-7 lg:px-8">
       {/* Back button */}
       <Link
         href="/annonces"
