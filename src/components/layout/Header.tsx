@@ -49,7 +49,7 @@ export function Header() {
           >
             <ArrowLeft weight="bold" size={20} />
           </button>
-          <Link href="/" className="flex items-center gap-2">
+          <Link href="/" className="flex items-center gap-2 md:hidden">
             <div className="from-primary-500 to-primary-600 flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-r">
               <span className="text-lg font-bold text-white">A</span>
             </div>

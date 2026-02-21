@@ -113,9 +113,9 @@ export function ListingDetail({ listingId }: ListingDetailProps) {
         Retour aux annonces
       </Link>
 
-      <div className="grid gap-6 lg:grid-cols-3">
+      <div className="grid gap-6 md:grid-cols-3">
         {/* Main content */}
-        <div className="lg:col-span-2">
+        <div className="md:col-span-2">
           <Card>
             <CardContent className="p-6">
               {/* Route */}
