@@ -1,1 +1,9 @@
 export { MessagesPage } from './MessagesPage';
+export { ConversationItem } from './ConversationItem';
+export { MessageBubble } from './MessageBubble';
+export { ChatInput } from './ChatInput';
+export { ChatHeader } from './ChatHeader';
+export { TypingIndicator } from './TypingIndicator';
+export { ImageLightbox } from './ImageLightbox';
+export { EmptyChatState } from './EmptyChatState';
+export { MessageList } from './MessageList';

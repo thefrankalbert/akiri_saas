@@ -14,7 +14,7 @@ import {
 } from '@phosphor-icons/react';
 import type { Icon as PhosphorIcon } from '@phosphor-icons/react';
 import { Avatar } from '@/components/ui';
-import { useAuth } from '@/lib/hooks';
+import { useAuth, useConversations } from '@/lib/hooks';
 import { cn } from '@/lib/utils';
 
 interface NavItem {
@@ -34,6 +34,7 @@ const primaryNav: NavItem[] = [
 export function Sidebar() {
   const pathname = usePathname();
   const { profile, isAuthenticated, signOut } = useAuth();
+  const { totalUnread } = useConversations('mock-user-001');
 
   return (
     <aside className="bg-surface-900 fixed inset-y-0 left-0 z-40 hidden w-16 flex-col border-r border-white/[0.06] md:flex lg:w-60">
@@ -64,7 +65,14 @@ export function Sidebar() {
                   : 'text-surface-200 hover:bg-surface-800 hover:text-neutral-100'
               )}
             >
-              <Icon weight={isActive ? 'fill' : 'duotone'} size={20} className="shrink-0" />
+              <div className="relative shrink-0">
+                <Icon weight={isActive ? 'fill' : 'duotone'} size={20} />
+                {item.href === '/messages' && totalUnread > 0 && (
+                  <span className="absolute -top-1 -right-1.5 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white">
+                    {totalUnread > 9 ? '9+' : totalUnread}
+                  </span>
+                )}
+              </div>
               <span className="hidden lg:inline">{item.label}</span>
             </Link>
           );

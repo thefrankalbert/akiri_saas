@@ -68,3 +68,30 @@ export function getInitials(firstName: string, lastName: string): string {
 export function calculatePlatformFee(amount: number, feePercent = 10): number {
   return Math.round(amount * (feePercent / 100) * 100) / 100;
 }
+
+/**
+ * Format time for chat messages — "14:30"
+ */
+export function formatMessageTime(date: string | Date): string {
+  return new Intl.DateTimeFormat('fr-FR', {
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(new Date(date));
+}
+
+/**
+ * Format date for chat message separators — "Aujourd'hui" / "Hier" / "12 février"
+ */
+export function formatMessageDate(date: string | Date): string {
+  const target = new Date(date);
+  const now = new Date();
+
+  const targetDate = new Date(target.getFullYear(), target.getMonth(), target.getDate());
+  const todayDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+  const diffDays = Math.round((todayDate.getTime() - targetDate.getTime()) / 86400000);
+
+  if (diffDays === 0) return "Aujourd'hui";
+  if (diffDays === 1) return 'Hier';
+  return new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'long' }).format(target);
+}

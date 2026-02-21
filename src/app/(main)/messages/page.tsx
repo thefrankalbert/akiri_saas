@@ -1,8 +1,6 @@
 import type { Metadata } from 'next';
 import { MessagesPage } from '@/components/features/chat/MessagesPage';
 
-export const dynamic = 'force-dynamic';
-
 export const metadata: Metadata = {
   title: 'Messages',
   description: 'Discutez avec vos voyageurs et expéditeurs.',
