@@ -57,14 +57,14 @@ export function IdentityVerification({
   // Verified state
   if (status === 'verified') {
     return (
-      <Card className={cn('border-green-200 bg-green-50', className)}>
+      <Card className={cn('border-success/20 bg-success/5', className)}>
         <CardContent className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-100">
-            <CheckCircle className="text-green-600" size={20} />
+          <div className="bg-success/10 flex h-10 w-10 items-center justify-center rounded-full">
+            <CheckCircle className="text-success" size={20} />
           </div>
           <div>
-            <p className="font-medium text-green-800">Identité vérifiée</p>
-            <p className="text-sm text-green-600">Votre pièce d&apos;identité a été validée</p>
+            <p className="text-success font-medium">Identité vérifiée</p>
+            <p className="text-success/80 text-sm">Votre pièce d&apos;identité a été validée</p>
           </div>
         </CardContent>
       </Card>
@@ -74,14 +74,14 @@ export function IdentityVerification({
   // Pending state
   if (status === 'pending') {
     return (
-      <Card className={cn('border-amber-200 bg-amber-50', className)}>
+      <Card className={cn('border-warning/20 bg-warning/5', className)}>
         <CardContent className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-amber-100">
-            <SpinnerGap className="animate-spin text-amber-600" size={20} />
+          <div className="bg-warning/10 flex h-10 w-10 items-center justify-center rounded-full">
+            <SpinnerGap className="text-warning animate-spin" size={20} />
           </div>
           <div>
-            <p className="font-medium text-amber-800">Vérification en cours</p>
-            <p className="text-sm text-amber-600">
+            <p className="text-warning font-medium">Vérification en cours</p>
+            <p className="text-warning/80 text-sm">
               Nous vérifions votre pièce d&apos;identité. Cela peut prendre quelques minutes.
             </p>
           </div>
@@ -93,15 +93,15 @@ export function IdentityVerification({
   // Failed state
   if (status === 'failed') {
     return (
-      <Card className={cn('border-red-200 bg-red-50', className)}>
+      <Card className={cn('border-error/20 bg-error/5', className)}>
         <CardHeader>
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-100">
-              <WarningCircle className="text-red-600" size={20} />
+            <div className="bg-error/10 flex h-10 w-10 items-center justify-center rounded-full">
+              <WarningCircle className="text-error" size={20} />
             </div>
             <div>
-              <CardTitle className="text-red-800">Vérification échouée</CardTitle>
-              <CardDescription className="text-red-600">
+              <CardTitle className="text-error">Vérification échouée</CardTitle>
+              <CardDescription className="text-error/80">
                 La vérification de votre identité n&apos;a pas pu être complétée
               </CardDescription>
             </div>
@@ -109,7 +109,7 @@ export function IdentityVerification({
         </CardHeader>
         <CardContent>
           {error && (
-            <div className="mb-4 rounded-lg bg-red-100 px-4 py-3 text-sm text-red-700">{error}</div>
+            <div className="bg-error/10 text-error mb-4 rounded-xl px-4 py-3 text-sm">{error}</div>
           )}
           <Button onClick={handleStartVerification} isLoading={isLoading} className="w-full">
             Réessayer la vérification
@@ -124,8 +124,8 @@ export function IdentityVerification({
     <Card className={className}>
       <CardHeader>
         <div className="flex items-center gap-3">
-          <div className="bg-primary-100 flex h-10 w-10 items-center justify-center rounded-full">
-            <ShieldCheck className="text-primary-600" size={20} />
+          <div className="bg-primary-500/10 flex h-10 w-10 items-center justify-center rounded-full">
+            <ShieldCheck className="text-primary-400" size={20} />
           </div>
           <div>
             <CardTitle>Vérifier votre identité</CardTitle>
@@ -137,10 +137,10 @@ export function IdentityVerification({
       </CardHeader>
       <CardContent>
         {error && (
-          <div className="mb-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>
+          <div className="bg-error/10 text-error mb-4 rounded-xl px-4 py-3 text-sm">{error}</div>
         )}
 
-        <div className="mb-4 space-y-2 text-sm text-neutral-600">
+        <div className="text-surface-100 mb-4 space-y-2 text-sm">
           <p>Documents acceptés :</p>
           <ul className="ml-4 list-disc space-y-1">
             <li>Carte nationale d&apos;identité</li>
@@ -153,7 +153,7 @@ export function IdentityVerification({
           Commencer la vérification
         </Button>
 
-        <p className="mt-3 text-center text-xs text-neutral-500">
+        <p className="text-surface-200 mt-3 text-center text-xs">
           Vos données sont sécurisées et traitées par Stripe Identity
         </p>
       </CardContent>

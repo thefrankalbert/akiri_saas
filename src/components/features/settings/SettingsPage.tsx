@@ -23,14 +23,14 @@ export function SettingsPage() {
       <div className="mx-auto max-w-2xl px-4 py-6">
         <Shimmer className="mb-6 h-8 w-48" />
         <Shimmer className="mb-4 h-10 w-full" />
-        <Shimmer className="h-64 w-full rounded-lg" />
+        <Shimmer className="h-64 w-full rounded-2xl" />
       </div>
     );
   }
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-6">
-      <h1 className="mb-6 text-xl font-bold text-neutral-900">Paramètres</h1>
+      <h1 className="mb-6 text-xl font-bold text-neutral-100">Paramètres</h1>
 
       <UnderlineTabs tabs={tabs} activeTab={activeTab} onChange={setActiveTab} />
 

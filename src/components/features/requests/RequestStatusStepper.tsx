@@ -27,9 +27,9 @@ export function RequestStatusStepper({ currentStatus }: RequestStatusStepperProp
   return (
     <div className="w-full">
       {isTerminal ? (
-        <div className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-3">
-          <XIcon weight="bold" size={16} className="text-red-500" />
-          <span className="text-sm font-medium text-red-700">
+        <div className="border-error/20 bg-error/10 flex items-center gap-2 rounded-lg border px-4 py-3">
+          <XIcon weight="bold" size={16} className="text-error" />
+          <span className="text-error text-sm font-medium">
             {currentStatus === 'cancelled' ? 'Demande annulée' : 'Litige en cours'}
           </span>
         </div>
@@ -47,9 +47,9 @@ export function RequestStatusStepper({ currentStatus }: RequestStatusStepperProp
                   <div
                     className={cn(
                       'flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold',
-                      isDone && 'bg-emerald-500 text-white',
+                      isDone && 'bg-success text-white',
                       isActive && 'bg-primary-500 text-white',
-                      isFuture && 'bg-neutral-200 text-neutral-400'
+                      isFuture && 'bg-surface-600 text-surface-200'
                     )}
                   >
                     {isDone ? <Check weight="bold" size={12} /> : index + 1}
@@ -57,9 +57,9 @@ export function RequestStatusStepper({ currentStatus }: RequestStatusStepperProp
                   <span
                     className={cn(
                       'mt-1 max-w-[56px] text-center text-[10px] leading-tight',
-                      isDone && 'text-emerald-600',
-                      isActive && 'text-primary-600 font-medium',
-                      isFuture && 'text-neutral-400'
+                      isDone && 'text-success',
+                      isActive && 'text-primary-400 font-medium',
+                      isFuture && 'text-surface-200'
                     )}
                   >
                     {step.label}
@@ -71,7 +71,7 @@ export function RequestStatusStepper({ currentStatus }: RequestStatusStepperProp
                   <div
                     className={cn(
                       'mx-1 h-0.5 flex-1',
-                      index < currentIndex ? 'bg-emerald-500' : 'bg-neutral-200'
+                      index < currentIndex ? 'bg-success' : 'bg-surface-600'
                     )}
                   />
                 )}

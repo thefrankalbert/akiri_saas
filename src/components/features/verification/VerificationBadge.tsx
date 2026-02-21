@@ -19,10 +19,10 @@ const levelConfig = {
 };
 
 const statusConfig = {
-  none: { icon: WarningCircle, color: 'text-neutral-400' },
-  pending: { icon: Clock, color: 'text-amber-500' },
-  verified: { icon: CheckCircle, color: 'text-green-500' },
-  failed: { icon: WarningCircle, color: 'text-red-500' },
+  none: { icon: WarningCircle, color: 'text-surface-400' },
+  pending: { icon: Clock, color: 'text-warning' },
+  verified: { icon: CheckCircle, color: 'text-success' },
+  failed: { icon: WarningCircle, color: 'text-error' },
 };
 
 export function VerificationBadge({
@@ -46,7 +46,7 @@ export function VerificationBadge({
     return (
       <Icon
         size={sizeMap[size]}
-        className={cn(status === 'verified' ? 'text-green-500' : statusCfg.color, className)}
+        className={cn(status === 'verified' ? 'text-success' : statusCfg.color, className)}
       />
     );
   }

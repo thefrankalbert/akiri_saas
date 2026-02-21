@@ -52,10 +52,10 @@ export function VerifyEmail() {
   };
 
   return (
-    <Card className="border-neutral-200/60">
+    <Card className="glass-strong rounded-3xl border-white/[0.08]">
       <CardHeader className="text-center">
-        <div className="bg-primary-100 mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full">
-          <Envelope className="text-primary-500" size={32} />
+        <div className="bg-info/10 mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full">
+          <Envelope className="text-info" size={32} />
         </div>
         <CardTitle className="text-2xl">Vérifiez votre email</CardTitle>
         <CardDescription>
@@ -64,9 +64,9 @@ export function VerifyEmail() {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="bg-primary-50 text-primary-700 rounded-lg px-4 py-3 text-sm">
+        <div className="bg-info/10 text-info rounded-xl px-4 py-3 text-sm">
           <p className="font-medium">Vérifiez votre boîte de réception</p>
-          <p className="mt-1">
+          <p className="text-info/80 mt-1">
             Si vous ne trouvez pas l&apos;email, pensez à vérifier vos spams ou courriers
             indésirables.
           </p>
@@ -82,16 +82,14 @@ export function VerifyEmail() {
           Renvoyer l&apos;email
         </Button>
 
-        {resent && (
-          <p className="text-secondary-600 text-center text-sm">Email renvoyé avec succès !</p>
-        )}
+        {resent && <p className="text-success text-center text-sm">Email renvoyé avec succès !</p>}
 
-        {error && <p className="text-center text-sm text-red-600">{error}</p>}
+        {error && <p className="text-error text-center text-sm">{error}</p>}
 
         <div className="text-center">
           <Link
             href="/login"
-            className="text-primary-600 hover:text-primary-500 inline-flex items-center gap-1 text-sm font-medium"
+            className="text-primary-400 hover:text-primary-300 inline-flex items-center gap-1 text-sm font-medium"
           >
             <ArrowLeft size={16} />
             Retour à la connexion

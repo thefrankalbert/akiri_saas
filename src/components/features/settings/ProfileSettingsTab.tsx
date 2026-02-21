@@ -76,7 +76,7 @@ export function ProfileSettingsTab({ profile }: ProfileSettingsTabProps) {
       {/* Form */}
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         {serverError && (
-          <div className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{serverError}</div>
+          <div className="bg-error/10 text-error rounded-xl px-4 py-3 text-sm">{serverError}</div>
         )}
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -103,18 +103,18 @@ export function ProfileSettingsTab({ profile }: ProfileSettingsTabProps) {
         />
 
         <div>
-          <label className="mb-1.5 block text-sm font-medium text-neutral-700">Bio</label>
+          <label className="text-surface-50 mb-1.5 block text-sm font-medium">Bio</label>
           <textarea
             placeholder="Décrivez-vous en quelques mots..."
-            className="focus:border-primary-500 focus:ring-primary-500 w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm text-neutral-900 placeholder:text-neutral-400 focus:ring-1 focus:outline-none"
+            className="bg-surface-700 placeholder:text-surface-200 focus:border-primary-500 focus:ring-primary-500 w-full rounded-lg border border-white/[0.08] px-3 py-2 text-sm text-neutral-100 focus:ring-1 focus:outline-none"
             rows={3}
             maxLength={500}
             {...register('bio')}
           />
           <div className="mt-1 flex justify-end">
-            <span className="text-xs text-neutral-400">{bioValue.length}/500</span>
+            <span className="text-surface-200 text-xs">{bioValue.length}/500</span>
           </div>
-          {errors.bio?.message && <p className="mt-1 text-xs text-red-600">{errors.bio.message}</p>}
+          {errors.bio?.message && <p className="text-error mt-1 text-xs">{errors.bio.message}</p>}
         </div>
 
         <Button type="submit" isLoading={isSubmitting} className="w-full sm:w-auto">

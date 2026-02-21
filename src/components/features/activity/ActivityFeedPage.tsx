@@ -136,8 +136,8 @@ const activityIcons = {
 
 const statusColors = {
   success: 'bg-success/10 text-success',
-  pending: 'bg-amber-100 text-amber-600',
-  info: 'bg-blue-100 text-blue-600',
+  pending: 'bg-warning/10 text-warning',
+  info: 'bg-info/10 text-info',
 };
 
 type FilterType = 'all' | 'listing' | 'request' | 'message' | 'payment' | 'review';
@@ -164,13 +164,13 @@ export function ActivityFeedPage() {
         <div className="mb-6">
           <Link
             href="/dashboard"
-            className="mb-4 inline-flex items-center gap-1.5 text-sm font-medium text-neutral-500 transition-colors hover:text-neutral-900"
+            className="text-surface-100 mb-4 inline-flex items-center gap-1.5 text-sm font-medium transition-colors hover:text-neutral-100"
           >
             <ArrowLeft size={16} />
             Retour au tableau de bord
           </Link>
-          <h1 className="text-2xl font-bold text-neutral-900 sm:text-3xl">Activité</h1>
-          <p className="mt-1 text-neutral-500">
+          <h1 className="text-2xl font-bold text-neutral-100 sm:text-3xl">Activité</h1>
+          <p className="text-surface-100 mt-1">
             Historique complet de vos actions et notifications
           </p>
         </div>
@@ -186,7 +186,7 @@ export function ActivityFeedPage() {
               className={`shrink-0 rounded-full px-4 py-2 text-sm font-medium transition-colors ${
                 activeFilter === filter.value
                   ? 'bg-primary-500 text-white'
-                  : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'
+                  : 'bg-surface-700 text-surface-100 hover:bg-surface-600'
               }`}
             >
               {filter.label}
@@ -198,9 +198,9 @@ export function ActivityFeedPage() {
       {/* Activity List */}
       <SlideUp delay={0.2}>
         <Card variant="elevated" padding="none">
-          <CardHeader className="border-b border-neutral-100 px-6 py-4">
+          <CardHeader className="border-b border-white/[0.06] px-6 py-4">
             <CardTitle className="flex items-center gap-2 text-lg">
-              <Clock className="text-neutral-400" size={20} />
+              <Clock className="text-surface-200" size={20} />
               Historique
             </CardTitle>
           </CardHeader>
@@ -211,19 +211,19 @@ export function ActivityFeedPage() {
                   const Icon = activityIcons[activity.icon];
                   return (
                     <StaggerItem key={activity.id}>
-                      <div className="flex items-start gap-3 rounded-xl p-3 transition-colors hover:bg-neutral-50">
+                      <div className="hover:bg-surface-700 flex items-start gap-3 rounded-xl p-3 transition-colors">
                         <div
                           className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${statusColors[activity.status || 'info']}`}
                         >
                           <Icon size={20} />
                         </div>
                         <div className="min-w-0 flex-1">
-                          <p className="font-medium text-neutral-900">{activity.title}</p>
-                          <p className="truncate text-sm text-neutral-500">
+                          <p className="font-medium text-neutral-100">{activity.title}</p>
+                          <p className="text-surface-100 truncate text-sm">
                             {activity.description}
                           </p>
                         </div>
-                        <span className="shrink-0 text-xs text-neutral-400">
+                        <span className="text-surface-200 shrink-0 text-xs">
                           {formatRelativeDate(activity.timestamp)}
                         </span>
                       </div>
@@ -233,11 +233,11 @@ export function ActivityFeedPage() {
               </StaggerContainer>
             ) : (
               <div className="flex flex-col items-center justify-center py-12 text-center">
-                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-neutral-100">
-                  <Clock className="text-neutral-300" size={32} />
+                <div className="bg-surface-700 flex h-16 w-16 items-center justify-center rounded-full">
+                  <Clock className="text-surface-300" size={32} />
                 </div>
-                <p className="mt-4 font-medium text-neutral-600">Aucune activité</p>
-                <p className="mt-1 text-sm text-neutral-400">
+                <p className="mt-4 font-medium text-neutral-100">Aucune activité</p>
+                <p className="text-surface-200 mt-1 text-sm">
                   Aucune activité ne correspond à ce filtre
                 </p>
               </div>

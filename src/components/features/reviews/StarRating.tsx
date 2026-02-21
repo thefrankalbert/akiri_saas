@@ -17,7 +17,7 @@ export function StarRating({ rating, size = 16, className }: StarRatingProps) {
           key={i}
           weight={i < rating ? 'fill' : 'duotone'}
           size={size}
-          className={i < rating ? 'text-amber-400' : 'text-neutral-300'}
+          className={i < rating ? 'text-amber-400' : 'text-surface-400'}
         />
       ))}
     </div>

@@ -33,42 +33,42 @@ export function TransactionsPage() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 lg:px-8">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-neutral-900">Transactions</h1>
-        <p className="mt-1 text-sm text-neutral-500">Historique de vos paiements et transactions</p>
+        <h1 className="text-2xl font-bold text-neutral-100">Transactions</h1>
+        <p className="text-surface-100 mt-1 text-sm">Historique de vos paiements et transactions</p>
       </div>
 
       {/* Summary cards */}
       <div className="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-3">
         <Card>
           <CardContent className="p-4 text-center">
-            <p className="text-2xl font-bold text-neutral-900">
+            <p className="font-mono text-2xl font-bold text-neutral-100">
               {formatCurrency(mockTransactions.reduce((sum, t) => sum + t.amount, 0))}
             </p>
-            <p className="text-xs text-neutral-500">Total des transactions</p>
+            <p className="text-surface-100 text-xs">Total des transactions</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4 text-center">
-            <p className="text-secondary-600 text-2xl font-bold">
+            <p className="text-success font-mono text-2xl font-bold">
               {formatCurrency(
                 mockTransactions
                   .filter((t) => t.status === 'released')
                   .reduce((sum, t) => sum + t.amount - t.platform_fee, 0)
               )}
             </p>
-            <p className="text-xs text-neutral-500">Revenus perçus</p>
+            <p className="text-surface-100 text-xs">Revenus perçus</p>
           </CardContent>
         </Card>
         <Card className="col-span-2 sm:col-span-1">
           <CardContent className="p-4 text-center">
-            <p className="text-2xl font-bold text-blue-600">
+            <p className="text-info font-mono text-2xl font-bold">
               {formatCurrency(
                 mockTransactions
                   .filter((t) => t.status === 'held')
                   .reduce((sum, t) => sum + t.amount, 0)
               )}
             </p>
-            <p className="text-xs text-neutral-500">En escrow</p>
+            <p className="text-surface-100 text-xs">En escrow</p>
           </CardContent>
         </Card>
       </div>
@@ -85,22 +85,22 @@ export function TransactionsPage() {
                 {/* Icon */}
                 <div
                   className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${
-                    txn.status === 'released' ? 'bg-green-100' : 'bg-blue-100'
+                    txn.status === 'released' ? 'bg-success/10' : 'bg-info/10'
                   }`}
                 >
                   {txn.status === 'released' ? (
-                    <ArrowDownLeft className="text-green-600" size={20} />
+                    <ArrowDownLeft className="text-success" size={20} />
                   ) : (
-                    <ArrowUpRight className="text-blue-600" size={20} />
+                    <ArrowUpRight className="text-info" size={20} />
                   )}
                 </div>
 
                 {/* Details */}
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-medium text-neutral-900">
+                  <p className="truncate text-sm font-medium text-neutral-100">
                     {txn.request?.item_description || 'Transaction'}
                   </p>
-                  <p className="text-xs text-neutral-400">
+                  <p className="text-surface-200 text-xs">
                     {formatDate(txn.created_at)}
                     {txn.request?.listing && (
                       <>
@@ -113,7 +113,9 @@ export function TransactionsPage() {
 
                 {/* Amount & Status */}
                 <div className="shrink-0 text-right">
-                  <p className="text-sm font-bold text-neutral-900">{formatCurrency(txn.amount)}</p>
+                  <p className="font-mono text-sm font-bold text-neutral-100">
+                    {formatCurrency(txn.amount)}
+                  </p>
                   <Badge variant={config.variant} size="sm">
                     <StatusIcon className="mr-1" size={12} />
                     {config.label}
@@ -125,7 +127,7 @@ export function TransactionsPage() {
         })}
       </div>
 
-      <p className="mt-6 text-center text-xs text-neutral-400">
+      <p className="text-surface-200 mt-6 text-center text-xs">
         Commission plateforme : 10% par transaction
       </p>
     </div>

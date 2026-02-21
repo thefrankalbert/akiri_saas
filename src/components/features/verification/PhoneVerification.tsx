@@ -131,14 +131,14 @@ export function PhoneVerification({
   // Already verified state
   if (isVerified) {
     return (
-      <Card className={cn('border-green-200 bg-green-50', className)}>
+      <Card className={cn('border-success/20 bg-success/5', className)}>
         <CardContent className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-100">
-            <CheckCircle className="text-green-600" size={20} />
+          <div className="bg-success/10 flex h-10 w-10 items-center justify-center rounded-full">
+            <CheckCircle className="text-success" size={20} />
           </div>
           <div>
-            <p className="font-medium text-green-800">Téléphone vérifié</p>
-            {currentPhone && <p className="text-sm text-green-600">{currentPhone}</p>}
+            <p className="text-success font-medium">Téléphone vérifié</p>
+            {currentPhone && <p className="text-success/80 text-sm">{currentPhone}</p>}
           </div>
         </CardContent>
       </Card>
@@ -153,7 +153,7 @@ export function PhoneVerification({
             <button
               type="button"
               onClick={handleGoBack}
-              className="rounded-lg p-1 text-neutral-500 hover:bg-neutral-100"
+              className="text-surface-200 hover:bg-surface-700 rounded-lg p-1"
             >
               <ArrowLeft size={20} />
             </button>
@@ -172,7 +172,7 @@ export function PhoneVerification({
       </CardHeader>
       <CardContent>
         {serverError && (
-          <div className="mb-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">
+          <div className="bg-error/10 text-error mb-4 rounded-xl px-4 py-3 text-sm">
             {serverError}
           </div>
         )}
@@ -196,9 +196,11 @@ export function PhoneVerification({
         ) : (
           <form onSubmit={otpForm.handleSubmit(handleVerifyOtp)} className="space-y-4">
             {mockCodeHint && (
-              <div className="rounded-lg bg-amber-50 px-4 py-3 text-sm text-amber-700">
+              <div className="bg-warning/10 text-warning rounded-xl px-4 py-3 text-sm">
                 <span className="font-medium">Mode test :</span> Utilisez le code{' '}
-                <code className="rounded bg-amber-100 px-1.5 py-0.5 font-mono">{mockCodeHint}</code>
+                <code className="bg-warning/20 rounded px-1.5 py-0.5 font-mono">
+                  {mockCodeHint}
+                </code>
               </div>
             )}
 
@@ -226,7 +228,7 @@ export function PhoneVerification({
               type="button"
               onClick={handleResendCode}
               disabled={phoneForm.formState.isSubmitting}
-              className="text-primary-600 hover:text-primary-500 w-full text-center text-sm disabled:opacity-50"
+              className="text-primary-400 hover:text-primary-300 w-full text-center text-sm disabled:opacity-50"
             >
               {phoneForm.formState.isSubmitting ? (
                 <span className="inline-flex items-center gap-1">

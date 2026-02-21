@@ -59,28 +59,28 @@ export function RequestCard({ request, role, onAction }: RequestCardProps) {
 
   return (
     <Link href={`/demandes/${request.id}`}>
-      <Card className="h-full transition-colors hover:border-neutral-300">
+      <Card className="h-full transition-all duration-200 hover:border-white/[0.15]">
         <CardContent className="p-3">
           {/* Status + date */}
           <div className="mb-2 flex items-center justify-between">
             <span
               className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium ${
-                REQUEST_STATUS_COLORS[request.status] || 'bg-neutral-100 text-neutral-700'
+                REQUEST_STATUS_COLORS[request.status] || 'bg-surface-700 text-surface-100'
               }`}
             >
               {REQUEST_STATUS_LABELS[request.status] || request.status}
             </span>
-            <span className="text-[11px] text-neutral-400">{formatDate(request.created_at)}</span>
+            <span className="text-surface-200 text-[11px]">{formatDate(request.created_at)}</span>
           </div>
 
           {/* Description */}
-          <h3 className="line-clamp-2 text-sm font-medium text-neutral-900">
+          <h3 className="line-clamp-2 text-sm font-medium text-neutral-100">
             {request.item_description}
           </h3>
 
           {/* Route */}
           {request.listing && (
-            <div className="mt-1.5 flex items-center gap-1 text-xs text-neutral-500">
+            <div className="text-surface-100 mt-1.5 flex items-center gap-1 text-xs">
               <MapPin weight="duotone" size={12} />
               <span>{request.listing.departure_city}</span>
               <span>&rarr;</span>
@@ -94,21 +94,21 @@ export function RequestCard({ request, role, onAction }: RequestCardProps) {
               <Package weight="duotone" size={12} className="mr-1" />
               {request.weight_kg} kg
             </Badge>
-            <span className="text-primary-600 text-sm font-bold">
+            <span className="text-primary-400 font-mono text-sm font-bold">
               {formatCurrency(request.total_price)}
             </span>
           </div>
 
           {/* Counterparty */}
           {counterparty && (
-            <div className="mt-2 flex items-center gap-2 border-t border-neutral-100 pt-2">
+            <div className="mt-2 flex items-center gap-2 border-t border-white/[0.06] pt-2">
               <Avatar
                 firstName={counterparty.first_name}
                 lastName={counterparty.last_name}
                 src={counterparty.avatar_url}
                 size="sm"
               />
-              <span className="text-xs font-medium text-neutral-600">
+              <span className="text-surface-100 text-xs font-medium">
                 {counterparty.first_name} {counterparty.last_name.charAt(0)}.
               </span>
             </div>
@@ -117,7 +117,7 @@ export function RequestCard({ request, role, onAction }: RequestCardProps) {
           {/* Inline actions */}
           {role === 'traveler' && request.status === 'pending' && (
             <div
-              className="mt-2 flex gap-2 border-t border-neutral-100 pt-2"
+              className="mt-2 flex gap-2 border-t border-white/[0.06] pt-2"
               onClick={(e) => e.preventDefault()}
             >
               <Button
@@ -132,7 +132,7 @@ export function RequestCard({ request, role, onAction }: RequestCardProps) {
               <Button
                 size="sm"
                 variant="ghost"
-                className="flex-1 text-xs text-red-600"
+                className="text-error flex-1 text-xs"
                 onClick={() => handleAction('cancel')}
                 leftIcon={<XCircle weight="duotone" size={14} />}
               >
@@ -143,7 +143,7 @@ export function RequestCard({ request, role, onAction }: RequestCardProps) {
 
           {role === 'sender' && request.status === 'accepted' && (
             <div
-              className="mt-2 border-t border-neutral-100 pt-2"
+              className="mt-2 border-t border-white/[0.06] pt-2"
               onClick={(e) => e.preventDefault()}
             >
               <Button
@@ -159,7 +159,7 @@ export function RequestCard({ request, role, onAction }: RequestCardProps) {
 
           {role === 'sender' && request.status === 'delivered' && (
             <div
-              className="mt-2 border-t border-neutral-100 pt-2"
+              className="mt-2 border-t border-white/[0.06] pt-2"
               onClick={(e) => e.preventDefault()}
             >
               <Button

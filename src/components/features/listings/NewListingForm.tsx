@@ -90,11 +90,11 @@ export function NewListingForm() {
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-8 sm:px-6 lg:px-8">
-      <Card className="border-neutral-200/60">
+      <Card>
         <CardHeader>
           <div className="flex items-center gap-3">
-            <div className="bg-primary-100 flex h-10 w-10 items-center justify-center rounded-xl">
-              <AirplaneTilt className="text-primary-600" size={20} />
+            <div className="bg-primary-500/10 flex h-10 w-10 items-center justify-center rounded-xl">
+              <AirplaneTilt className="text-primary-400" size={20} />
             </div>
             <div>
               <CardTitle className="text-xl">Publier une annonce</CardTitle>
@@ -107,24 +107,24 @@ export function NewListingForm() {
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             {serverError && (
-              <div className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">
+              <div className="bg-error/10 text-error rounded-xl px-4 py-3 text-sm">
                 {serverError}
               </div>
             )}
 
             {/* Route */}
             <div>
-              <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold text-neutral-800">
+              <h3 className="text-surface-50 mb-3 flex items-center gap-2 text-sm font-semibold">
                 <MapPin size={16} />
                 Itinéraire
               </h3>
               <div className="grid gap-3 sm:grid-cols-2">
                 <div>
-                  <label className="mb-1.5 block text-sm font-medium text-neutral-700">
+                  <label className="text-surface-50 mb-1.5 block text-sm font-medium">
                     Pays de départ
                   </label>
                   <select
-                    className="flex h-10 w-full rounded-lg border border-neutral-300 bg-white px-3 text-sm"
+                    className="bg-surface-700 flex h-10 w-full rounded-lg border border-white/[0.08] px-3 text-sm text-neutral-100"
                     {...register('departure_country')}
                   >
                     <option value="">Sélectionner</option>
@@ -145,11 +145,11 @@ export function NewListingForm() {
                   {...register('departure_city')}
                 />
                 <div>
-                  <label className="mb-1.5 block text-sm font-medium text-neutral-700">
+                  <label className="text-surface-50 mb-1.5 block text-sm font-medium">
                     Pays d&apos;arrivée
                   </label>
                   <select
-                    className="flex h-10 w-full rounded-lg border border-neutral-300 bg-white px-3 text-sm"
+                    className="bg-surface-700 flex h-10 w-full rounded-lg border border-white/[0.08] px-3 text-sm text-neutral-100"
                     {...register('arrival_country')}
                   >
                     <option value="">Sélectionner</option>
@@ -174,7 +174,7 @@ export function NewListingForm() {
 
             {/* Dates */}
             <div>
-              <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold text-neutral-800">
+              <h3 className="text-surface-50 mb-3 flex items-center gap-2 text-sm font-semibold">
                 <CalendarBlank size={16} />
                 Dates
               </h3>
@@ -196,7 +196,7 @@ export function NewListingForm() {
 
             {/* Weight & Price */}
             <div>
-              <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold text-neutral-800">
+              <h3 className="text-surface-50 mb-3 flex items-center gap-2 text-sm font-semibold">
                 <Package size={16} />
                 Kilos et prix
               </h3>
@@ -221,7 +221,7 @@ export function NewListingForm() {
 
             {/* Categories */}
             <div>
-              <label className="mb-2 block text-sm font-medium text-neutral-700">
+              <label className="text-surface-50 mb-2 block text-sm font-medium">
                 Articles acceptés
               </label>
               <div className="flex flex-wrap gap-2">
@@ -232,8 +232,8 @@ export function NewListingForm() {
                     onClick={() => toggleCategory(category)}
                     className={`rounded-full border px-3 py-1.5 text-sm font-medium transition-colors ${
                       selectedCategories.includes(category)
-                        ? 'border-primary-500 bg-primary-50 text-primary-700'
-                        : 'border-neutral-200 bg-white text-neutral-600 hover:border-neutral-300'
+                        ? 'border-primary-500 bg-primary-500/10 text-primary-400'
+                        : 'bg-surface-700 text-surface-100 border-white/[0.08] hover:border-white/[0.15]'
                     }`}
                   >
                     {category}
@@ -247,7 +247,7 @@ export function NewListingForm() {
 
             {/* Collection Points */}
             <div>
-              <label className="mb-2 block text-sm font-medium text-neutral-700">
+              <label className="text-surface-50 mb-2 block text-sm font-medium">
                 Points de collecte
               </label>
               <div className="space-y-2">
@@ -262,7 +262,7 @@ export function NewListingForm() {
                       <button
                         type="button"
                         onClick={() => removeCollectionPoint(i)}
-                        className="rounded-lg p-2 text-neutral-400 hover:bg-neutral-100 hover:text-neutral-600"
+                        className="text-surface-200 hover:bg-surface-700 rounded-lg p-2 hover:text-neutral-100"
                       >
                         <X size={16} />
                       </button>
@@ -273,7 +273,7 @@ export function NewListingForm() {
               <button
                 type="button"
                 onClick={addCollectionPoint}
-                className="text-primary-600 hover:text-primary-500 mt-2 inline-flex items-center gap-1 text-sm font-medium"
+                className="text-primary-400 hover:text-primary-300 mt-2 inline-flex items-center gap-1 text-sm font-medium"
               >
                 <Plus size={16} />
                 Ajouter un point
@@ -285,11 +285,11 @@ export function NewListingForm() {
 
             {/* Description */}
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-neutral-700">
+              <label className="text-surface-50 mb-1.5 block text-sm font-medium">
                 Description (optionnel)
               </label>
               <textarea
-                className="focus:border-primary-500 focus:ring-primary-500/20 flex min-h-[100px] w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm placeholder:text-neutral-400 focus:ring-2 focus:outline-none"
+                className="bg-surface-700 placeholder:text-surface-200 focus:border-primary-500 focus:ring-primary-500/20 flex min-h-[100px] w-full rounded-lg border border-white/[0.08] px-3 py-2 text-sm text-neutral-100 focus:ring-2 focus:outline-none"
                 placeholder="Informations complémentaires sur votre trajet..."
                 {...register('description')}
               />

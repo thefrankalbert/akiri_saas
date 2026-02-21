@@ -240,10 +240,10 @@ export function CorridorsPage() {
       {/* ===== PAGE HEADER ===== */}
       <div className="mb-6 flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-neutral-900">
+          <h1 className="text-2xl font-semibold tracking-tight text-neutral-100">
             Hub des corridors
           </h1>
-          <p className="mt-1 text-sm text-neutral-500">
+          <p className="text-surface-100 mt-1 text-sm">
             Suivez en temps réel l&apos;activité de la communauté
           </p>
         </div>
@@ -252,7 +252,7 @@ export function CorridorsPage() {
           size="sm"
           className="animate-pulse-live mt-1 flex items-center gap-1.5"
         >
-          <span className="animate-pulse-dot inline-block h-2 w-2 rounded-full bg-red-500" />
+          <span className="animate-pulse-dot bg-error inline-block h-2 w-2 rounded-full" />
           EN DIRECT
         </Badge>
       </div>
@@ -264,29 +264,29 @@ export function CorridorsPage() {
             icon: Package,
             label: 'Annonces actives',
             value: displayedStats.listings,
-            color: 'text-primary-600',
-            bg: 'bg-primary-50',
+            color: 'text-primary-400',
+            bg: 'bg-primary-500/10',
           },
           {
             icon: TrendUp,
             label: 'Kilos disponibles',
             value: `${displayedStats.kg} kg`,
-            color: 'text-emerald-600',
-            bg: 'bg-emerald-50',
+            color: 'text-success',
+            bg: 'bg-success/10',
           },
           {
             icon: GlobeHemisphereWest,
             label: 'Corridors actifs',
             value: displayedStats.corridors,
-            color: 'text-accent-600',
-            bg: 'bg-accent-50',
+            color: 'text-accent-400',
+            bg: 'bg-accent-500/10',
           },
           {
             icon: UsersThree,
             label: 'Voyageurs',
             value: displayedStats.travelers,
-            color: 'text-blue-600',
-            bg: 'bg-blue-50',
+            color: 'text-info',
+            bg: 'bg-info/10',
           },
         ].map((stat) => {
           const Icon = stat.icon;
@@ -304,11 +304,11 @@ export function CorridorsPage() {
                 <div className="min-w-0">
                   <p
                     key={statPulseKey}
-                    className="animate-count-pulse text-base font-semibold text-neutral-900"
+                    className="animate-count-pulse font-mono text-base font-semibold text-neutral-100"
                   >
                     {stat.value}
                   </p>
-                  <p className="truncate text-[11px] text-neutral-500">{stat.label}</p>
+                  <p className="text-surface-100 truncate text-[11px]">{stat.label}</p>
                 </div>
               </CardContent>
             </Card>
@@ -320,7 +320,7 @@ export function CorridorsPage() {
       <div className="mb-8 grid gap-6 lg:grid-cols-3">
         {/* LEFT: Corridors populaires (2/3) */}
         <div className="lg:col-span-2">
-          <h2 className="mb-4 text-lg font-semibold text-neutral-900">Corridors populaires</h2>
+          <h2 className="mb-4 text-lg font-semibold text-neutral-100">Corridors populaires</h2>
           <div className="grid gap-2.5 sm:grid-cols-2 xl:grid-cols-3">
             {corridors.map((corridor, index) => {
               const isImminentDeparture =
@@ -331,10 +331,10 @@ export function CorridorsPage() {
 
               const trendColor =
                 corridor.trend === 'up'
-                  ? 'text-green-500'
+                  ? 'text-success'
                   : corridor.trend === 'down'
-                    ? 'text-red-500'
-                    : 'text-neutral-400';
+                    ? 'text-error'
+                    : 'text-surface-300';
 
               return (
                 <Link
@@ -345,38 +345,38 @@ export function CorridorsPage() {
                 >
                   <Card
                     className={cn(
-                      'h-full transition-all duration-200 hover:border-neutral-300 hover:bg-neutral-50',
-                      isImminentDeparture && 'ring-2 ring-amber-200'
+                      'hover:bg-surface-700 h-full transition-all duration-200 hover:border-white/[0.15]',
+                      isImminentDeparture && 'ring-warning/30 ring-2'
                     )}
                   >
                     <CardContent className="p-3">
                       {/* Route header */}
                       <div className="flex items-center gap-1.5">
                         <span className="shrink-0 text-base">{corridor.fromCountry.flag}</span>
-                        <p className="min-w-0 flex-1 truncate text-xs font-semibold text-neutral-900">
+                        <p className="min-w-0 flex-1 truncate text-xs font-semibold text-neutral-100">
                           {corridor.departureCity}
                         </p>
                         <ArrowRight weight="bold" size={12} className="text-primary-400 shrink-0" />
-                        <p className="min-w-0 flex-1 truncate text-right text-xs font-semibold text-neutral-900">
+                        <p className="min-w-0 flex-1 truncate text-right text-xs font-semibold text-neutral-100">
                           {corridor.arrivalCity}
                         </p>
                         <span className="shrink-0 text-base">{corridor.toCountry.flag}</span>
                       </div>
 
                       {/* Stats row */}
-                      <div className="mt-2 flex items-center justify-between text-[11px] text-neutral-500">
+                      <div className="text-surface-100 mt-2 flex items-center justify-between text-[11px]">
                         <span className="flex items-center gap-1">
                           <Package weight="duotone" size={11} />
                           {corridor.count} annonce{corridor.count > 1 ? 's' : ''}
                         </span>
-                        <span className="text-primary-600 font-medium">
+                        <span className="text-primary-400 font-mono font-medium">
                           ~{corridor.avgPrice} €/kg
                         </span>
                         <TrendIcon weight="duotone" size={12} className={trendColor} />
                       </div>
 
                       {/* Next departure + Top traveler */}
-                      <div className="mt-2 flex items-center justify-between border-t border-neutral-100 pt-2">
+                      <div className="mt-2 flex items-center justify-between border-t border-white/[0.06] pt-2">
                         {corridor.nextDeparture && (
                           <Badge variant={isImminentDeparture ? 'warning' : 'outline'} size="sm">
                             <CalendarBlank weight="duotone" size={10} className="mr-0.5" />
@@ -393,7 +393,7 @@ export function CorridorsPage() {
                             />
                             <div className="flex items-center gap-0.5">
                               <Star weight="fill" size={10} className="text-amber-400" />
-                              <span className="text-[11px] font-medium">
+                              <span className="text-[11px] font-medium text-neutral-100">
                                 {corridor.topTraveler.rating.toFixed(1)}
                               </span>
                             </div>
@@ -411,12 +411,12 @@ export function CorridorsPage() {
         {/* RIGHT: Activity feed sidebar (1/3) */}
         <div>
           <div className="mb-3 flex items-center gap-2">
-            <Broadcast weight="duotone" size={16} className="animate-pulse-live text-red-500" />
-            <h2 className="text-sm font-semibold text-neutral-900">Activité en direct</h2>
+            <Broadcast weight="duotone" size={16} className="animate-pulse-live text-error" />
+            <h2 className="text-sm font-semibold text-neutral-100">Activité en direct</h2>
           </div>
 
           <Card padding="none" className="overflow-hidden">
-            <div className="divide-y divide-neutral-100">
+            <div className="divide-y divide-white/[0.06]">
               {visibleEvents.map((event, index) => {
                 const config = ACTIVITY_CONFIG[event.type];
                 const Icon = config.icon;
@@ -427,41 +427,41 @@ export function CorridorsPage() {
                     key={`${event.id}-${index}`}
                     href={`/annonces/${listing.id}`}
                     className={cn(
-                      'flex items-start gap-2.5 p-3 transition-colors hover:bg-neutral-50',
+                      'hover:bg-surface-700 flex items-start gap-2.5 p-3 transition-colors',
                       index === 0 && 'animate-slide-in-right'
                     )}
                   >
                     <div
                       className={cn(
                         'mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full',
-                        event.type === 'new_listing' && 'bg-green-100',
-                        event.type === 'departure_soon' && 'bg-amber-100',
-                        event.type === 'delivery_confirmed' && 'bg-blue-100'
+                        event.type === 'new_listing' && 'bg-success/10',
+                        event.type === 'departure_soon' && 'bg-warning/10',
+                        event.type === 'delivery_confirmed' && 'bg-info/10'
                       )}
                     >
                       <Icon
                         weight="duotone"
                         size={14}
                         className={cn(
-                          event.type === 'new_listing' && 'text-green-600',
-                          event.type === 'departure_soon' && 'text-amber-600',
-                          event.type === 'delivery_confirmed' && 'text-blue-600'
+                          event.type === 'new_listing' && 'text-success',
+                          event.type === 'departure_soon' && 'text-warning',
+                          event.type === 'delivery_confirmed' && 'text-info'
                         )}
                       />
                     </div>
 
                     <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium text-neutral-900">
+                      <p className="text-sm font-medium text-neutral-100">
                         {profile.first_name} {profile.last_name.charAt(0)}.
                       </p>
-                      <p className="mt-0.5 truncate text-xs text-neutral-500">
+                      <p className="text-surface-100 mt-0.5 truncate text-xs">
                         {listing.departure_city} → {listing.arrival_city}
                       </p>
                       <div className="mt-1 flex items-center gap-2">
                         <Badge variant={config.badge} size="sm">
                           {config.label}
                         </Badge>
-                        <span className="text-[10px] text-neutral-400">{event.relativeTime}</span>
+                        <span className="text-surface-200 text-[10px]">{event.relativeTime}</span>
                       </div>
                     </div>
                   </Link>
@@ -477,8 +477,8 @@ export function CorridorsPage() {
         {/* LEFT: Prochains départs (3/5) */}
         <div className="lg:col-span-3">
           <div className="mb-3 flex items-center gap-2">
-            <AirplaneTilt weight="duotone" size={18} className="text-primary-500" />
-            <h2 className="text-sm font-semibold text-neutral-900">Prochains départs</h2>
+            <AirplaneTilt weight="duotone" size={18} className="text-primary-400" />
+            <h2 className="text-sm font-semibold text-neutral-100">Prochains départs</h2>
           </div>
 
           <div className="space-y-2">
@@ -491,8 +491,8 @@ export function CorridorsPage() {
                 <Link key={listing.id} href={`/annonces/${listing.id}`}>
                   <Card
                     className={cn(
-                      'transition-all duration-200 hover:border-neutral-300 hover:bg-neutral-50',
-                      isImminent && 'border-l-2 border-l-amber-400'
+                      'hover:bg-surface-700 transition-all duration-200 hover:border-white/[0.15]',
+                      isImminent && 'border-l-warning border-l-2'
                     )}
                     padding="none"
                   >
@@ -507,7 +507,7 @@ export function CorridorsPage() {
                       )}
 
                       <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-medium text-neutral-900">
+                        <p className="truncate text-sm font-medium text-neutral-100">
                           {traveler
                             ? `${traveler.first_name} ${traveler.last_name.charAt(0)}.`
                             : 'Voyageur'}
@@ -515,15 +515,15 @@ export function CorridorsPage() {
                           {listing.departure_city} → {listing.arrival_city}
                         </p>
                         <div className="mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-0.5">
-                          <span className="flex items-center gap-1 text-xs text-neutral-500">
+                          <span className="text-surface-100 flex items-center gap-1 text-xs">
                             <CalendarBlank weight="duotone" size={12} />
                             {formatDate(listing.departure_date)}
                           </span>
-                          <span className="flex items-center gap-1 text-xs text-neutral-500">
+                          <span className="text-surface-100 flex items-center gap-1 text-xs">
                             <Package weight="duotone" size={12} />
                             {listing.available_kg} kg
                           </span>
-                          <span className="text-primary-600 text-xs font-medium">
+                          <span className="text-primary-400 font-mono text-xs font-medium">
                             {listing.price_per_kg} €/kg
                           </span>
                         </div>
@@ -546,12 +546,12 @@ export function CorridorsPage() {
 
         {/* RIGHT: Tous les pays (2/5) */}
         <div className="lg:col-span-2">
-          <h2 className="mb-3 text-sm font-semibold text-neutral-900">Tous les pays</h2>
+          <h2 className="mb-3 text-sm font-semibold text-neutral-100">Tous les pays</h2>
           <Card padding="none">
             <CardContent className="flex flex-wrap gap-2 p-4">
               {SUPPORTED_COUNTRIES.map((country) => (
                 <Link key={country.code} href={`/annonces?to=${country.code}`}>
-                  <span className="hover:border-primary-200 hover:bg-primary-50 inline-flex items-center gap-1.5 rounded-md border border-neutral-200/60 bg-white px-2.5 py-1.5 text-sm font-medium text-neutral-700 transition-colors">
+                  <span className="bg-surface-700 hover:border-primary-500/30 hover:bg-surface-600 inline-flex items-center gap-1.5 rounded-md border border-white/[0.08] px-2.5 py-1.5 text-sm font-medium text-neutral-100 transition-colors">
                     <span className="text-base">{country.flag}</span>
                     {country.name}
                   </span>
@@ -563,19 +563,22 @@ export function CorridorsPage() {
       </div>
 
       {/* ===== CTA Banner ===== */}
-      <Card padding="none" className="overflow-hidden border-0 bg-neutral-950">
+      <Card
+        padding="none"
+        className="from-primary-600 to-primary-700 overflow-hidden border-0 bg-gradient-to-r"
+      >
         <CardContent className="flex flex-col items-center gap-4 p-6 text-center sm:flex-row sm:justify-between sm:text-left">
           <div>
             <h2 className="text-lg font-semibold text-white">
               Votre corridor n&apos;est pas listé ?
             </h2>
-            <p className="mt-1 text-sm text-neutral-400">
+            <p className="text-primary-100 mt-1 text-sm">
               Publiez une annonce et ouvrez un nouveau corridor pour la communauté.
             </p>
           </div>
           <Link
             href="/annonces/new"
-            className="bg-primary-500 hover:bg-primary-600 inline-flex shrink-0 items-center gap-2 rounded-lg px-5 py-2.5 text-sm font-medium text-white transition-colors"
+            className="text-primary-700 inline-flex shrink-0 items-center gap-2 rounded-lg bg-white px-5 py-2.5 text-sm font-medium transition-colors hover:bg-neutral-100"
           >
             Publier une annonce
             <ArrowRight weight="bold" size={16} />

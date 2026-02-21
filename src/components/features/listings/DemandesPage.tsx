@@ -93,7 +93,7 @@ export function DemandesPage() {
         <Shimmer className="mb-4 h-10 w-full" />
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 4 }).map((_, i) => (
-            <Shimmer key={i} className="h-48 w-full rounded-lg" />
+            <Shimmer key={i} className="h-48 w-full rounded-2xl" />
           ))}
         </div>
       </div>
@@ -102,7 +102,7 @@ export function DemandesPage() {
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-6">
-      <h1 className="mb-6 text-xl font-bold text-neutral-900">Demandes d&apos;envoi</h1>
+      <h1 className="mb-6 text-xl font-bold text-neutral-100">Demandes d&apos;envoi</h1>
 
       <UnderlineTabs tabs={tabs} activeTab={activeTab} onChange={setActiveTab} />
 
@@ -116,8 +116,8 @@ export function DemandesPage() {
             </div>
           ) : (
             <div className="py-16 text-center">
-              <Package weight="duotone" size={40} className="mx-auto text-neutral-300" />
-              <p className="mt-3 text-sm text-neutral-500">
+              <Package weight="duotone" size={40} className="text-surface-300 mx-auto" />
+              <p className="text-surface-100 mt-3 text-sm">
                 {activeTab === 'sent'
                   ? "Vous n'avez pas encore envoyé de demande."
                   : "Vous n'avez pas encore reçu de demande."}

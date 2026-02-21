@@ -88,7 +88,7 @@ export function ProfilePage({ userId }: ProfilePageProps) {
   if (!profile) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-16 text-center sm:px-6 lg:px-8">
-        <h2 className="text-xl font-semibold text-neutral-700">Profil introuvable</h2>
+        <h2 className="text-xl font-semibold text-neutral-100">Profil introuvable</h2>
         <Link href="/annonces" className="mt-4 inline-block">
           <Button variant="outline" leftIcon={<ArrowLeft size={16} />}>
             Retour aux annonces
@@ -102,7 +102,7 @@ export function ProfilePage({ userId }: ProfilePageProps) {
     <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 lg:px-8">
       <Link
         href="/annonces"
-        className="mb-6 inline-flex items-center gap-1 text-sm font-medium text-neutral-500 hover:text-neutral-700"
+        className="text-surface-100 mb-6 inline-flex items-center gap-1 text-sm font-medium hover:text-neutral-100"
       >
         <ArrowLeft size={16} />
         Retour
@@ -120,15 +120,17 @@ export function ProfilePage({ userId }: ProfilePageProps) {
               isVerified={profile.is_verified}
             />
             <div className="flex-1">
-              <h1 className="text-xl font-bold text-neutral-900">
+              <h1 className="text-xl font-bold text-neutral-100">
                 {profile.first_name} {profile.last_name}
               </h1>
               <div className="mt-1 flex flex-wrap items-center gap-2">
                 {profile.rating > 0 && (
                   <div className="flex items-center gap-1">
                     <Star className="fill-accent-500 text-accent-500" size={16} />
-                    <span className="text-sm font-medium">{profile.rating.toFixed(1)}</span>
-                    <span className="text-xs text-neutral-400">({profile.total_reviews} avis)</span>
+                    <span className="text-sm font-medium text-neutral-100">
+                      {profile.rating.toFixed(1)}
+                    </span>
+                    <span className="text-surface-200 text-xs">({profile.total_reviews} avis)</span>
                   </div>
                 )}
                 {profile.is_verified && (
@@ -138,7 +140,7 @@ export function ProfilePage({ userId }: ProfilePageProps) {
                   </Badge>
                 )}
               </div>
-              <p className="mt-1 text-xs text-neutral-400">
+              <p className="text-surface-200 mt-1 text-xs">
                 <CalendarBlank className="mr-1 inline" size={12} />
                 Membre depuis {formatDate(profile.created_at)}
               </p>
@@ -146,25 +148,25 @@ export function ProfilePage({ userId }: ProfilePageProps) {
           </div>
 
           {profile.bio && (
-            <p className="mt-4 text-sm leading-relaxed text-neutral-600">{profile.bio}</p>
+            <p className="text-surface-100 mt-4 text-sm leading-relaxed">{profile.bio}</p>
           )}
 
           {/* Stats */}
           <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3">
-            <div className="rounded-lg bg-neutral-50 p-3 text-center">
-              <AirplaneTilt className="text-primary-500 mx-auto" size={20} />
-              <p className="mt-1 text-lg font-bold text-neutral-900">{profile.total_trips}</p>
-              <p className="text-xs text-neutral-500">Trajets</p>
+            <div className="bg-surface-700 rounded-xl p-3 text-center">
+              <AirplaneTilt className="text-primary-400 mx-auto" size={20} />
+              <p className="mt-1 text-lg font-bold text-neutral-100">{profile.total_trips}</p>
+              <p className="text-surface-100 text-xs">Trajets</p>
             </div>
-            <div className="rounded-lg bg-neutral-50 p-3 text-center">
-              <Package className="text-secondary-500 mx-auto" size={20} />
-              <p className="mt-1 text-lg font-bold text-neutral-900">{profile.total_shipments}</p>
-              <p className="text-xs text-neutral-500">Envois</p>
+            <div className="bg-surface-700 rounded-xl p-3 text-center">
+              <Package className="text-success mx-auto" size={20} />
+              <p className="mt-1 text-lg font-bold text-neutral-100">{profile.total_shipments}</p>
+              <p className="text-surface-100 text-xs">Envois</p>
             </div>
-            <div className="rounded-lg bg-neutral-50 p-3 text-center">
-              <Star className="text-accent-500 mx-auto" size={20} />
-              <p className="mt-1 text-lg font-bold text-neutral-900">{profile.total_reviews}</p>
-              <p className="text-xs text-neutral-500">Avis</p>
+            <div className="bg-surface-700 rounded-xl p-3 text-center">
+              <Star className="text-accent-400 mx-auto" size={20} />
+              <p className="mt-1 text-lg font-bold text-neutral-100">{profile.total_reviews}</p>
+              <p className="text-surface-100 text-xs">Avis</p>
             </div>
           </div>
         </CardContent>
@@ -172,12 +174,12 @@ export function ProfilePage({ userId }: ProfilePageProps) {
 
       {/* Reviews */}
       <div className="mt-6">
-        <h2 className="mb-4 text-lg font-semibold text-neutral-900">Avis ({reviews.length})</h2>
+        <h2 className="mb-4 text-lg font-semibold text-neutral-100">Avis ({reviews.length})</h2>
         {reviews.length === 0 ? (
           <Card>
             <CardContent className="py-8 text-center">
-              <Star className="mx-auto text-neutral-300" size={40} />
-              <p className="mt-3 text-sm text-neutral-500">Aucun avis pour le moment</p>
+              <Star className="text-surface-300 mx-auto" size={40} />
+              <p className="text-surface-100 mt-3 text-sm">Aucun avis pour le moment</p>
             </CardContent>
           </Card>
         ) : (
@@ -196,7 +198,7 @@ export function ProfilePage({ userId }: ProfilePageProps) {
                     )}
                     <div className="flex-1">
                       <div className="flex items-center justify-between">
-                        <p className="text-sm font-medium text-neutral-700">
+                        <p className="text-sm font-medium text-neutral-100">
                           {review.reviewer
                             ? `${review.reviewer.first_name} ${review.reviewer.last_name.charAt(0)}.`
                             : 'Utilisateur'}
@@ -209,16 +211,16 @@ export function ProfilePage({ userId }: ProfilePageProps) {
                               className={
                                 i < review.rating
                                   ? 'fill-accent-500 text-accent-500'
-                                  : 'text-neutral-200'
+                                  : 'text-surface-400'
                               }
                             />
                           ))}
                         </div>
                       </div>
                       {review.comment && (
-                        <p className="mt-1 text-sm text-neutral-600">{review.comment}</p>
+                        <p className="text-surface-100 mt-1 text-sm">{review.comment}</p>
                       )}
-                      <p className="mt-1 text-xs text-neutral-400">
+                      <p className="text-surface-200 mt-1 text-xs">
                         {formatDate(review.created_at)}
                       </p>
                     </div>

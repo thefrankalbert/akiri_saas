@@ -89,9 +89,9 @@ const activityIcons = {
 };
 
 const statusDot = {
-  success: 'bg-emerald-500',
-  pending: 'bg-amber-500',
-  info: 'bg-blue-500',
+  success: 'bg-success',
+  pending: 'bg-warning',
+  info: 'bg-info',
 };
 
 export function DashboardPage() {
@@ -178,13 +178,13 @@ export function DashboardPage() {
   if (loading) {
     return (
       <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6 lg:px-8">
-        <Shimmer className="mb-6 h-32 w-full rounded-xl" />
+        <Shimmer className="mb-6 h-32 w-full rounded-2xl" />
         <div className="mb-6 flex gap-2">
           {Array.from({ length: 3 }).map((_, i) => (
             <Shimmer key={i} className="h-10 w-32 rounded-lg" />
           ))}
         </div>
-        <Shimmer className="h-48 w-full rounded-lg" />
+        <Shimmer className="h-48 w-full rounded-2xl" />
       </div>
     );
   }
@@ -201,25 +201,25 @@ export function DashboardPage() {
       href: '/annonces/new',
       icon: Plus,
       label: 'Publier',
-      bg: 'bg-primary-600 text-white hover:bg-primary-700',
+      bg: 'bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg shadow-primary-500/20',
     },
     {
       href: '/annonces',
       icon: Package,
-      label: 'Envoyer un colis',
-      bg: 'border border-neutral-200 text-neutral-700 hover:bg-neutral-50',
+      label: 'Envoyer',
+      bg: 'bg-surface-700 border border-white/[0.08] text-neutral-100 hover:bg-surface-600',
     },
     {
       href: '/corridors',
       icon: GlobeHemisphereWest,
       label: 'Corridors',
-      bg: 'border border-neutral-200 text-neutral-700 hover:bg-neutral-50',
+      bg: 'bg-surface-700 border border-white/[0.08] text-neutral-100 hover:bg-surface-600',
     },
     {
       href: '/messages',
       icon: ChatCircle,
       label: stats.unreadMessages > 0 ? `Messages (${stats.unreadMessages})` : 'Messages',
-      bg: 'border border-neutral-200 text-neutral-700 hover:bg-neutral-50',
+      bg: 'bg-surface-700 border border-white/[0.08] text-neutral-100 hover:bg-surface-600',
     },
   ];
 
@@ -227,28 +227,30 @@ export function DashboardPage() {
     <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6 lg:px-8">
       {/* ===== HERO: Welcome + Stats ===== */}
       <FadeIn>
-        <div className="mb-6 rounded-xl bg-neutral-950 px-5 py-5">
+        <div className="bg-surface-800 mb-6 rounded-2xl px-5 py-6">
           <div className="flex items-center justify-between gap-4">
             {/* Left: avatar + greeting */}
             <div className="flex items-center gap-3">
               {profile && (
-                <Avatar
-                  src={profile.avatar_url}
-                  firstName={profile.first_name}
-                  lastName={profile.last_name}
-                  size="md"
-                  isVerified={profile.is_verified}
-                />
+                <div className="ring-primary-500/30 rounded-full ring-2">
+                  <Avatar
+                    src={profile.avatar_url}
+                    firstName={profile.first_name}
+                    lastName={profile.last_name}
+                    size="md"
+                    isVerified={profile.is_verified}
+                  />
+                </div>
               )}
               <div>
-                <h1 className="text-base font-semibold text-white sm:text-lg">
+                <h1 className="text-base font-semibold text-neutral-100 sm:text-lg">
                   Bonjour, {profile?.first_name || 'Utilisateur'}
                 </h1>
-                <p className="flex items-center gap-1.5 text-xs text-neutral-400">
+                <p className="text-surface-100 flex items-center gap-1.5 text-xs">
                   Voici votre tableau de bord
                   <Link
                     href="/parametres"
-                    className="text-neutral-500 transition-colors hover:text-white"
+                    className="text-surface-200 transition-colors hover:text-neutral-100"
                   >
                     <GearSix weight="duotone" size={14} />
                   </Link>
@@ -260,35 +262,39 @@ export function DashboardPage() {
             <div className="hidden items-center gap-6 sm:flex">
               {statItems.map((s) => (
                 <Link key={s.label} href={s.href} className="group text-center">
-                  <p className="group-hover:text-primary-400 text-lg font-bold text-white transition-colors">
+                  <p className="group-hover:text-primary-400 text-lg font-bold text-neutral-100 transition-colors">
                     {s.value}
                   </p>
-                  <p className="text-[10px] text-neutral-500">{s.label}</p>
+                  <p className="text-surface-100 text-[10px]">{s.label}</p>
                 </Link>
               ))}
             </div>
           </div>
 
-          {/* Mobile stats row */}
-          <div className="mt-4 grid grid-cols-4 gap-2 sm:hidden">
+          {/* Mobile stats row — 2 cols for readability at 375px */}
+          <div className="mt-4 grid grid-cols-2 gap-2 sm:hidden">
             {statItems.map((s) => (
-              <Link key={s.label} href={s.href} className="text-center">
-                <p className="text-sm font-bold text-white">{s.value}</p>
-                <p className="text-[10px] text-neutral-500">{s.label}</p>
+              <Link
+                key={s.label}
+                href={s.href}
+                className="bg-surface-700 hover:bg-surface-600 rounded-xl p-3 text-center transition-colors"
+              >
+                <p className="text-sm font-bold text-neutral-100">{s.value}</p>
+                <p className="text-surface-100 text-[10px]">{s.label}</p>
               </Link>
             ))}
           </div>
 
           {/* Verification inline if needed */}
           {profile && !profile.is_verified && (
-            <div className="mt-4 flex items-center justify-between rounded-lg border border-amber-500/20 bg-amber-500/10 px-3 py-2">
+            <div className="border-warning/20 bg-warning/10 mt-4 flex items-center justify-between rounded-xl border px-3 py-2">
               <div className="flex items-center gap-2">
-                <WarningCircle weight="duotone" size={16} className="text-amber-400" />
-                <span className="text-xs text-amber-200">Identité non vérifiée</span>
+                <WarningCircle weight="duotone" size={16} className="text-warning" />
+                <span className="text-warning text-xs">Identité non vérifiée</span>
               </div>
               <Link
                 href="/profil/verification"
-                className="flex items-center gap-1 text-xs font-medium text-amber-400 hover:text-amber-300"
+                className="text-warning flex items-center gap-1 text-xs font-medium hover:text-amber-300"
               >
                 Vérifier
                 <ArrowRight weight="bold" size={12} />
@@ -307,7 +313,7 @@ export function DashboardPage() {
               <Link
                 key={action.href}
                 href={action.href}
-                className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${action.bg}`}
+                className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200 ${action.bg}`}
               >
                 <Icon weight="bold" size={15} />
                 {action.label}
@@ -319,15 +325,15 @@ export function DashboardPage() {
 
       {/* ===== MAIN: Activity timeline ===== */}
       <FadeIn delay={0.2}>
-        <div className="rounded-lg border border-neutral-200/60 bg-white">
-          <div className="flex items-center justify-between border-b border-neutral-100 px-4 py-2.5">
-            <h2 className="flex items-center gap-1.5 text-xs font-semibold text-neutral-900">
-              <Clock weight="duotone" size={14} className="text-neutral-400" />
+        <div className="bg-surface-800 rounded-2xl border border-white/[0.08] p-5">
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="flex items-center gap-1.5 text-xs font-semibold text-neutral-100">
+              <Clock weight="duotone" size={14} className="text-surface-200" />
               Activité récente
             </h2>
             <Link
               href="/activite"
-              className="text-primary-500 hover:text-primary-600 flex items-center gap-0.5 text-xs font-medium"
+              className="text-primary-400 hover:text-primary-300 flex items-center gap-0.5 text-xs font-medium"
             >
               Tout voir
               <CaretRight weight="bold" size={12} />
@@ -335,13 +341,13 @@ export function DashboardPage() {
           </div>
 
           {activities.length > 0 ? (
-            <div>
+            <div className="space-y-0.5">
               {activities.map((activity) => {
                 const Icon = activityIcons[activity.icon];
                 return (
                   <div
                     key={activity.id}
-                    className="flex items-center gap-3 border-b border-neutral-50 px-4 py-2.5 transition-colors last:border-b-0 hover:bg-neutral-50"
+                    className="hover:bg-surface-700 flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors"
                   >
                     {/* Status dot */}
                     <span
@@ -349,17 +355,17 @@ export function DashboardPage() {
                     />
 
                     {/* Icon */}
-                    <Icon weight="duotone" size={16} className="shrink-0 text-neutral-400" />
+                    <Icon weight="duotone" size={16} className="text-surface-200 shrink-0" />
 
                     {/* Content */}
                     <div className="min-w-0 flex-1">
-                      <span className="text-sm text-neutral-900">{activity.title}</span>
-                      <span className="mx-1.5 text-neutral-300">&middot;</span>
-                      <span className="text-sm text-neutral-500">{activity.description}</span>
+                      <span className="text-sm text-neutral-100">{activity.title}</span>
+                      <span className="text-surface-400 mx-1.5">&middot;</span>
+                      <span className="text-surface-100 text-sm">{activity.description}</span>
                     </div>
 
                     {/* Time */}
-                    <span className="shrink-0 text-[11px] text-neutral-400">
+                    <span className="text-surface-200 shrink-0 text-[11px]">
                       {formatRelativeDate(activity.timestamp)}
                     </span>
                   </div>
@@ -368,8 +374,8 @@ export function DashboardPage() {
             </div>
           ) : (
             <div className="py-8 text-center">
-              <Clock weight="duotone" size={24} className="mx-auto text-neutral-300" />
-              <p className="mt-2 text-sm text-neutral-500">Aucune activité récente</p>
+              <Clock weight="duotone" size={24} className="text-surface-300 mx-auto" />
+              <p className="text-surface-100 mt-2 text-sm">Aucune activité récente</p>
             </div>
           )}
         </div>
@@ -377,9 +383,9 @@ export function DashboardPage() {
 
       {/* ===== BOTTOM: Trust indicators ===== */}
       <FadeIn delay={0.3}>
-        <div className="mt-6 flex flex-wrap items-center justify-center gap-5 text-xs text-neutral-400">
+        <div className="text-surface-200 mt-6 flex flex-wrap items-center justify-center gap-5 text-xs">
           <span className="flex items-center gap-1.5">
-            <ShieldCheck weight="duotone" size={14} className="text-emerald-500" />
+            <ShieldCheck weight="duotone" size={14} className="text-success" />
             Paiements sécurisés
           </span>
           <span className="flex items-center gap-1.5">

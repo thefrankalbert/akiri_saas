@@ -101,7 +101,7 @@ export function LoginForm() {
   };
 
   return (
-    <Card className="border-neutral-200/60">
+    <Card className="glass-strong rounded-3xl border-white/[0.08]">
       <CardHeader className="text-center">
         <CardTitle className="text-2xl">Bon retour !</CardTitle>
         <CardDescription>Connectez-vous à votre compte Akiri</CardDescription>
@@ -109,12 +109,12 @@ export function LoginForm() {
       <CardContent>
         {/* Demo Mode Banner */}
         {!supabaseConfigured && (
-          <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 p-4">
+          <div className="border-warning/20 bg-warning/10 mb-4 rounded-xl border p-4">
             <div className="flex items-start gap-3">
-              <Warning size={20} className="shrink-0 text-amber-600" />
+              <Warning size={20} className="text-warning shrink-0" />
               <div className="flex-1">
-                <p className="font-medium text-amber-800">Mode Démonstration</p>
-                <p className="mt-1 text-sm text-amber-700">
+                <p className="text-warning font-medium">Mode Démonstration</p>
+                <p className="text-warning/80 mt-1 text-sm">
                   Supabase n&apos;est pas configuré. Utilisez le mode démo pour tester
                   l&apos;application.
                 </p>
@@ -122,7 +122,7 @@ export function LoginForm() {
                   <Button
                     type="button"
                     onClick={handleDemoLogin}
-                    className="bg-amber-600 hover:bg-amber-700"
+                    className="bg-warning text-surface-950 hover:bg-amber-600"
                     size="sm"
                   >
                     Connexion Démo Rapide
@@ -130,7 +130,7 @@ export function LoginForm() {
                   <button
                     type="button"
                     onClick={fillDemoCredentials}
-                    className="text-sm font-medium text-amber-800 underline hover:text-amber-900"
+                    className="text-warning text-sm font-medium underline hover:text-amber-300"
                   >
                     ou remplir le formulaire
                   </button>
@@ -142,7 +142,7 @@ export function LoginForm() {
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           {serverError && (
-            <div className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{serverError}</div>
+            <div className="bg-error/10 text-error rounded-xl px-4 py-3 text-sm">{serverError}</div>
           )}
 
           <Input
@@ -165,7 +165,7 @@ export function LoginForm() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="text-neutral-400 hover:text-neutral-600"
+                  className="text-surface-200 hover:text-neutral-100"
                   tabIndex={-1}
                 >
                   {showPassword ? <EyeSlash size={16} /> : <Eye size={16} />}
@@ -180,7 +180,7 @@ export function LoginForm() {
           <div className="flex items-center justify-end">
             <Link
               href="/reset-password"
-              className="text-primary-600 hover:text-primary-500 text-sm font-medium"
+              className="text-primary-400 hover:text-primary-300 text-sm font-medium"
             >
               Mot de passe oublié ?
             </Link>
@@ -190,11 +190,11 @@ export function LoginForm() {
             Se connecter
           </Button>
 
-          <p className="text-center text-sm text-neutral-500">
+          <p className="text-surface-100 text-center text-sm">
             Pas encore de compte ?{' '}
             <Link
               href="/register"
-              className="text-primary-600 hover:text-primary-500 font-semibold"
+              className="text-primary-400 hover:text-primary-300 font-semibold"
             >
               Créer un compte
             </Link>

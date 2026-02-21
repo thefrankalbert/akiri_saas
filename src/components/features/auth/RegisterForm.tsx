@@ -61,7 +61,7 @@ export function RegisterForm() {
   };
 
   return (
-    <Card className="border-neutral-200/60">
+    <Card className="glass-strong rounded-3xl border-white/[0.08]">
       <CardHeader className="text-center">
         <CardTitle className="text-2xl">Créer un compte</CardTitle>
         <CardDescription>
@@ -71,7 +71,7 @@ export function RegisterForm() {
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           {serverError && (
-            <div className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{serverError}</div>
+            <div className="bg-error/10 text-error rounded-xl px-4 py-3 text-sm">{serverError}</div>
           )}
 
           <div className="grid grid-cols-2 gap-3">
@@ -111,7 +111,7 @@ export function RegisterForm() {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="text-neutral-400 hover:text-neutral-600"
+                className="text-surface-200 hover:text-neutral-100"
                 tabIndex={-1}
               >
                 {showPassword ? <EyeSlash size={16} /> : <Eye size={16} />}
@@ -136,18 +136,18 @@ export function RegisterForm() {
           <label className="flex items-start gap-2">
             <input
               type="checkbox"
-              className="text-primary-500 focus:ring-primary-500 mt-1 h-4 w-4 rounded border-neutral-300"
+              className="bg-surface-700 text-primary-500 focus:ring-primary-500 mt-1 h-4 w-4 rounded border-white/[0.08]"
               {...registerField('accept_terms')}
             />
-            <span className="text-sm text-neutral-600">
+            <span className="text-surface-100 text-sm">
               J&apos;accepte les{' '}
-              <Link href="/cgu" className="text-primary-600 font-medium hover:underline">
+              <Link href="/cgu" className="text-primary-400 font-medium hover:underline">
                 conditions g&eacute;n&eacute;rales d&apos;utilisation
               </Link>{' '}
               et la{' '}
               <Link
                 href="/confidentialite"
-                className="text-primary-600 font-medium hover:underline"
+                className="text-primary-400 font-medium hover:underline"
               >
                 politique de confidentialit&eacute;
               </Link>
@@ -161,9 +161,9 @@ export function RegisterForm() {
             Créer mon compte
           </Button>
 
-          <p className="text-center text-sm text-neutral-500">
+          <p className="text-surface-100 text-center text-sm">
             Déjà un compte ?{' '}
-            <Link href="/login" className="text-primary-600 hover:text-primary-500 font-semibold">
+            <Link href="/login" className="text-primary-400 hover:text-primary-300 font-semibold">
               Se connecter
             </Link>
           </p>

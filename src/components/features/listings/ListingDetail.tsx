@@ -79,7 +79,7 @@ export function ListingDetail({ listingId }: ListingDetailProps) {
       <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 lg:px-8">
         <Skeleton className="mb-4 h-6 w-32" />
         <Skeleton className="mb-6 h-8 w-64" />
-        <Skeleton className="h-96 w-full rounded-xl" />
+        <Skeleton className="h-96 w-full rounded-2xl" />
       </div>
     );
   }
@@ -87,8 +87,8 @@ export function ListingDetail({ listingId }: ListingDetailProps) {
   if (error || !listing) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-16 text-center sm:px-6 lg:px-8">
-        <Package className="mx-auto text-neutral-300" size={64} />
-        <h2 className="mt-4 text-xl font-semibold text-neutral-700">
+        <Package className="text-surface-300 mx-auto" size={64} />
+        <h2 className="mt-4 text-xl font-semibold text-neutral-100">
           {error || 'Annonce introuvable'}
         </h2>
         <Link href="/annonces" className="mt-4 inline-block">
@@ -107,7 +107,7 @@ export function ListingDetail({ listingId }: ListingDetailProps) {
       {/* Back button */}
       <Link
         href="/annonces"
-        className="mb-6 inline-flex items-center gap-1 text-sm font-medium text-neutral-500 hover:text-neutral-700"
+        className="text-surface-100 mb-6 inline-flex items-center gap-1 text-sm font-medium hover:text-neutral-100"
       >
         <ArrowLeft size={16} />
         Retour aux annonces
@@ -120,13 +120,13 @@ export function ListingDetail({ listingId }: ListingDetailProps) {
             <CardContent className="p-6">
               {/* Route */}
               <div className="flex items-center gap-3">
-                <MapPin className="text-primary-500" size={20} />
+                <MapPin className="text-primary-400" size={20} />
                 <div>
-                  <h1 className="truncate text-xl font-bold text-neutral-900">
+                  <h1 className="truncate text-xl font-bold text-neutral-100">
                     {listing.departure_city}, {listing.departure_country}
                   </h1>
-                  <p className="text-neutral-500">&darr;</p>
-                  <h1 className="truncate text-xl font-bold text-neutral-900">
+                  <p className="text-surface-200">&darr;</p>
+                  <h1 className="truncate text-xl font-bold text-neutral-100">
                     {listing.arrival_city}, {listing.arrival_country}
                   </h1>
                 </div>
@@ -145,26 +145,26 @@ export function ListingDetail({ listingId }: ListingDetailProps) {
 
               {/* Key info */}
               <div className="mt-6 grid grid-cols-2 gap-4">
-                <div className="rounded-lg bg-neutral-50 p-4 text-center">
-                  <Package className="text-primary-500 mx-auto" size={24} />
-                  <p className="mt-2 text-2xl font-bold text-neutral-900">
+                <div className="bg-surface-700 rounded-xl p-4 text-center">
+                  <Package className="text-primary-400 mx-auto" size={24} />
+                  <p className="mt-2 font-mono text-2xl font-bold text-neutral-100">
                     {listing.available_kg} kg
                   </p>
-                  <p className="text-sm text-neutral-500">disponibles</p>
+                  <p className="text-surface-100 text-sm">disponibles</p>
                 </div>
-                <div className="rounded-lg bg-neutral-50 p-4 text-center">
-                  <span className="text-primary-600 text-2xl font-bold">
+                <div className="bg-surface-700 rounded-xl p-4 text-center">
+                  <span className="text-primary-400 font-mono text-2xl font-bold">
                     {formatCurrency(listing.price_per_kg)}
                   </span>
-                  <p className="text-sm text-neutral-500">par kilo</p>
+                  <p className="text-surface-100 text-sm">par kilo</p>
                 </div>
               </div>
 
               {/* Description */}
               {listing.description && (
                 <div className="mt-6">
-                  <h3 className="text-sm font-semibold text-neutral-700">Description</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-neutral-600">
+                  <h3 className="text-surface-50 text-sm font-semibold">Description</h3>
+                  <p className="text-surface-100 mt-2 text-sm leading-relaxed">
                     {listing.description}
                   </p>
                 </div>
@@ -173,11 +173,11 @@ export function ListingDetail({ listingId }: ListingDetailProps) {
               {/* Accepted items */}
               {listing.accepted_items.length > 0 && (
                 <div className="mt-6">
-                  <h3 className="text-sm font-semibold text-neutral-700">Articles acceptés</h3>
+                  <h3 className="text-surface-50 text-sm font-semibold">Articles acceptés</h3>
                   <div className="mt-2 flex flex-wrap gap-2">
                     {listing.accepted_items.map((item) => (
                       <Badge key={item} variant="outline">
-                        <CheckCircle className="text-secondary-500 mr-1" size={12} />
+                        <CheckCircle className="text-success mr-1" size={12} />
                         {item}
                       </Badge>
                     ))}
@@ -188,11 +188,11 @@ export function ListingDetail({ listingId }: ListingDetailProps) {
               {/* Collection points */}
               {listing.collection_points.length > 0 && (
                 <div className="mt-6">
-                  <h3 className="text-sm font-semibold text-neutral-700">Points de collecte</h3>
+                  <h3 className="text-surface-50 text-sm font-semibold">Points de collecte</h3>
                   <ul className="mt-2 space-y-1">
                     {listing.collection_points.map((point, i) => (
-                      <li key={i} className="flex items-center gap-2 text-sm text-neutral-600">
-                        <MapPin className="text-neutral-400" size={14} />
+                      <li key={i} className="text-surface-100 flex items-center gap-2 text-sm">
+                        <MapPin className="text-surface-200" size={14} />
                         {point}
                       </li>
                     ))}
@@ -201,8 +201,8 @@ export function ListingDetail({ listingId }: ListingDetailProps) {
               )}
 
               {/* Published date */}
-              <div className="mt-6 border-t border-neutral-100 pt-4">
-                <p className="flex items-center gap-1 text-xs text-neutral-400">
+              <div className="mt-6 border-t border-white/[0.06] pt-4">
+                <p className="text-surface-200 flex items-center gap-1 text-xs">
                   <Clock size={14} />
                   Publiée {formatRelativeDate(listing.created_at)}
                 </p>
@@ -221,17 +221,19 @@ export function ListingDetail({ listingId }: ListingDetailProps) {
             <CardContent className="p-6 pt-0">
               <div className="space-y-3">
                 <div className="flex justify-between text-sm">
-                  <span className="text-neutral-500">Prix par kg</span>
-                  <span className="font-medium">{formatCurrency(listing.price_per_kg)}</span>
+                  <span className="text-surface-100">Prix par kg</span>
+                  <span className="font-medium text-neutral-100">
+                    {formatCurrency(listing.price_per_kg)}
+                  </span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-neutral-500">Kilos disponibles</span>
-                  <span className="font-medium">{listing.available_kg} kg</span>
+                  <span className="text-surface-100">Kilos disponibles</span>
+                  <span className="font-medium text-neutral-100">{listing.available_kg} kg</span>
                 </div>
-                <div className="border-t border-neutral-100 pt-3">
+                <div className="border-t border-white/[0.06] pt-3">
                   <div className="flex justify-between">
-                    <span className="font-medium text-neutral-700">Total max</span>
-                    <span className="text-primary-600 text-lg font-bold">
+                    <span className="text-surface-50 font-medium">Total max</span>
+                    <span className="text-primary-400 font-mono text-lg font-bold">
                       {formatCurrency(totalCost)}
                     </span>
                   </div>
@@ -266,16 +268,16 @@ export function ListingDetail({ listingId }: ListingDetailProps) {
                     isVerified={listing.traveler.is_verified}
                   />
                   <div>
-                    <p className="font-semibold text-neutral-900">
+                    <p className="font-semibold text-neutral-100">
                       {listing.traveler.first_name} {listing.traveler.last_name}
                     </p>
                     {listing.traveler.rating > 0 && (
                       <div className="flex items-center gap-1">
                         <Star className="fill-accent-500 text-accent-500" size={16} />
-                        <span className="text-sm font-medium">
+                        <span className="text-sm font-medium text-neutral-100">
                           {listing.traveler.rating.toFixed(1)}
                         </span>
-                        <span className="text-xs text-neutral-400">
+                        <span className="text-surface-200 text-xs">
                           ({listing.traveler.total_reviews} avis)
                         </span>
                       </div>
@@ -283,13 +285,13 @@ export function ListingDetail({ listingId }: ListingDetailProps) {
                   </div>
                 </div>
                 <div className="mt-4 grid grid-cols-2 gap-2 text-center text-xs">
-                  <div className="rounded-lg bg-neutral-50 p-2">
-                    <p className="font-bold text-neutral-900">{listing.traveler.total_trips}</p>
-                    <p className="text-neutral-500">trajets</p>
+                  <div className="bg-surface-700 rounded-lg p-2">
+                    <p className="font-bold text-neutral-100">{listing.traveler.total_trips}</p>
+                    <p className="text-surface-100">trajets</p>
                   </div>
-                  <div className="rounded-lg bg-neutral-50 p-2">
-                    <p className="font-bold text-neutral-900">{listing.traveler.total_shipments}</p>
-                    <p className="text-neutral-500">envois</p>
+                  <div className="bg-surface-700 rounded-lg p-2">
+                    <p className="font-bold text-neutral-100">{listing.traveler.total_shipments}</p>
+                    <p className="text-surface-100">envois</p>
                   </div>
                 </div>
                 <Link href={`/profil/${listing.traveler.user_id}`} className="mt-3 block">
@@ -304,12 +306,12 @@ export function ListingDetail({ listingId }: ListingDetailProps) {
           {/* Trust */}
           <Card>
             <CardContent className="space-y-2 p-4">
-              <div className="flex items-center gap-2 text-sm text-neutral-600">
-                <ShieldCheck className="text-secondary-500" size={16} />
+              <div className="text-surface-100 flex items-center gap-2 text-sm">
+                <ShieldCheck className="text-success" size={16} />
                 Paiement sécurisé par Stripe
               </div>
-              <div className="flex items-center gap-2 text-sm text-neutral-600">
-                <ShieldCheck className="text-secondary-500" size={16} />
+              <div className="text-surface-100 flex items-center gap-2 text-sm">
+                <ShieldCheck className="text-success" size={16} />
                 Argent bloqué jusqu&apos;à la livraison
               </div>
             </CardContent>

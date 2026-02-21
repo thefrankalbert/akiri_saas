@@ -47,10 +47,10 @@ export function ResetPassword() {
 
   if (submitted) {
     return (
-      <Card className="border-neutral-200/60">
+      <Card className="glass-strong rounded-3xl border-white/[0.08]">
         <CardHeader className="text-center">
-          <div className="bg-secondary-100 mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full">
-            <CheckCircle className="text-secondary-500" size={32} />
+          <div className="bg-success/10 mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full">
+            <CheckCircle className="text-success" size={32} />
           </div>
           <CardTitle className="text-2xl">Email envoyé !</CardTitle>
           <CardDescription>
@@ -70,7 +70,7 @@ export function ResetPassword() {
   }
 
   return (
-    <Card className="border-neutral-200/60">
+    <Card className="glass-strong rounded-3xl border-white/[0.08]">
       <CardHeader className="text-center">
         <CardTitle className="text-2xl">Mot de passe oublié</CardTitle>
         <CardDescription>
@@ -81,7 +81,7 @@ export function ResetPassword() {
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           {serverError && (
-            <div className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{serverError}</div>
+            <div className="bg-error/10 text-error rounded-xl px-4 py-3 text-sm">{serverError}</div>
           )}
 
           <Input
@@ -101,7 +101,7 @@ export function ResetPassword() {
           <div className="text-center">
             <Link
               href="/login"
-              className="text-primary-600 hover:text-primary-500 inline-flex items-center gap-1 text-sm font-medium"
+              className="text-primary-400 hover:text-primary-300 inline-flex items-center gap-1 text-sm font-medium"
             >
               <ArrowLeft size={16} />
               Retour à la connexion

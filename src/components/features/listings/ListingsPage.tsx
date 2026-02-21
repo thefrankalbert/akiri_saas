@@ -30,8 +30,8 @@ export function ListingsPage() {
       {/* Header */}
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-neutral-900">Annonces</h1>
-          <p className="mt-1 text-sm text-neutral-500">
+          <h1 className="text-2xl font-bold text-neutral-100">Annonces</h1>
+          <p className="text-surface-100 mt-1 text-sm">
             Trouvez un voyageur pour transporter votre colis
           </p>
         </div>
@@ -58,14 +58,14 @@ export function ListingsPage() {
         </div>
 
         {showFilters && (
-          <Card>
-            <CardContent className="grid gap-4 p-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="bg-surface-800 rounded-xl border border-white/[0.08] p-4">
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               <div>
-                <label className="mb-1.5 block text-sm font-medium text-neutral-700">
+                <label className="text-surface-50 mb-1.5 block text-sm font-medium">
                   Pays de départ
                 </label>
                 <select
-                  className="h-10 w-full appearance-none rounded-lg border border-neutral-300 bg-white bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%236b7280%22%20stroke-width%3D%222%22%3E%3Cpath%20d%3D%22m6%209%206%206%206-6%22%2F%3E%3C%2Fsvg%3E')] bg-[length:16px] bg-[right_8px_center] bg-no-repeat px-3 pr-8 text-sm"
+                  className="bg-surface-700 h-10 w-full appearance-none rounded-lg border border-white/[0.08] px-3 pr-8 text-sm text-neutral-100"
                   onChange={(e) =>
                     updateFilters({ departure_country: e.target.value || undefined })
                   }
@@ -79,11 +79,11 @@ export function ListingsPage() {
                 </select>
               </div>
               <div>
-                <label className="mb-1.5 block text-sm font-medium text-neutral-700">
+                <label className="text-surface-50 mb-1.5 block text-sm font-medium">
                   Pays d&apos;arriv&eacute;e
                 </label>
                 <select
-                  className="h-10 w-full appearance-none rounded-lg border border-neutral-300 bg-white bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%236b7280%22%20stroke-width%3D%222%22%3E%3Cpath%20d%3D%22m6%209%206%206%206-6%22%2F%3E%3C%2Fsvg%3E')] bg-[length:16px] bg-[right_8px_center] bg-no-repeat px-3 pr-8 text-sm"
+                  className="bg-surface-700 h-10 w-full appearance-none rounded-lg border border-white/[0.08] px-3 pr-8 text-sm text-neutral-100"
                   onChange={(e) => updateFilters({ arrival_country: e.target.value || undefined })}
                 >
                   <option value="">Tous</option>
@@ -95,7 +95,7 @@ export function ListingsPage() {
                 </select>
               </div>
               <div>
-                <label className="mb-1.5 block text-sm font-medium text-neutral-700">
+                <label className="text-surface-50 mb-1.5 block text-sm font-medium">
                   Poids minimum (kg)
                 </label>
                 <Input
@@ -107,7 +107,7 @@ export function ListingsPage() {
                 />
               </div>
               <div>
-                <label className="mb-1.5 block text-sm font-medium text-neutral-700">
+                <label className="text-surface-50 mb-1.5 block text-sm font-medium">
                   Prix max (/kg)
                 </label>
                 <Input
@@ -120,20 +120,20 @@ export function ListingsPage() {
                   }
                 />
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         )}
       </div>
 
       {/* Sort */}
       <div className="mb-4 flex items-center justify-between">
-        <p className="text-sm text-neutral-500">
+        <p className="text-surface-100 text-sm">
           {loading ? 'Chargement...' : `${listings.length} annonce(s) trouvée(s)`}
         </p>
         <div className="flex items-center gap-2">
-          <span className="text-sm text-neutral-500">Trier par</span>
+          <span className="text-surface-100 text-sm">Trier par</span>
           <select
-            className="appearance-none rounded-lg border border-neutral-300 bg-white bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%236b7280%22%20stroke-width%3D%222%22%3E%3Cpath%20d%3D%22m6%209%206%206%206-6%22%2F%3E%3C%2Fsvg%3E')] bg-[length:14px] bg-[right_6px_center] bg-no-repeat px-2 py-1 pr-7 text-sm"
+            className="bg-surface-700 appearance-none rounded-lg border border-white/[0.08] px-2 py-1 pr-7 text-sm text-neutral-100"
             onChange={(e) =>
               updateFilters({
                 sort_by: e.target.value as 'departure_date' | 'price_per_kg',
@@ -146,7 +146,7 @@ export function ListingsPage() {
             <option value="created_at">Plus récent</option>
           </select>
           <button
-            className="text-neutral-400 hover:text-neutral-600"
+            className="text-surface-200 hover:text-neutral-100"
             onClick={() =>
               updateFilters({
                 sort_order: 'desc',
@@ -162,34 +162,35 @@ export function ListingsPage() {
       {loading ? (
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {Array.from({ length: 8 }).map((_, i) => (
-            <Skeleton key={i} className="h-36 w-full rounded-lg" />
+            <Skeleton key={i} className="h-36 w-full rounded-2xl" />
           ))}
         </div>
       ) : listings.length === 0 ? (
-        <Card className="py-16 text-center">
-          <CardContent>
-            <Package weight="duotone" size={48} className="mx-auto text-neutral-300" />
-            <h3 className="mt-4 text-lg font-semibold text-neutral-700">Aucune annonce</h3>
-            <p className="mt-2 text-sm text-neutral-500">
-              Aucune annonce ne correspond à vos critères de recherche.
-            </p>
-          </CardContent>
-        </Card>
+        <div className="bg-surface-800 rounded-2xl border border-white/[0.08] py-16 text-center">
+          <Package weight="duotone" size={48} className="text-surface-300 mx-auto" />
+          <h3 className="mt-4 text-lg font-semibold text-neutral-100">Aucune annonce</h3>
+          <p className="text-surface-100 mt-2 text-sm">
+            Aucune annonce ne correspond à vos critères de recherche.
+          </p>
+        </div>
       ) : (
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {listings.map((listing) => (
             <Link key={listing.id} href={`/annonces/${listing.id}`}>
-              <Card className="h-full transition-colors hover:border-neutral-300" padding="none">
+              <Card
+                className="h-full transition-all duration-200 hover:border-white/[0.15]"
+                padding="none"
+              >
                 <CardContent className="p-2.5">
                   {/* Route + Date */}
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-1.5 text-sm">
-                      <MapPin weight="duotone" size={14} className="text-primary-500" />
-                      <span className="font-medium text-neutral-900">{listing.departure_city}</span>
-                      <span className="text-neutral-400">&rarr;</span>
-                      <span className="font-medium text-neutral-900">{listing.arrival_city}</span>
+                      <MapPin weight="duotone" size={14} className="text-primary-400" />
+                      <span className="font-medium text-neutral-100">{listing.departure_city}</span>
+                      <span className="text-surface-300">&rarr;</span>
+                      <span className="font-medium text-neutral-100">{listing.arrival_city}</span>
                     </div>
-                    <span className="flex items-center gap-1 text-xs text-neutral-400">
+                    <span className="text-surface-200 flex items-center gap-1 text-xs">
                       <CalendarBlank weight="duotone" size={12} />
                       {formatDate(listing.departure_date)}
                     </span>
@@ -200,7 +201,7 @@ export function ListingsPage() {
                     <Badge variant="default" size="sm">
                       {listing.available_kg} kg
                     </Badge>
-                    <span className="text-primary-600 text-sm font-bold">
+                    <span className="text-primary-400 font-mono text-sm font-bold">
                       {formatCurrency(listing.price_per_kg)}/kg
                     </span>
                   </div>
@@ -223,20 +224,20 @@ export function ListingsPage() {
 
                   {/* Traveler */}
                   {listing.traveler && (
-                    <div className="mt-2 flex items-center gap-2 border-t border-neutral-100 pt-2">
+                    <div className="mt-2 flex items-center gap-2 border-t border-white/[0.06] pt-2">
                       <Avatar
                         src={listing.traveler.avatar_url}
                         firstName={listing.traveler.first_name}
                         lastName={listing.traveler.last_name}
                         size="sm"
                       />
-                      <p className="flex-1 text-xs font-medium text-neutral-700">
+                      <p className="text-surface-50 flex-1 text-xs font-medium">
                         {listing.traveler.first_name} {listing.traveler.last_name.charAt(0)}.
                       </p>
                       {listing.traveler.rating > 0 && (
                         <div className="flex items-center gap-0.5">
                           <Star weight="fill" size={12} className="text-amber-400" />
-                          <span className="text-xs font-medium text-neutral-700">
+                          <span className="text-xs font-medium text-neutral-100">
                             {listing.traveler.rating.toFixed(1)}
                           </span>
                         </div>
@@ -261,7 +262,7 @@ export function ListingsPage() {
           >
             Précédent
           </Button>
-          <span className="flex items-center px-3 text-sm text-neutral-500">
+          <span className="text-surface-100 flex items-center px-3 text-sm">
             Page {currentPage} / {totalPages}
           </span>
           <Button

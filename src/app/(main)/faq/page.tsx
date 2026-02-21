@@ -54,28 +54,28 @@ export default function FAQ() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:px-8">
       <div className="mb-8 text-center">
-        <h1 className="text-3xl font-bold text-neutral-900">Questions fréquentes</h1>
-        <p className="mt-2 text-neutral-500">Tout ce que vous devez savoir sur Akiri</p>
+        <h1 className="text-3xl font-bold text-neutral-100">Questions fréquentes</h1>
+        <p className="text-surface-100 mt-2">Tout ce que vous devez savoir sur Akiri</p>
       </div>
 
       <div className="space-y-3">
         {faqs.map((faq, i) => (
           <Card key={i}>
             <CardContent className="p-5">
-              <h3 className="text-base font-semibold text-neutral-900">{faq.question}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-neutral-600">{faq.answer}</p>
+              <h3 className="text-base font-semibold text-neutral-100">{faq.question}</h3>
+              <p className="text-surface-100 mt-2 text-sm leading-relaxed">{faq.answer}</p>
             </CardContent>
           </Card>
         ))}
       </div>
 
-      <div className="mt-10 rounded-2xl bg-neutral-100 p-6 text-center">
-        <p className="text-sm text-neutral-600">
+      <div className="bg-surface-800 mt-10 rounded-2xl border border-white/[0.08] p-6 text-center">
+        <p className="text-surface-100 text-sm">
           Vous n&apos;avez pas trouvé la réponse à votre question ?
         </p>
         <Link
           href="/contact"
-          className="text-primary-600 hover:text-primary-700 mt-2 inline-block text-sm font-semibold"
+          className="text-primary-400 hover:text-primary-300 mt-2 inline-block text-sm font-semibold"
         >
           Contactez-nous →
         </Link>

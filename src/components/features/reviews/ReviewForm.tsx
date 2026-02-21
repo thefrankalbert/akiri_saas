@@ -78,12 +78,12 @@ export function ReviewForm({
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       {serverError && (
-        <div className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{serverError}</div>
+        <div className="bg-error/10 text-error rounded-xl px-4 py-3 text-sm">{serverError}</div>
       )}
 
       {/* Star selector */}
       <div>
-        <label className="mb-1.5 block text-sm font-medium text-neutral-700">
+        <label className="text-surface-50 mb-1.5 block text-sm font-medium">
           Note pour {reviewedName}
         </label>
         <div className="flex items-center gap-1">
@@ -105,35 +105,35 @@ export function ReviewForm({
                   size={28}
                   className={cn(
                     'transition-colors',
-                    isFilled ? 'text-amber-400' : 'text-neutral-300'
+                    isFilled ? 'text-amber-400' : 'text-surface-400'
                   )}
                 />
               </button>
             );
           })}
           {ratingValue > 0 && (
-            <span className="ml-2 text-sm text-neutral-500">{ratingValue}/5</span>
+            <span className="text-surface-100 ml-2 text-sm">{ratingValue}/5</span>
           )}
         </div>
         {errors.rating?.message && (
-          <p className="mt-1 text-xs text-red-600">{errors.rating.message}</p>
+          <p className="text-error mt-1 text-xs">{errors.rating.message}</p>
         )}
       </div>
 
       {/* Comment */}
       <div>
-        <label className="mb-1.5 block text-sm font-medium text-neutral-700">
+        <label className="text-surface-50 mb-1.5 block text-sm font-medium">
           Commentaire (optionnel)
         </label>
         <textarea
           placeholder="Partagez votre expérience..."
-          className="focus:border-primary-500 focus:ring-primary-500 w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm text-neutral-900 placeholder:text-neutral-400 focus:ring-1 focus:outline-none"
+          className="bg-surface-700 placeholder:text-surface-200 focus:border-primary-500 focus:ring-primary-500 w-full rounded-lg border border-white/[0.08] px-3 py-2 text-sm text-neutral-100 focus:ring-1 focus:outline-none"
           rows={3}
           maxLength={1000}
           {...register('comment')}
         />
         <div className="mt-1 flex justify-end">
-          <span className="text-xs text-neutral-400">{commentValue.length}/1000</span>
+          <span className="text-surface-200 text-xs">{commentValue.length}/1000</span>
         </div>
       </div>
 

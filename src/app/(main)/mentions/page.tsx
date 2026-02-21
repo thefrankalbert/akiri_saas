@@ -8,11 +8,11 @@ export const metadata: Metadata = {
 export default function Mentions() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:px-8">
-      <h1 className="mb-8 text-3xl font-bold text-neutral-900">Mentions Légales</h1>
+      <h1 className="mb-8 text-3xl font-bold text-neutral-100">Mentions Légales</h1>
 
-      <div className="prose prose-neutral max-w-none space-y-6 text-sm leading-relaxed text-neutral-700">
+      <div className="text-surface-100 max-w-none space-y-6 text-sm leading-relaxed">
         <section>
-          <h2 className="text-lg font-semibold text-neutral-900">Éditeur du site</h2>
+          <h2 className="text-lg font-semibold text-neutral-100">Éditeur du site</h2>
           <p>
             Akiri SAS
             <br />
@@ -25,7 +25,7 @@ export default function Mentions() {
         </section>
 
         <section>
-          <h2 className="text-lg font-semibold text-neutral-900">Hébergement</h2>
+          <h2 className="text-lg font-semibold text-neutral-100">Hébergement</h2>
           <p>
             Le site est hébergé par :<br />
             Vercel Inc.
@@ -37,7 +37,7 @@ export default function Mentions() {
         </section>
 
         <section>
-          <h2 className="text-lg font-semibold text-neutral-900">Base de données</h2>
+          <h2 className="text-lg font-semibold text-neutral-100">Base de données</h2>
           <p>
             Les données sont stockées et gérées par :<br />
             Supabase Inc.
@@ -47,7 +47,7 @@ export default function Mentions() {
         </section>
 
         <section>
-          <h2 className="text-lg font-semibold text-neutral-900">Paiements</h2>
+          <h2 className="text-lg font-semibold text-neutral-100">Paiements</h2>
           <p>
             Les transactions financières sont gérées par :<br />
             Stripe, Inc.
@@ -61,7 +61,7 @@ export default function Mentions() {
         </section>
 
         <section>
-          <h2 className="text-lg font-semibold text-neutral-900">Propriété intellectuelle</h2>
+          <h2 className="text-lg font-semibold text-neutral-100">Propriété intellectuelle</h2>
           <p>
             L&apos;ensemble des éléments composant le site Akiri (textes, images, logo, design, code
             source) sont protégés par le droit de la propriété intellectuelle. Toute reproduction,
@@ -70,7 +70,7 @@ export default function Mentions() {
         </section>
 
         <section>
-          <h2 className="text-lg font-semibold text-neutral-900">Responsabilité</h2>
+          <h2 className="text-lg font-semibold text-neutral-100">Responsabilité</h2>
           <p>
             Akiri est une plateforme de mise en relation entre voyageurs et expéditeurs. Akiri ne
             transporte pas directement les colis et ne peut être tenu responsable des actes des
@@ -80,7 +80,7 @@ export default function Mentions() {
         </section>
 
         <section>
-          <h2 className="text-lg font-semibold text-neutral-900">Droit applicable</h2>
+          <h2 className="text-lg font-semibold text-neutral-100">Droit applicable</h2>
           <p>
             Les présentes mentions légales sont soumises au droit français. En cas de litige, les
             tribunaux de Paris seront seuls compétents.

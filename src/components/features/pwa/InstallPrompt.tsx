@@ -56,14 +56,14 @@ export function InstallPrompt() {
 
   return (
     <div className="animate-in slide-in-from-bottom fixed right-4 bottom-20 left-4 z-50 md:right-4 md:bottom-4 md:left-auto md:w-96">
-      <div className="rounded-2xl border border-gray-200 bg-white p-4">
+      <div className="bg-surface-800 rounded-2xl border border-white/[0.08] p-4 shadow-lg">
         <div className="flex items-start gap-3">
-          <div className="bg-primary/10 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl">
-            <DownloadSimple className="text-primary" size={20} />
+          <div className="bg-primary-500/10 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl">
+            <DownloadSimple className="text-primary-400" size={20} />
           </div>
           <div className="flex-1">
-            <h3 className="font-semibold text-gray-900">Installer Akiri</h3>
-            <p className="mt-0.5 text-sm text-gray-500">
+            <h3 className="font-semibold text-neutral-100">Installer Akiri</h3>
+            <p className="text-surface-100 mt-0.5 text-sm">
               Installez l&apos;application pour un acc&egrave;s rapide depuis votre &eacute;cran
               d&apos;accueil.
             </p>
@@ -78,7 +78,7 @@ export function InstallPrompt() {
           </div>
           <button
             onClick={handleDismiss}
-            className="shrink-0 rounded-lg p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+            className="text-surface-200 hover:bg-surface-700 shrink-0 rounded-lg p-1 hover:text-neutral-100"
           >
             <X size={16} />
           </button>

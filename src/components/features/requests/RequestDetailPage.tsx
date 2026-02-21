@@ -166,8 +166,8 @@ export function RequestDetailPage({ requestId }: RequestDetailPageProps) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-6">
         <Shimmer className="mb-4 h-6 w-32" />
-        <Shimmer className="mb-6 h-16 w-full rounded-lg" />
-        <Shimmer className="h-64 w-full rounded-lg" />
+        <Shimmer className="mb-6 h-16 w-full rounded-2xl" />
+        <Shimmer className="h-64 w-full rounded-2xl" />
       </div>
     );
   }
@@ -175,8 +175,8 @@ export function RequestDetailPage({ requestId }: RequestDetailPageProps) {
   if (error || !request) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-16 text-center">
-        <Package weight="duotone" size={48} className="mx-auto text-neutral-300" />
-        <h2 className="mt-4 text-xl font-semibold text-neutral-700">
+        <Package weight="duotone" size={48} className="text-surface-300 mx-auto" />
+        <h2 className="mt-4 text-xl font-semibold text-neutral-100">
           {error || 'Demande introuvable'}
         </h2>
         <Link href="/demandes" className="mt-4 inline-block">
@@ -193,7 +193,7 @@ export function RequestDetailPage({ requestId }: RequestDetailPageProps) {
       {/* Back */}
       <Link
         href="/demandes"
-        className="mb-4 inline-flex items-center gap-1 text-sm font-medium text-neutral-500 hover:text-neutral-700"
+        className="text-surface-100 mb-4 inline-flex items-center gap-1 text-sm font-medium hover:text-neutral-100"
       >
         <ArrowLeft weight="bold" size={16} />
         Retour aux demandes
@@ -202,10 +202,10 @@ export function RequestDetailPage({ requestId }: RequestDetailPageProps) {
       <FadeIn>
         {/* Status header */}
         <div className="mb-4 flex items-center justify-between">
-          <h1 className="text-lg font-bold text-neutral-900">Détail de la demande</h1>
+          <h1 className="text-lg font-bold text-neutral-100">Détail de la demande</h1>
           <span
             className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium ${
-              REQUEST_STATUS_COLORS[request.status] || 'bg-neutral-100 text-neutral-700'
+              REQUEST_STATUS_COLORS[request.status] || 'bg-surface-700 text-surface-100'
             }`}
           >
             {REQUEST_STATUS_LABELS[request.status] || request.status}
@@ -222,10 +222,10 @@ export function RequestDetailPage({ requestId }: RequestDetailPageProps) {
         {/* Info */}
         <Card className="mb-4">
           <CardContent className="space-y-3 p-4">
-            <h2 className="text-sm font-semibold text-neutral-900">{request.item_description}</h2>
+            <h2 className="text-sm font-semibold text-neutral-100">{request.item_description}</h2>
 
             {request.listing && (
-              <div className="flex items-center gap-1.5 text-sm text-neutral-500">
+              <div className="text-surface-100 flex items-center gap-1.5 text-sm">
                 <MapPin weight="duotone" size={14} />
                 <span>
                   {request.listing.departure_city} &rarr; {request.listing.arrival_city}
@@ -238,19 +238,19 @@ export function RequestDetailPage({ requestId }: RequestDetailPageProps) {
                 <Package weight="duotone" size={12} className="mr-1" />
                 {request.weight_kg} kg
               </Badge>
-              <span className="text-primary-600 font-bold">
+              <span className="text-primary-400 font-mono font-bold">
                 {formatCurrency(request.total_price)}
               </span>
             </div>
 
             {request.special_instructions && (
-              <p className="text-xs text-neutral-500">
-                <span className="font-medium text-neutral-600">Instructions : </span>
+              <p className="text-surface-100 text-xs">
+                <span className="text-surface-50 font-medium">Instructions : </span>
                 {request.special_instructions}
               </p>
             )}
 
-            <p className="text-xs text-neutral-400">Créée le {formatDate(request.created_at)}</p>
+            <p className="text-surface-200 text-xs">Créée le {formatDate(request.created_at)}</p>
           </CardContent>
         </Card>
 
@@ -266,26 +266,26 @@ export function RequestDetailPage({ requestId }: RequestDetailPageProps) {
                 isVerified={counterparty.is_verified}
               />
               <div className="flex-1">
-                <p className="text-sm font-medium text-neutral-900">
+                <p className="text-sm font-medium text-neutral-100">
                   {counterparty.first_name} {counterparty.last_name}
                 </p>
                 {counterparty.rating > 0 && (
                   <div className="flex items-center gap-1">
                     <Star weight="fill" size={12} className="text-amber-400" />
-                    <span className="text-xs text-neutral-500">
+                    <span className="text-surface-100 text-xs">
                       {counterparty.rating.toFixed(1)} ({counterparty.total_reviews} avis)
                     </span>
                   </div>
                 )}
               </div>
-              <span className="text-xs text-neutral-400">
+              <span className="text-surface-200 text-xs">
                 {role === 'sender' ? 'Voyageur' : 'Expéditeur'}
               </span>
             </CardContent>
           </Card>
         )}
 
-        {/* Confirmation code — shown to sender when status >= paid */}
+        {/* Confirmation code */}
         {role === 'sender' &&
           request.confirmation_code &&
           ['paid', 'collected', 'in_transit', 'delivered', 'confirmed'].includes(
@@ -293,22 +293,22 @@ export function RequestDetailPage({ requestId }: RequestDetailPageProps) {
           ) && (
             <Card className="mb-4">
               <CardContent className="p-4">
-                <div className="flex items-center gap-2 text-sm text-neutral-600">
-                  <LockKey weight="duotone" size={16} className="text-primary-500" />
+                <div className="text-surface-100 flex items-center gap-2 text-sm">
+                  <LockKey weight="duotone" size={16} className="text-primary-400" />
                   <span className="font-medium">Code de confirmation</span>
                 </div>
                 <div className="mt-2 flex items-center gap-2">
-                  <span className="rounded-lg bg-neutral-100 px-4 py-2 font-mono text-lg font-bold tracking-widest text-neutral-900">
+                  <span className="bg-surface-700 rounded-lg px-4 py-2 font-mono text-lg font-bold tracking-widest text-neutral-100">
                     {request.confirmation_code}
                   </span>
                   <button
                     onClick={copyCode}
-                    className="rounded-lg p-2 text-neutral-400 transition-colors hover:bg-neutral-100 hover:text-neutral-600"
+                    className="text-surface-200 hover:bg-surface-700 rounded-lg p-2 transition-colors hover:text-neutral-100"
                   >
                     <Copy weight="duotone" size={16} />
                   </button>
                 </div>
-                <p className="mt-1 text-xs text-neutral-400">
+                <p className="text-surface-200 mt-1 text-xs">
                   Communiquez ce code au voyageur à la livraison.
                 </p>
               </CardContent>
@@ -318,7 +318,6 @@ export function RequestDetailPage({ requestId }: RequestDetailPageProps) {
         {/* Actions */}
         <Card className="mb-4">
           <CardContent className="p-4">
-            {/* Traveler + pending → Accept/Refuse */}
             {role === 'traveler' && request.status === 'pending' && (
               <div className="flex gap-3">
                 <Button
@@ -331,7 +330,7 @@ export function RequestDetailPage({ requestId }: RequestDetailPageProps) {
                 </Button>
                 <Button
                   variant="outline"
-                  className="flex-1 text-red-600"
+                  className="text-error flex-1"
                   onClick={() => handleStatusAction('cancel')}
                   isLoading={actionLoading}
                   leftIcon={<XCircle weight="duotone" size={16} />}
@@ -341,7 +340,6 @@ export function RequestDetailPage({ requestId }: RequestDetailPageProps) {
               </div>
             )}
 
-            {/* Sender + accepted → Pay */}
             {role === 'sender' && request.status === 'accepted' && (
               <Button
                 className="w-full"
@@ -353,10 +351,9 @@ export function RequestDetailPage({ requestId }: RequestDetailPageProps) {
               </Button>
             )}
 
-            {/* Sender + delivered → Confirm with code */}
             {role === 'sender' && request.status === 'delivered' && (
               <div className="space-y-3">
-                <p className="text-sm text-neutral-600">
+                <p className="text-surface-100 text-sm">
                   Entrez le code à 6 chiffres pour confirmer la réception.
                 </p>
                 <input
@@ -366,7 +363,7 @@ export function RequestDetailPage({ requestId }: RequestDetailPageProps) {
                   placeholder="000000"
                   value={confirmCode}
                   onChange={(e) => setConfirmCode(e.target.value.replace(/\D/g, ''))}
-                  className="focus:border-primary-500 focus:ring-primary-500 w-full rounded-lg border border-neutral-200 px-4 py-3 text-center font-mono text-2xl tracking-[0.5em] text-neutral-900 focus:ring-1 focus:outline-none"
+                  className="bg-surface-700 focus:border-primary-500 focus:ring-primary-500 w-full rounded-lg border border-white/[0.08] px-4 py-3 text-center font-mono text-2xl tracking-[0.5em] text-neutral-100 focus:ring-1 focus:outline-none"
                 />
                 <Button
                   className="w-full"
@@ -380,11 +377,10 @@ export function RequestDetailPage({ requestId }: RequestDetailPageProps) {
               </div>
             )}
 
-            {/* Confirmed → Review */}
             {request.status === 'confirmed' && !hasReviewed && counterparty && (
               <div className="space-y-3">
-                <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3">
-                  <p className="text-sm font-medium text-emerald-700">
+                <div className="border-success/20 bg-success/10 rounded-xl border px-4 py-3">
+                  <p className="text-success text-sm font-medium">
                     Livraison confirmée ! Partagez votre expérience.
                   </p>
                 </div>
@@ -398,15 +394,14 @@ export function RequestDetailPage({ requestId }: RequestDetailPageProps) {
             )}
 
             {request.status === 'confirmed' && hasReviewed && (
-              <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-center">
-                <CheckCircle weight="duotone" size={24} className="mx-auto text-emerald-500" />
-                <p className="mt-1 text-sm font-medium text-emerald-700">Merci pour votre avis !</p>
+              <div className="border-success/20 bg-success/10 rounded-xl border px-4 py-3 text-center">
+                <CheckCircle weight="duotone" size={24} className="text-success mx-auto" />
+                <p className="text-success mt-1 text-sm font-medium">Merci pour votre avis !</p>
               </div>
             )}
 
-            {/* No action states */}
             {['paid', 'collected', 'in_transit'].includes(request.status) && (
-              <p className="text-center text-sm text-neutral-500">
+              <p className="text-surface-100 text-center text-sm">
                 {request.status === 'paid' && 'En attente de la collecte du colis par le voyageur.'}
                 {request.status === 'collected' &&
                   'Le colis a été collecté et sera bientôt en transit.'}
@@ -415,7 +410,7 @@ export function RequestDetailPage({ requestId }: RequestDetailPageProps) {
             )}
 
             {request.status === 'cancelled' && (
-              <p className="text-center text-sm text-red-600">Cette demande a été annulée.</p>
+              <p className="text-error text-center text-sm">Cette demande a été annulée.</p>
             )}
           </CardContent>
         </Card>
