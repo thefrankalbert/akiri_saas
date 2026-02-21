@@ -85,7 +85,11 @@ const SheetContent = React.forwardRef<
           animate={variants.animate}
           exit={variants.exit}
           transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-          className={cn('fixed z-50 gap-4 bg-white p-6 shadow-xl', sideStyles[side], className)}
+          className={cn(
+            'fixed z-50 gap-4 border-neutral-200 bg-white p-6',
+            sideStyles[side],
+            className
+          )}
         >
           {children}
           {showClose && (

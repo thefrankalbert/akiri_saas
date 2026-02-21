@@ -160,9 +160,9 @@ export function ListingsPage() {
 
       {/* Listings Grid */}
       {loading ? (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <Skeleton key={i} className="h-64 w-full rounded-xl" />
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <Skeleton key={i} className="h-36 w-full rounded-lg" />
           ))}
         </div>
       ) : listings.length === 0 ? (
@@ -176,36 +176,38 @@ export function ListingsPage() {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {listings.map((listing) => (
             <Link key={listing.id} href={`/annonces/${listing.id}`}>
-              <Card className="h-full transition-shadow hover:shadow-md">
-                <CardContent className="p-5">
-                  {/* Route */}
-                  <div className="flex items-center gap-2 text-sm">
-                    <MapPin weight="duotone" size={16} className="text-primary-500" />
-                    <span className="font-medium text-neutral-900">{listing.departure_city}</span>
-                    <span className="text-neutral-400">&rarr;</span>
-                    <span className="font-medium text-neutral-900">{listing.arrival_city}</span>
-                  </div>
-
-                  {/* Date */}
-                  <div className="mt-2 flex items-center gap-2 text-sm text-neutral-500">
-                    <CalendarBlank weight="duotone" size={16} />
-                    {formatDate(listing.departure_date)}
+              <Card className="h-full transition-colors hover:border-neutral-300" padding="none">
+                <CardContent className="p-2.5">
+                  {/* Route + Date */}
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1.5 text-sm">
+                      <MapPin weight="duotone" size={14} className="text-primary-500" />
+                      <span className="font-medium text-neutral-900">{listing.departure_city}</span>
+                      <span className="text-neutral-400">&rarr;</span>
+                      <span className="font-medium text-neutral-900">{listing.arrival_city}</span>
+                    </div>
+                    <span className="flex items-center gap-1 text-xs text-neutral-400">
+                      <CalendarBlank weight="duotone" size={12} />
+                      {formatDate(listing.departure_date)}
+                    </span>
                   </div>
 
                   {/* Details */}
-                  <div className="mt-4 flex items-center gap-4">
-                    <Badge variant="default">{listing.available_kg} kg disponibles</Badge>
-                    <span className="text-primary-600 text-lg font-bold">
+                  <div className="mt-2 flex items-center gap-3">
+                    <Badge variant="default" size="sm">
+                      {listing.available_kg} kg
+                    </Badge>
+                    <span className="text-primary-600 text-sm font-bold">
                       {formatCurrency(listing.price_per_kg)}/kg
                     </span>
                   </div>
 
                   {/* Categories */}
                   {listing.accepted_items.length > 0 && (
-                    <div className="mt-3 flex flex-wrap gap-1">
+                    <div className="mt-2 flex flex-wrap gap-1">
                       {listing.accepted_items.slice(0, 3).map((item) => (
                         <Badge key={item} variant="outline" size="sm">
                           {item}
@@ -221,22 +223,20 @@ export function ListingsPage() {
 
                   {/* Traveler */}
                   {listing.traveler && (
-                    <div className="mt-4 flex items-center gap-2 border-t border-neutral-100 pt-3">
+                    <div className="mt-2 flex items-center gap-2 border-t border-neutral-100 pt-2">
                       <Avatar
                         src={listing.traveler.avatar_url}
                         firstName={listing.traveler.first_name}
                         lastName={listing.traveler.last_name}
                         size="sm"
                       />
-                      <div className="flex-1">
-                        <p className="text-sm font-medium text-neutral-700">
-                          {listing.traveler.first_name} {listing.traveler.last_name.charAt(0)}.
-                        </p>
-                      </div>
+                      <p className="flex-1 text-xs font-medium text-neutral-700">
+                        {listing.traveler.first_name} {listing.traveler.last_name.charAt(0)}.
+                      </p>
                       {listing.traveler.rating > 0 && (
-                        <div className="flex items-center gap-1">
-                          <Star weight="fill" size={14} className="text-amber-400" />
-                          <span className="text-sm font-medium text-neutral-700">
+                        <div className="flex items-center gap-0.5">
+                          <Star weight="fill" size={12} className="text-amber-400" />
+                          <span className="text-xs font-medium text-neutral-700">
                             {listing.traveler.rating.toFixed(1)}
                           </span>
                         </div>

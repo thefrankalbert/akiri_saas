@@ -52,7 +52,7 @@ export function VerifyEmail() {
   };
 
   return (
-    <Card className="shadow-soft border-0">
+    <Card className="border-neutral-200/60">
       <CardHeader className="text-center">
         <div className="bg-primary-100 mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full">
           <Mail className="text-primary-500 h-8 w-8" />

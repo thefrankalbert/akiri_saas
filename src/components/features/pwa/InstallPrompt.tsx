@@ -56,7 +56,7 @@ export function InstallPrompt() {
 
   return (
     <div className="animate-in slide-in-from-bottom fixed right-4 bottom-20 left-4 z-50 md:right-4 md:bottom-4 md:left-auto md:w-96">
-      <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-lg">
+      <div className="rounded-2xl border border-gray-200 bg-white p-4">
         <div className="flex items-start gap-3">
           <div className="bg-primary/10 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl">
             <Download className="text-primary h-5 w-5" />

@@ -1,11 +1,13 @@
 import Link from 'next/link';
 import { APP_NAME } from '@/constants';
+import { AuthBackButton } from '@/components/layout/AuthBackButton';
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="from-primary-50 to-secondary-50 flex min-h-screen flex-col bg-gradient-to-br via-white">
       {/* Header */}
-      <header className="px-4 py-6 sm:px-6 lg:px-8">
+      <header className="flex items-center gap-1 px-4 py-6 sm:px-6 lg:px-8">
+        <AuthBackButton />
         <Link href="/" className="inline-flex items-center gap-2">
           <div className="bg-primary-500 flex h-8 w-8 items-center justify-center rounded-lg">
             <span className="text-lg font-bold text-white">A</span>

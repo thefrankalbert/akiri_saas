@@ -61,7 +61,7 @@ export function RegisterForm() {
   };
 
   return (
-    <Card className="shadow-soft border-0">
+    <Card className="border-neutral-200/60">
       <CardHeader className="text-center">
         <CardTitle className="text-2xl">Créer un compte</CardTitle>
         <CardDescription>

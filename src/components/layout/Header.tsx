@@ -10,6 +10,8 @@ import {
   ChatCircle,
   SignOut,
   TestTube,
+  ArrowLeft,
+  GearSix,
 } from '@phosphor-icons/react';
 import { useState } from 'react';
 import { Avatar } from '@/components/ui';
@@ -38,13 +40,22 @@ export function Header() {
       )}
 
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        {/* Logo */}
-        <Link href="/" className="flex items-center gap-2">
-          <div className="bg-primary-600 flex h-8 w-8 items-center justify-center rounded-lg">
-            <span className="text-lg font-bold text-white">A</span>
-          </div>
-          <span className="text-xl font-bold text-neutral-900">{APP_NAME}</span>
-        </Link>
+        {/* Back button + Logo */}
+        <div className="flex items-center gap-1">
+          <button
+            onClick={() => router.back()}
+            className="rounded-lg p-2 text-neutral-400 transition-colors hover:bg-neutral-100 hover:text-neutral-700"
+            aria-label="Retour"
+          >
+            <ArrowLeft weight="bold" size={20} />
+          </button>
+          <Link href="/" className="flex items-center gap-2">
+            <div className="bg-primary-600 flex h-8 w-8 items-center justify-center rounded-lg">
+              <span className="text-lg font-bold text-white">A</span>
+            </div>
+            <span className="text-xl font-bold text-neutral-900">{APP_NAME}</span>
+          </Link>
+        </div>
 
         {/* Desktop Navigation */}
         <nav className="hidden items-center gap-1 md:flex">
@@ -84,6 +95,12 @@ export function Header() {
               <button className="relative rounded-lg p-2.5 text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-neutral-700">
                 <Bell weight="duotone" size={20} />
               </button>
+              <Link
+                href="/parametres"
+                className="relative rounded-lg p-2.5 text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-neutral-700"
+              >
+                <GearSix weight="duotone" size={20} />
+              </Link>
               <div className="mx-2 h-6 w-px bg-neutral-200" />
               <Link href="/dashboard" className="flex items-center gap-2">
                 <Avatar

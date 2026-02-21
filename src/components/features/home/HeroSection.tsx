@@ -90,7 +90,7 @@ export function HeroSection() {
         >
           <Link
             href="/annonces"
-            className="bg-primary-500 hover:bg-primary-600 shadow-primary-500/25 inline-flex h-14 items-center gap-2 rounded-xl px-8 text-base font-semibold text-white shadow-lg transition-colors"
+            className="bg-primary-500 hover:bg-primary-600 inline-flex h-14 items-center gap-2 rounded-xl px-8 text-base font-semibold text-white transition-colors"
           >
             Trouver un voyageur
             <ArrowRight weight="bold" size={20} />

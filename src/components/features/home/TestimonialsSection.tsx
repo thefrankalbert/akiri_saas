@@ -1,8 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Star, MapPin } from '@phosphor-icons/react';
-import { Badge, Avatar } from '@/components/ui';
+import { Star, MapPin, Quotes } from '@phosphor-icons/react';
+import { Avatar } from '@/components/ui';
 import { useInView } from '@/lib/hooks/use-in-view';
 import { cn } from '@/lib/utils';
 import { mockProfiles } from '@/lib/mock-data';
@@ -11,117 +10,145 @@ const testimonials = [
   {
     profile: mockProfiles[0],
     text: "Grâce à Akiri, j'envoie des colis à ma famille à Douala chaque mois. C'est fiable, économique et la communauté est incroyable !",
-    role: 'Expéditrice régulière',
-    corridor: 'Paris \u2192 Douala',
+    role: 'Voyageur vérifié',
+    corridor: 'Paris → Douala',
+    rating: 5,
+    highlight: true,
   },
   {
     profile: mockProfiles[2],
     text: 'Je voyage souvent entre Paris et Yaoundé. Akiri me permet de rentabiliser mes kilos disponibles. Tout le monde y gagne !',
-    role: 'Voyageur vérifié',
-    corridor: 'Paris \u2192 Yaoundé',
+    role: 'Voyageur premium',
+    corridor: 'Paris → Yaoundé',
+    rating: 5,
+    highlight: false,
   },
   {
     profile: mockProfiles[11],
     text: "Le système d'escrow est rassurant. On sait que le paiement est sécurisé. Je recommande à 100% !",
-    role: 'Voyageur premium',
-    corridor: 'Bruxelles \u2192 Kinshasa',
+    role: 'Expéditrice régulière',
+    corridor: 'Paris → Dakar',
+    rating: 5,
+    highlight: false,
+  },
+  {
+    profile: mockProfiles[7],
+    text: "5 ans d'expérience en transport de colis entre Lyon et Abidjan. Akiri a simplifié tout le processus.",
+    role: 'Voyageuse expérimentée',
+    corridor: 'Lyon → Abidjan',
+    rating: 5,
+    highlight: false,
+  },
+  {
+    profile: mockProfiles[9],
+    text: "Service impeccable. J'ai pu envoyer des médicaments à ma mère en RD Congo rapidement et en toute sécurité.",
+    role: 'Expéditeuse',
+    corridor: 'Bruxelles → Kinshasa',
+    rating: 5,
+    highlight: false,
+  },
+  {
+    profile: mockProfiles[4],
+    text: 'En tant que consultant, je voyage souvent. Akiri me permet de rendre service tout en gagnant un complément.',
+    role: 'Voyageur régulier',
+    corridor: 'Paris → Dakar',
+    rating: 4,
+    highlight: false,
   },
 ];
 
 export function TestimonialsSection() {
-  const [activeTestimonial, setActiveTestimonial] = useState(0);
-  const { inViewRef, inView } = useInView(0.15);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setActiveTestimonial((prev) => (prev + 1) % testimonials.length);
-    }, 5000);
-    return () => clearInterval(timer);
-  }, []);
+  const { inViewRef, inView } = useInView(0.1);
 
   return (
     <section ref={inViewRef} className="relative overflow-hidden bg-white py-20 sm:py-28">
-      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        {/* Header */}
         <div
           className={cn(
-            'mx-auto max-w-2xl text-center transition-all duration-700',
+            'flex flex-col items-start justify-between gap-4 transition-all duration-700 sm:flex-row sm:items-end',
             inView ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
           )}
         >
-          <div className="bg-primary-50 text-primary-600 mb-4 inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-medium">
-            <Star weight="duotone" size={16} className="text-amber-400" />
-            Témoignages
+          <div>
+            <div className="flex items-center gap-2 text-sm font-medium text-amber-500">
+              <Star weight="fill" size={16} />
+              <span>Témoignages</span>
+            </div>
+            <h2 className="mt-3 text-3xl font-bold tracking-tight text-neutral-900 sm:text-4xl lg:text-5xl">
+              Ils nous font
+              <br />
+              <span className="text-neutral-400">confiance.</span>
+            </h2>
           </div>
-          <h2 className="text-3xl font-bold text-neutral-900 sm:text-4xl">La communauté parle</h2>
-          <p className="mt-3 text-neutral-500">Des milliers de membres font confiance à Akiri</p>
+          <div className="flex items-center gap-2 rounded-full border border-neutral-200 bg-neutral-50 px-4 py-2">
+            <div className="flex gap-0.5">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <Star key={i} weight="fill" size={14} className="text-amber-400" />
+              ))}
+            </div>
+            <span className="text-sm font-bold text-neutral-900">4.8/5</span>
+            <span className="text-xs text-neutral-400">sur 2 500+ avis</span>
+          </div>
         </div>
 
-        <div className="mx-auto mt-12 max-w-3xl">
-          <div className="relative min-h-[280px] sm:min-h-[240px]">
-            {testimonials.map((t, i) => (
-              <div
-                key={i}
+        {/* Masonry-style grid */}
+        <div className="mt-12 columns-1 gap-3 space-y-3 sm:columns-2 lg:columns-3">
+          {testimonials.map((t, i) => (
+            <div
+              key={i}
+              className={cn(
+                'break-inside-avoid rounded-xl border p-5 transition-all duration-500',
+                t.highlight
+                  ? 'border-primary-200 bg-primary-50'
+                  : 'border-neutral-200 bg-white hover:border-neutral-300',
+                inView ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
+              )}
+              style={{ transitionDelay: `${i * 80}ms` }}
+            >
+              {/* Quote icon for highlighted */}
+              {t.highlight && <Quotes weight="fill" size={24} className="text-primary-300 mb-3" />}
+
+              {/* Stars */}
+              <div className="mb-3 flex gap-0.5">
+                {Array.from({ length: t.rating }).map((_, j) => (
+                  <Star key={j} weight="fill" size={14} className="text-amber-400" />
+                ))}
+              </div>
+
+              {/* Quote */}
+              <blockquote
                 className={cn(
-                  'transition-all duration-700',
-                  i === activeTestimonial
-                    ? 'relative scale-100 opacity-100'
-                    : 'pointer-events-none absolute inset-0 scale-95 opacity-0'
+                  'text-sm leading-relaxed',
+                  t.highlight ? 'text-base font-medium text-neutral-900' : 'text-neutral-600'
                 )}
               >
-                <div className="rounded-lg border border-neutral-200/60 bg-neutral-50 p-6 sm:p-8">
-                  <div className="mb-4 flex gap-1">
-                    {Array.from({ length: 5 }).map((_, j) => (
-                      <Star key={j} weight="fill" size={20} className="text-amber-400" />
-                    ))}
-                  </div>
+                &ldquo;{t.text}&rdquo;
+              </blockquote>
 
-                  <blockquote className="text-lg leading-relaxed font-medium text-neutral-900 sm:text-xl">
-                    &ldquo;{t.text}&rdquo;
-                  </blockquote>
-
-                  <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                    <div className="flex items-center gap-3">
-                      <Avatar
-                        firstName={t.profile.first_name}
-                        lastName={t.profile.last_name}
-                        size="lg"
-                        isVerified={t.profile.is_verified}
-                      />
-                      <div>
-                        <p className="font-semibold text-neutral-900">
-                          {t.profile.first_name} {t.profile.last_name}
-                        </p>
-                        <p className="text-sm text-neutral-500">{t.role}</p>
-                      </div>
-                    </div>
-                    <Badge variant="outline" size="sm" className="w-fit">
-                      <MapPin weight="duotone" size={12} className="mr-1" />
-                      {t.corridor}
-                    </Badge>
-                  </div>
+              {/* Author */}
+              <div className="mt-4 flex items-center gap-3">
+                <Avatar
+                  firstName={t.profile.first_name}
+                  lastName={t.profile.last_name}
+                  size="sm"
+                  isVerified={t.profile.is_verified}
+                />
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-medium text-neutral-900">
+                    {t.profile.first_name} {t.profile.last_name.charAt(0)}.
+                  </p>
+                  <p className="text-xs text-neutral-400">{t.role}</p>
                 </div>
               </div>
-            ))}
-          </div>
 
-          {/* Navigation dots */}
-          <div className="mt-8 flex justify-center gap-3">
-            {testimonials.map((_, i) => (
-              <button
-                key={i}
-                onClick={() => setActiveTestimonial(i)}
-                className="flex h-11 w-11 items-center justify-center"
-                aria-label={`Témoignage ${i + 1}`}
-              >
-                <span
-                  className={cn(
-                    'block h-2.5 rounded-full transition-all duration-300',
-                    i === activeTestimonial ? 'bg-primary-500 w-10' : 'w-2.5 bg-neutral-300'
-                  )}
-                />
-              </button>
-            ))}
-          </div>
+              {/* Corridor badge */}
+              <div className="mt-3 inline-flex items-center gap-1 rounded-full bg-neutral-100 px-2.5 py-1 text-[11px] font-medium text-neutral-500">
+                <MapPin weight="duotone" size={10} />
+                {t.corridor}
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </section>

@@ -10,19 +10,19 @@ export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 const variantStyles: Record<string, string> = {
-  default: 'bg-white border border-neutral-200/60 rounded-lg shadow-xs',
+  default: 'bg-white border border-neutral-200/60 rounded-lg',
   bordered: 'bg-white border border-neutral-200 rounded-lg',
-  elevated: 'bg-white border border-neutral-200/60 rounded-lg shadow-soft',
-  interactive: 'bg-white border border-neutral-200/60 rounded-lg shadow-xs cursor-pointer',
-  gradient: 'bg-white border border-neutral-200/60 rounded-lg shadow-xs',
-  glass: 'bg-white/80 backdrop-blur-lg border border-neutral-200/40 rounded-lg shadow-sm',
+  elevated: 'bg-white border border-neutral-200/60 rounded-lg',
+  interactive: 'bg-white border border-neutral-200/60 rounded-lg cursor-pointer',
+  gradient: 'bg-white border border-neutral-200/60 rounded-lg',
+  glass: 'bg-white/80 backdrop-blur-lg border border-neutral-200/40 rounded-lg',
 };
 
 const paddingStyles: Record<string, string> = {
   none: '',
-  sm: 'p-3',
-  md: 'p-4',
-  lg: 'p-6',
+  sm: 'p-2',
+  md: 'p-3',
+  lg: 'p-4',
 };
 
 export function Card({
@@ -39,9 +39,9 @@ export function Card({
       className={cn(
         variantStyles[variant],
         paddingStyles[padding],
-        hover && 'hover:shadow-soft transition-all duration-200 hover:border-neutral-300',
+        hover && 'transition-colors duration-200 hover:border-neutral-300',
         variant === 'interactive' &&
-          'hover:shadow-soft transition-all duration-200 hover:border-neutral-300 active:scale-[0.99]',
+          'transition-colors duration-200 hover:border-neutral-300 active:scale-[0.99]',
         glow && 'hover:ring-primary-200 hover:ring-2',
         className
       )}
@@ -58,7 +58,7 @@ export function CardHeader({
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) {
   return (
-    <div className={cn('mb-4', className)} {...props}>
+    <div className={cn('mb-3', className)} {...props}>
       {children}
     </div>
   );
@@ -71,7 +71,7 @@ export function CardTitle({
   ...props
 }: React.HTMLAttributes<HTMLHeadingElement> & { as?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' }) {
   return (
-    <Tag className={cn('text-lg font-semibold text-neutral-900', className)} {...props}>
+    <Tag className={cn('text-base font-semibold text-neutral-900', className)} {...props}>
       {children}
     </Tag>
   );
@@ -107,7 +107,7 @@ export function CardFooter({
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) {
   return (
-    <div className={cn('mt-4 flex items-center gap-2', className)} {...props}>
+    <div className={cn('mt-3 flex items-center gap-2', className)} {...props}>
       {children}
     </div>
   );
@@ -164,38 +164,40 @@ export function StatsCard({
   return (
     <Card
       variant="elevated"
-      padding="lg"
+      padding="md"
       hover
       className={cn('group', styles.bg, className)}
       {...props}
     >
-      <div className="flex items-start justify-between">
-        <div className="flex-1">
-          <p className="text-sm font-medium text-neutral-500">{title}</p>
-          <p className="mt-2 text-3xl font-bold text-neutral-900">{value}</p>
-          {description && <p className="mt-1 text-sm text-neutral-400">{description}</p>}
-          {trend && (
-            <div
-              className={cn(
-                'mt-2 inline-flex items-center gap-1 text-sm font-medium',
-                trend.isPositive ? 'text-success' : 'text-error'
-              )}
-            >
-              <span>{trend.isPositive ? '↑' : '↓'}</span>
-              <span>{Math.abs(trend.value)}%</span>
-            </div>
-          )}
-        </div>
+      <div className="flex items-center gap-3">
         {icon && (
           <div
             className={cn(
-              'flex h-12 w-12 shrink-0 items-center justify-center rounded-xl',
+              'flex h-9 w-9 shrink-0 items-center justify-center rounded-lg',
               styles.iconBg
             )}
           >
             <span className={styles.iconColor}>{icon}</span>
           </div>
         )}
+        <div className="min-w-0 flex-1">
+          <p className="text-xs text-neutral-500">{title}</p>
+          <div className="flex items-baseline gap-1.5">
+            <p className="text-xl font-bold text-neutral-900">{value}</p>
+            {trend && (
+              <span
+                className={cn(
+                  'text-xs font-medium',
+                  trend.isPositive ? 'text-success' : 'text-error'
+                )}
+              >
+                {trend.isPositive ? '↑' : '↓'}
+                {Math.abs(trend.value)}%
+              </span>
+            )}
+          </div>
+          {description && <p className="text-xs text-neutral-400">{description}</p>}
+        </div>
       </div>
     </Card>
   );

@@ -90,7 +90,7 @@ export function NewListingForm() {
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-8 sm:px-6 lg:px-8">
-      <Card className="shadow-soft border-0">
+      <Card className="border-neutral-200/60">
         <CardHeader>
           <div className="flex items-center gap-3">
             <div className="bg-primary-100 flex h-10 w-10 items-center justify-center rounded-xl">

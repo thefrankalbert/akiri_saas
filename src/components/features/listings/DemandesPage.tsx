@@ -1,92 +1,131 @@
 'use client';
 
-import Link from 'next/link';
-import { Package, MapPin } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui';
-import { Badge } from '@/components/ui';
-import { Avatar } from '@/components/ui';
-import { formatCurrency, formatDate } from '@/lib/utils';
+import { useEffect, useState } from 'react';
+import { PaperPlaneTilt, Package, Tray } from '@phosphor-icons/react';
+import { UnderlineTabs, Shimmer, FadeIn } from '@/components/ui';
+import { createClient, supabaseConfigured } from '@/lib/supabase/client';
 import { mockRequests } from '@/lib/mock-data';
-import { REQUEST_STATUS_LABELS, REQUEST_STATUS_COLORS } from '@/constants';
+import { RequestCard } from '@/components/features/requests/RequestCard';
+import type { ShipmentRequest } from '@/types';
+
+// For demo mode, simulate current user
+const MOCK_CURRENT_USER = 'mock-user-001';
 
 export function DemandesPage() {
+  const [requests, setRequests] = useState<ShipmentRequest[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState('sent');
+
+  useEffect(() => {
+    if (!supabaseConfigured) {
+      queueMicrotask(() => {
+        setRequests(mockRequests);
+        setLoading(false);
+      });
+      return;
+    }
+
+    const controller = new AbortController();
+
+    const fetchRequests = async () => {
+      const supabase = createClient();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!user || controller.signal.aborted) {
+        setLoading(false);
+        return;
+      }
+
+      const { data } = await supabase
+        .from('shipment_requests')
+        .select(
+          '*, listing:listings!listing_id(*, traveler:profiles!traveler_id(*)), sender:profiles!sender_id(*)'
+        )
+        .or(`sender_id.eq.${user.id},listing.traveler_id.eq.${user.id}`)
+        .order('created_at', { ascending: false });
+
+      if (controller.signal.aborted) return;
+
+      setRequests((data as unknown as ShipmentRequest[]) || []);
+      setLoading(false);
+    };
+
+    fetchRequests();
+
+    return () => controller.abort();
+  }, []);
+
+  // Filter by role
+  const sentRequests = requests.filter((r) => {
+    if (supabaseConfigured) return true; // Server-side filter handles it
+    return r.sender_id === MOCK_CURRENT_USER;
+  });
+
+  const receivedRequests = requests.filter((r) => {
+    if (supabaseConfigured) return true;
+    return r.listing?.traveler_id === MOCK_CURRENT_USER || r.sender_id !== MOCK_CURRENT_USER;
+  });
+
+  const tabs = [
+    {
+      id: 'sent',
+      label: 'Mes envois',
+      icon: <PaperPlaneTilt weight="duotone" size={14} />,
+      count: sentRequests.length,
+    },
+    {
+      id: 'received',
+      label: 'Demandes reçues',
+      icon: <Tray weight="duotone" size={14} />,
+      count: receivedRequests.length,
+    },
+  ];
+
+  const displayedRequests = activeTab === 'sent' ? sentRequests : receivedRequests;
+  const currentRole = activeTab === 'sent' ? 'sender' : 'traveler';
+
+  if (loading) {
+    return (
+      <div className="mx-auto max-w-5xl px-4 py-6">
+        <Shimmer className="mb-6 h-8 w-48" />
+        <Shimmer className="mb-4 h-10 w-full" />
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Shimmer key={i} className="h-48 w-full rounded-lg" />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-neutral-900">Demandes d&apos;envoi</h1>
-        <p className="mt-1 text-sm text-neutral-500">
-          {mockRequests.length} demande{mockRequests.length > 1 ? 's' : ''} en cours
-        </p>
-      </div>
+    <div className="mx-auto max-w-5xl px-4 py-6">
+      <h1 className="mb-6 text-xl font-bold text-neutral-900">Demandes d&apos;envoi</h1>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {mockRequests.map((request) => (
-          <Link key={request.id} href={`/annonces/${request.listing_id}`}>
-            <Card className="h-full transition-shadow hover:shadow-md">
-              <CardContent className="p-5">
-                {/* Status badge */}
-                <div className="mb-3 flex items-center justify-between">
-                  <span
-                    className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                      REQUEST_STATUS_COLORS[request.status] || 'bg-neutral-100 text-neutral-700'
-                    }`}
-                  >
-                    {REQUEST_STATUS_LABELS[request.status] || request.status}
-                  </span>
-                  <span className="text-xs text-neutral-400">{formatDate(request.created_at)}</span>
-                </div>
+      <UnderlineTabs tabs={tabs} activeTab={activeTab} onChange={setActiveTab} />
 
-                {/* Item description */}
-                <h3 className="line-clamp-2 text-sm font-semibold text-neutral-900">
-                  {request.item_description}
-                </h3>
-
-                {/* Route from listing */}
-                {request.listing && (
-                  <div className="mt-2 flex items-center gap-1 text-xs text-neutral-500">
-                    <MapPin className="h-3 w-3" />
-                    <span>{request.listing.departure_city}</span>
-                    <span>→</span>
-                    <span>{request.listing.arrival_city}</span>
-                  </div>
-                )}
-
-                {/* Weight & Price */}
-                <div className="mt-3 flex items-center gap-3">
-                  <Badge variant="default" size="sm">
-                    <Package className="mr-1 h-3 w-3" />
-                    {request.weight_kg} kg
-                  </Badge>
-                  <span className="text-primary-600 text-sm font-bold">
-                    {formatCurrency(request.total_price)}
-                  </span>
-                </div>
-
-                {/* Special instructions */}
-                {request.special_instructions && (
-                  <p className="mt-2 line-clamp-1 text-xs text-neutral-400">
-                    💡 {request.special_instructions}
-                  </p>
-                )}
-
-                {/* Sender */}
-                {request.sender && (
-                  <div className="mt-3 flex items-center gap-2 border-t border-neutral-100 pt-3">
-                    <Avatar
-                      firstName={request.sender.first_name}
-                      lastName={request.sender.last_name}
-                      size="sm"
-                    />
-                    <span className="text-xs font-medium text-neutral-600">
-                      {request.sender.first_name} {request.sender.last_name.charAt(0)}.
-                    </span>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </Link>
-        ))}
-      </div>
+      <FadeIn key={activeTab}>
+        <div className="mt-6">
+          {displayedRequests.length > 0 ? (
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {displayedRequests.map((request) => (
+                <RequestCard key={request.id} request={request} role={currentRole} />
+              ))}
+            </div>
+          ) : (
+            <div className="py-16 text-center">
+              <Package weight="duotone" size={40} className="mx-auto text-neutral-300" />
+              <p className="mt-3 text-sm text-neutral-500">
+                {activeTab === 'sent'
+                  ? "Vous n'avez pas encore envoyé de demande."
+                  : "Vous n'avez pas encore reçu de demande."}
+              </p>
+            </div>
+          )}
+        </div>
+      </FadeIn>
     </div>
   );
 }

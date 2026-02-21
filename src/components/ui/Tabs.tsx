@@ -32,7 +32,7 @@ const TabsTrigger = React.forwardRef<
       'inline-flex items-center justify-center rounded-lg px-3 py-1.5 text-sm font-medium whitespace-nowrap transition-all',
       'focus-visible:ring-primary-500 ring-offset-white focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none',
       'disabled:pointer-events-none disabled:opacity-50',
-      'data-[state=active]:bg-white data-[state=active]:text-neutral-900 data-[state=active]:shadow-sm',
+      'data-[state=active]:bg-white data-[state=active]:text-neutral-900',
       'data-[state=inactive]:text-neutral-500 data-[state=inactive]:hover:text-neutral-700',
       className
     )}
@@ -94,7 +94,7 @@ function AnimatedTabs({ tabs, activeTab, onChange, className }: AnimatedTabsProp
             {isActive && (
               <motion.div
                 layoutId="activeTabIndicator"
-                className="absolute inset-0 z-[-1] rounded-lg bg-white shadow-sm"
+                className="absolute inset-0 z-[-1] rounded-lg bg-white"
                 transition={{ type: 'spring', bounce: 0.2, duration: 0.4 }}
               />
             )}

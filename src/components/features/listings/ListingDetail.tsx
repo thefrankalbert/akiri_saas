@@ -18,6 +18,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui';
 import { Badge } from '@/components/ui';
 import { Avatar } from '@/components/ui';
 import { Skeleton } from '@/components/ui';
+import { SendRequestModal } from '@/components/features/requests/SendRequestModal';
 import { createClient, supabaseConfigured } from '@/lib/supabase/client';
 import type { Listing } from '@/types';
 import { formatCurrency, formatDate, formatRelativeDate } from '@/lib/utils';
@@ -238,11 +239,11 @@ export function ListingDetail({ listingId }: ListingDetailProps) {
               </div>
 
               <div className="mt-5 flex flex-col gap-3">
-                <Link href="/demandes" className="block">
+                <SendRequestModal listing={listing}>
                   <Button className="w-full" size="lg">
                     Envoyer une demande
                   </Button>
-                </Link>
+                </SendRequestModal>
                 <Link href="/messages" className="block">
                   <Button
                     variant="outline"

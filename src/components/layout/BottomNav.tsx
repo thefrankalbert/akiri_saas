@@ -9,7 +9,7 @@ import {
   GlobeHemisphereWest,
   Package,
   ChatCircle,
-  User,
+  GearSix,
 } from '@phosphor-icons/react';
 import type { Icon as PhosphorIcon } from '@phosphor-icons/react';
 import { cn } from '@/lib/utils';
@@ -31,7 +31,7 @@ const navItems: NavItem[] = [
 
 const secondaryItems: NavItem[] = [
   { href: '/messages', label: 'Messages', icon: ChatCircle },
-  { href: '/dashboard', label: 'Profil', icon: User },
+  { href: '/parametres', label: 'Compte', icon: GearSix },
 ];
 
 export function BottomNav() {
@@ -53,7 +53,7 @@ export function BottomNav() {
                 href={item.href}
                 className="flex flex-col items-center justify-center"
               >
-                <div className="bg-primary-600 flex h-11 w-11 items-center justify-center rounded-full text-white shadow-sm">
+                <div className="bg-primary-600 flex h-11 w-11 items-center justify-center rounded-full text-white">
                   <Icon weight="bold" size={18} />
                 </div>
               </Link>

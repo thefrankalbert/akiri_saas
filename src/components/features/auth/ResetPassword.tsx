@@ -47,7 +47,7 @@ export function ResetPassword() {
 
   if (submitted) {
     return (
-      <Card className="shadow-soft border-0">
+      <Card className="border-neutral-200/60">
         <CardHeader className="text-center">
           <div className="bg-secondary-100 mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full">
             <CheckCircle className="text-secondary-500 h-8 w-8" />
@@ -74,7 +74,7 @@ export function ResetPassword() {
   }
 
   return (
-    <Card className="shadow-soft border-0">
+    <Card className="border-neutral-200/60">
       <CardHeader className="text-center">
         <CardTitle className="text-2xl">Mot de passe oublié</CardTitle>
         <CardDescription>
