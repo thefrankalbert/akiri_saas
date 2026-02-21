@@ -6,3 +6,5 @@ export { useMessages } from './use-messages';
 export { useTypingIndicator } from './use-typing';
 export { useDashboardData } from './use-dashboard-data';
 export { useRequestDetail } from './use-request-detail';
+export { useParcels } from './use-parcels';
+export { useParcelDetail } from './use-parcel-detail';
