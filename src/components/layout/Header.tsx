@@ -7,7 +7,6 @@ import {
   X,
   MagnifyingGlass,
   Bell,
-  ChatCircle,
   SignOut,
   TestTube,
   ArrowLeft,
@@ -16,12 +15,15 @@ import { useState } from 'react';
 import { Avatar } from '@/components/ui';
 import { APP_NAME } from '@/constants';
 import { useAuth } from '@/lib/hooks';
+import { getMobileMenuItems } from '@/lib/navigation';
 import { cn } from '@/lib/utils';
 
 export function Header() {
   const router = useRouter();
   const { user, profile, isAuthenticated, isDemo, signOut } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const mobileMenuItems = getMobileMenuItems();
 
   const handleSignOut = async () => {
     await signOut();
@@ -97,27 +99,20 @@ export function Header() {
       {mobileMenuOpen && (
         <div className="bg-surface-950/95 border-t border-white/[0.06] px-4 pb-4 backdrop-blur-xl md:hidden">
           <nav className="flex flex-col gap-1 pt-2">
-            <Link
-              href="/annonces"
-              className="hover:bg-surface-800 rounded-xl px-4 py-3 text-sm font-medium text-neutral-100"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Annonces
-            </Link>
-            <Link
-              href="/demandes"
-              className="hover:bg-surface-800 rounded-xl px-4 py-3 text-sm font-medium text-neutral-100"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Demandes
-            </Link>
-            <Link
-              href="/corridors"
-              className="hover:bg-surface-800 rounded-xl px-4 py-3 text-sm font-medium text-neutral-100"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Corridors
-            </Link>
+            {mobileMenuItems.map((item) => {
+              const Icon = item.icon;
+              return (
+                <Link
+                  key={item.id}
+                  href={item.href}
+                  className="hover:bg-surface-800 flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-neutral-100"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <Icon weight="duotone" size={20} className="text-surface-200" />
+                  {item.label}
+                </Link>
+              );
+            })}
             <div className="my-2 h-px bg-white/[0.06]" />
             {isAuthenticated ? (
               <>
@@ -137,20 +132,14 @@ export function Header() {
                   </div>
                   <span>{profile?.first_name || 'Mon compte'}</span>
                 </Link>
-                <Link
-                  href="/messages"
-                  className="hover:bg-surface-800 rounded-xl px-4 py-3 text-sm font-medium text-neutral-100"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  Messages
-                </Link>
                 <button
                   onClick={() => {
                     handleSignOut();
                     setMobileMenuOpen(false);
                   }}
-                  className="text-error hover:bg-error/10 w-full rounded-xl px-4 py-3 text-left text-sm font-medium"
+                  className="text-error hover:bg-error/10 flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-sm font-medium"
                 >
+                  <SignOut weight="duotone" size={20} />
                   Deconnexion
                 </button>
               </>
