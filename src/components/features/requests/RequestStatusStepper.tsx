@@ -56,7 +56,7 @@ export function RequestStatusStepper({ currentStatus }: RequestStatusStepperProp
                   </div>
                   <span
                     className={cn(
-                      'mt-1 max-w-[56px] text-center text-[10px] leading-tight',
+                      'mt-1 max-w-[48px] text-center text-[10px] leading-tight sm:max-w-[72px] sm:text-xs',
                       isDone && 'text-success',
                       isActive && 'text-primary-400 font-medium',
                       isFuture && 'text-surface-200'

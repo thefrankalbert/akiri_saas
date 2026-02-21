@@ -38,7 +38,7 @@ const sizeClasses = {
   md: 'max-w-md',
   lg: 'max-w-lg',
   xl: 'max-w-xl',
-  full: 'max-w-[calc(100vw-2rem)] md:max-w-[calc(100vw-4rem)]',
+  full: 'max-w-[calc(100vw-2rem)] md:max-w-[calc(100vw-4rem)] lg:max-w-4xl 2xl:max-w-6xl mx-auto',
 };
 
 const ModalContent = React.forwardRef<

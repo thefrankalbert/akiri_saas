@@ -93,7 +93,7 @@ export function MessagesPage() {
       {/* Conversations panel */}
       <div
         className={cn(
-          'w-full flex-col border-r border-white/[0.06] pb-16 md:flex md:w-80 md:pb-0 lg:w-96',
+          'w-full flex-col border-r border-white/[0.06] pb-20 md:flex md:w-80 md:pb-0 lg:w-96',
           viewMode === 'list' ? 'flex' : 'hidden'
         )}
       >
@@ -140,7 +140,7 @@ export function MessagesPage() {
       {/* Chat panel */}
       <div
         className={cn(
-          'flex-1 flex-col pb-16 md:flex md:pb-0',
+          'flex-1 flex-col pb-20 md:flex md:pb-0',
           viewMode === 'chat' ? 'flex' : 'hidden'
         )}
       >

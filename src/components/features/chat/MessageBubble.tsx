@@ -53,7 +53,7 @@ export function MessageBubble({
         ) : !isOwn && showAvatar ? (
           <div className="w-8" />
         ) : null}
-        <div className="max-w-[280px]">
+        <div className="max-w-[min(280px,calc(100vw-5rem))]">
           <button
             onClick={() => onImageClick?.(message.media_url!)}
             className="overflow-hidden rounded-2xl transition-opacity hover:opacity-90"
@@ -97,13 +97,13 @@ export function MessageBubble({
       ) : null}
       <div
         className={cn(
-          'max-w-[80%] px-4 py-2.5',
+          'max-w-[min(80%,calc(100vw-5rem))] px-4 py-2.5',
           isOwn
             ? 'bg-primary-600 rounded-2xl rounded-br-sm text-white'
             : 'bg-surface-700 rounded-2xl rounded-bl-sm text-neutral-100'
         )}
       >
-        <p className="text-sm leading-relaxed">{message.content}</p>
+        <p className="text-sm leading-relaxed break-words">{message.content}</p>
         <div
           className={cn('mt-1 flex items-center gap-1', isOwn ? 'justify-end' : 'justify-start')}
         >
