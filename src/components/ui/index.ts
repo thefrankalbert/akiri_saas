@@ -104,3 +104,6 @@ export { TypeToggle } from './TypeToggle';
 
 // PhotoUpload
 export { PhotoUpload } from './PhotoUpload';
+
+// Language Switcher
+export { LanguageSwitcher } from './LanguageSwitcher';

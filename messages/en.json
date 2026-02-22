@@ -1,0 +1,122 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "retry": "Retry",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "confirm": "Confirm",
+    "back": "Back",
+    "next": "Next",
+    "search": "Search",
+    "noResults": "No results",
+    "seeAll": "See all",
+    "close": "Close"
+  },
+  "nav": {
+    "home": "Home",
+    "listings": "Listings",
+    "parcels": "Parcels",
+    "requests": "Requests",
+    "messages": "Messages",
+    "dashboard": "Dashboard",
+    "profile": "Profile",
+    "settings": "Settings",
+    "transactions": "Transactions",
+    "activity": "Activity",
+    "logout": "Log out"
+  },
+  "auth": {
+    "login": "Log in",
+    "register": "Create account",
+    "email": "Email address",
+    "password": "Password",
+    "confirmPassword": "Confirm password",
+    "forgotPassword": "Forgot password?",
+    "resetPassword": "Reset password",
+    "firstName": "First name",
+    "lastName": "Last name",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?",
+    "orContinueWith": "Or continue with"
+  },
+  "listings": {
+    "title": "Available listings",
+    "create": "Post a listing",
+    "departure": "Departure",
+    "arrival": "Arrival",
+    "date": "Departure date",
+    "availableKg": "Available kilos",
+    "pricePerKg": "Price per kg",
+    "sendRequest": "Send a request",
+    "noListings": "No listings available",
+    "filters": "Filters"
+  },
+  "requests": {
+    "title": "My requests",
+    "send": "Send request",
+    "weight": "Weight (kg)",
+    "description": "Package description",
+    "specialInstructions": "Special instructions",
+    "status": {
+      "pending": "Pending",
+      "accepted": "Accepted",
+      "paid": "Paid",
+      "collected": "Collected",
+      "in_transit": "In transit",
+      "delivered": "Delivered",
+      "confirmed": "Confirmed",
+      "disputed": "Disputed",
+      "cancelled": "Cancelled"
+    }
+  },
+  "parcels": {
+    "title": "Send a parcel",
+    "postParcel": "Post a parcel",
+    "category": "Category",
+    "urgency": "Urgency",
+    "budget": "Budget per kg",
+    "fragile": "Fragile",
+    "photos": "Photos"
+  },
+  "messages": {
+    "title": "Messages",
+    "noConversations": "No messages yet",
+    "typeMessage": "Type a message...",
+    "send": "Send"
+  },
+  "settings": {
+    "title": "Settings",
+    "profile": "Profile",
+    "verification": "Verification",
+    "notifications": "Notifications",
+    "account": "Account",
+    "language": "Language",
+    "changeLanguage": "Change language"
+  },
+  "verification": {
+    "phone": "Phone verification",
+    "identity": "Identity verification",
+    "level": "Verification level",
+    "verified": "Verified",
+    "pending": "Pending",
+    "notStarted": "Not started"
+  },
+  "footer": {
+    "about": "About",
+    "faq": "FAQ",
+    "security": "Security",
+    "privacy": "Privacy",
+    "terms": "Terms",
+    "contact": "Contact",
+    "rights": "All rights reserved"
+  },
+  "landing": {
+    "hero": "Collaborative parcel transport for the diaspora",
+    "subtitle": "Send your parcels to Africa with trusted travelers. Cheaper, faster, 100% secure.",
+    "cta": "Get started",
+    "ctaSecondary": "Browse listings"
+  }
+}

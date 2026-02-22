@@ -5,12 +5,14 @@ import { UnderlineTabs, Shimmer, FadeIn } from '@/components/ui';
 import { useAuth } from '@/lib/hooks';
 import { ProfileSettingsTab } from './ProfileSettingsTab';
 import { AccountSettingsTab } from './AccountSettingsTab';
+import { NotificationsTab } from './NotificationsTab';
 import { PhoneVerification } from '@/components/features/verification';
 import { IdentityVerification } from '@/components/features/verification';
 
 const tabs = [
   { id: 'profile', label: 'Profil' },
   { id: 'verification', label: 'Vérification' },
+  { id: 'notifications', label: 'Notifications' },
   { id: 'account', label: 'Compte' },
 ];
 
@@ -47,6 +49,8 @@ export function SettingsPage() {
               <IdentityVerification status={profile?.id_verification_status || 'none'} />
             </div>
           )}
+
+          {activeTab === 'notifications' && <NotificationsTab />}
 
           {activeTab === 'account' && <AccountSettingsTab email={user?.email || ''} />}
         </div>

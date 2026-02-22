@@ -1,6 +1,9 @@
 import type { Metadata, Viewport } from 'next';
 import { Inter, JetBrains_Mono } from 'next/font/google';
 import { Toaster } from 'sonner';
+import { NextIntlClientProvider } from 'next-intl';
+import { getLocale, getMessages } from 'next-intl/server';
+import { PostHogProvider } from '@/components/providers/PostHogProvider';
 import './globals.css';
 
 const inter = Inter({
@@ -114,14 +117,17 @@ const jsonLd = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const locale = await getLocale();
+  const messages = await getMessages();
+
   return (
     <html
-      lang="fr"
+      lang={locale}
       className={`${inter.variable} ${jetbrainsMono.variable}`}
       suppressHydrationWarning
     >
@@ -132,7 +138,9 @@ export default function RootLayout({
         />
       </head>
       <body className="font-sans" suppressHydrationWarning>
-        {children}
+        <NextIntlClientProvider messages={messages}>
+          <PostHogProvider>{children}</PostHogProvider>
+        </NextIntlClientProvider>
         <Toaster position="top-right" richColors closeButton />
       </body>
     </html>

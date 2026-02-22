@@ -9,11 +9,14 @@ export interface User {
   created_at: string;
 }
 
+export type UserRole = 'user' | 'admin';
+
 export interface Profile {
   id: string;
   user_id: string;
   first_name: string;
   last_name: string;
+  role: UserRole;
   phone: string | null;
   phone_verified: boolean;
   phone_verified_at: string | null;

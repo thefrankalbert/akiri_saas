@@ -1,0 +1,122 @@
+{
+  "common": {
+    "loading": "Chargement...",
+    "error": "Une erreur est survenue",
+    "retry": "Réessayer",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "confirm": "Confirmer",
+    "back": "Retour",
+    "next": "Suivant",
+    "search": "Rechercher",
+    "noResults": "Aucun résultat",
+    "seeAll": "Voir tout",
+    "close": "Fermer"
+  },
+  "nav": {
+    "home": "Accueil",
+    "listings": "Annonces",
+    "parcels": "Colis",
+    "requests": "Demandes",
+    "messages": "Messages",
+    "dashboard": "Tableau de bord",
+    "profile": "Profil",
+    "settings": "Paramètres",
+    "transactions": "Transactions",
+    "activity": "Activité",
+    "logout": "Se déconnecter"
+  },
+  "auth": {
+    "login": "Se connecter",
+    "register": "Créer un compte",
+    "email": "Adresse email",
+    "password": "Mot de passe",
+    "confirmPassword": "Confirmer le mot de passe",
+    "forgotPassword": "Mot de passe oublié ?",
+    "resetPassword": "Réinitialiser le mot de passe",
+    "firstName": "Prénom",
+    "lastName": "Nom",
+    "noAccount": "Pas encore de compte ?",
+    "hasAccount": "Déjà un compte ?",
+    "orContinueWith": "Ou continuer avec"
+  },
+  "listings": {
+    "title": "Annonces disponibles",
+    "create": "Publier une annonce",
+    "departure": "Départ",
+    "arrival": "Arrivée",
+    "date": "Date de départ",
+    "availableKg": "Kilos disponibles",
+    "pricePerKg": "Prix par kg",
+    "sendRequest": "Envoyer une demande",
+    "noListings": "Aucune annonce disponible",
+    "filters": "Filtres"
+  },
+  "requests": {
+    "title": "Mes demandes",
+    "send": "Envoyer la demande",
+    "weight": "Poids (kg)",
+    "description": "Description du colis",
+    "specialInstructions": "Instructions spéciales",
+    "status": {
+      "pending": "En attente",
+      "accepted": "Acceptée",
+      "paid": "Payée",
+      "collected": "Collecté",
+      "in_transit": "En transit",
+      "delivered": "Livré",
+      "confirmed": "Confirmé",
+      "disputed": "En litige",
+      "cancelled": "Annulée"
+    }
+  },
+  "parcels": {
+    "title": "Envoyer un colis",
+    "postParcel": "Publier un colis",
+    "category": "Catégorie",
+    "urgency": "Urgence",
+    "budget": "Budget par kg",
+    "fragile": "Fragile",
+    "photos": "Photos"
+  },
+  "messages": {
+    "title": "Messages",
+    "noConversations": "Pas encore de messages",
+    "typeMessage": "Écrire un message...",
+    "send": "Envoyer"
+  },
+  "settings": {
+    "title": "Paramètres",
+    "profile": "Profil",
+    "verification": "Vérification",
+    "notifications": "Notifications",
+    "account": "Compte",
+    "language": "Langue",
+    "changeLanguage": "Changer la langue"
+  },
+  "verification": {
+    "phone": "Vérification du téléphone",
+    "identity": "Vérification d'identité",
+    "level": "Niveau de vérification",
+    "verified": "Vérifié",
+    "pending": "En attente",
+    "notStarted": "Non commencé"
+  },
+  "footer": {
+    "about": "À propos",
+    "faq": "FAQ",
+    "security": "Sécurité",
+    "privacy": "Confidentialité",
+    "terms": "Mentions légales",
+    "contact": "Contact",
+    "rights": "Tous droits réservés"
+  },
+  "landing": {
+    "hero": "Transport collaboratif de colis pour la diaspora",
+    "subtitle": "Envoyez vos colis en Afrique avec des voyageurs de confiance. Moins cher, plus rapide, 100% sécurisé.",
+    "cta": "Commencer maintenant",
+    "ctaSecondary": "Voir les annonces"
+  }
+}

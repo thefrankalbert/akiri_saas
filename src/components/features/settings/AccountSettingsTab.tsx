@@ -1,9 +1,11 @@
 'use client';
 
-import { Envelope, LockKey, Trash } from '@phosphor-icons/react';
+import { Envelope, LockKey, Trash, GlobeSimple } from '@phosphor-icons/react';
 import { Button } from '@/components/ui';
 import { useAuth } from '@/lib/hooks';
 import { toasts } from '@/lib/utils/toast';
+import { useLocale } from 'next-intl';
+import { useRouter } from 'next/navigation';
 
 interface AccountSettingsTabProps {
   email: string;
@@ -11,6 +13,17 @@ interface AccountSettingsTabProps {
 
 export function AccountSettingsTab({ email }: AccountSettingsTabProps) {
   const { resetPassword } = useAuth();
+  const locale = useLocale();
+  const router = useRouter();
+
+  const switchLocale = async (newLocale: string) => {
+    await fetch('/api/locale', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ locale: newLocale }),
+    });
+    router.refresh();
+  };
 
   const handleResetPassword = async () => {
     if (!email) return;
@@ -56,6 +69,39 @@ export function AccountSettingsTab({ email }: AccountSettingsTabProps) {
           <Button variant="outline" size="sm" onClick={handleResetPassword}>
             Réinitialiser
           </Button>
+        </div>
+      </div>
+
+      {/* Language */}
+      <div className="bg-surface-800 rounded-xl border border-white/[0.08] p-4">
+        <div className="flex items-center gap-3">
+          <GlobeSimple weight="duotone" size={20} className="text-surface-200 shrink-0" />
+          <div className="min-w-0 flex-1">
+            <h3 className="text-sm font-medium text-neutral-100">Langue</h3>
+            <p className="text-surface-100 text-xs">Choisissez votre langue préférée.</p>
+          </div>
+          <div className="flex gap-1.5">
+            <button
+              onClick={() => switchLocale('fr')}
+              className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
+                locale === 'fr'
+                  ? 'bg-primary-500/20 text-primary-400'
+                  : 'bg-surface-700 text-surface-300 hover:text-white'
+              }`}
+            >
+              Français
+            </button>
+            <button
+              onClick={() => switchLocale('en')}
+              className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
+                locale === 'en'
+                  ? 'bg-primary-500/20 text-primary-400'
+                  : 'bg-surface-700 text-surface-300 hover:text-white'
+              }`}
+            >
+              English
+            </button>
+          </div>
         </div>
       </div>
 

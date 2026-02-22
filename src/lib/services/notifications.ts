@@ -6,6 +6,7 @@ import { createClient, createAdminClient } from '@/lib/supabase/server';
 import type { Notification, ApiResponse, PaginatedResponse } from '@/types';
 import type { NotificationType } from '@/types';
 import { DEFAULT_PAGE_SIZE } from '@/constants';
+import { sendPushToUser } from './push';
 
 /**
  * Get notifications for a user (paginated)
@@ -85,6 +86,14 @@ export async function createNotification(
   if (error) {
     return { data: null, error: error.message, status: 400 };
   }
+
+  // Also send push notification (fire-and-forget)
+  sendPushToUser(userId, {
+    title,
+    body,
+    url: typeof data.url === 'string' ? data.url : '/',
+    tag: type,
+  }).catch(() => {});
 
   return { data: notification as Notification, error: null, status: 201 };
 }

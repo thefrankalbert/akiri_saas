@@ -67,7 +67,6 @@ export async function updateSession(request: NextRequest) {
       });
 
       if (!result.success) {
-        const retryAfterSeconds = Math.ceil(result.retryAfterMs / 1000);
         const url = request.nextUrl.clone();
         url.pathname = '/';
         url.searchParams.set('error', 'rate_limited');
@@ -114,6 +113,7 @@ export async function updateSession(request: NextRequest) {
     '/parametres',
     '/activite',
     '/demandes',
+    '/admin',
   ];
 
   const isProtectedRoute = protectedPaths.some((path) => request.nextUrl.pathname.startsWith(path));
