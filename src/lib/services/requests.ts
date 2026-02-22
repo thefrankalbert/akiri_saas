@@ -2,11 +2,11 @@
 // Shipment Requests Service — Server-side business logic
 // ============================================
 
-import { createClient, createAdminClient } from '@/lib/supabase/server';
+import { createClient } from '@/lib/supabase/server';
 import type { ShipmentRequest, ApiResponse, RequestStatus } from '@/types';
 import type { CreateRequestInput } from '@/lib/validations';
 import { PLATFORM_FEE_PERCENT } from '@/constants';
-import { capturePayment } from './transactions';
+import { capturePayment, refundPayment } from './transactions';
 import { createNotification } from './notifications';
 
 // Valid state transitions: each key lists the statuses it can transition FROM
@@ -16,9 +16,9 @@ const VALID_TRANSITIONS: Record<string, RequestStatus[]> = {
   collected: ['paid'],
   in_transit: ['collected'],
   delivered: ['in_transit'],
-  confirmed: ['delivered'],
+  confirmed: ['delivered', 'disputed'], // disputed → confirmed = release payment
   disputed: ['paid', 'collected', 'in_transit', 'delivered'],
-  cancelled: ['pending', 'accepted'],
+  cancelled: ['pending', 'accepted', 'disputed'], // disputed → cancelled = refund
 };
 
 /**
@@ -57,11 +57,23 @@ export async function createRequest(
     return { data: null, error: 'Annonce introuvable ou inactive', status: 404 };
   }
 
-  // Check available weight
-  if (input.weight_kg > listing.available_kg) {
+  // Check available weight accounting for pending/active requests (prevent overbooking)
+  const { data: activeRequests } = await supabase
+    .from('shipment_requests')
+    .select('weight_kg')
+    .eq('listing_id', input.listing_id)
+    .in('status', ['pending', 'accepted', 'paid', 'collected', 'in_transit', 'delivered']);
+
+  const reservedKg = (activeRequests || []).reduce((sum, r) => sum + Number(r.weight_kg), 0);
+  const effectiveAvailable = listing.available_kg - reservedKg;
+
+  if (input.weight_kg > effectiveAvailable) {
     return {
       data: null,
-      error: `Poids demand\u00e9 (${input.weight_kg}kg) sup\u00e9rieur aux kilos disponibles (${listing.available_kg}kg)`,
+      error:
+        effectiveAvailable <= 0
+          ? 'Tous les kilos sont d\u00e9j\u00e0 r\u00e9serv\u00e9s pour cette annonce'
+          : `Seulement ${effectiveAvailable}kg disponibles (${reservedKg}kg d\u00e9j\u00e0 r\u00e9serv\u00e9s)`,
       status: 400,
     };
   }
@@ -85,7 +97,7 @@ export async function createRequest(
       sender_id: senderId,
       weight_kg: input.weight_kg,
       item_description: input.item_description,
-      item_photos: [],
+      item_photos: input.item_photos || [],
       special_instructions: input.special_instructions || null,
       status: 'pending',
       total_price: totalPrice,
@@ -424,6 +436,17 @@ export async function cancelRequest(
     return { data: null, error: error.message, status: 400 };
   }
 
+  // Restore kg to listing if request was accepted (kg were decremented by DB trigger)
+  if (request.status === 'accepted') {
+    await supabase
+      .from('listings')
+      .update({
+        available_kg: request.listing.available_kg + request.weight_kg,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', request.listing_id);
+  }
+
   // Notify the other party
   const notifyUserId = isSender ? request.listing.traveler_id : request.sender_id;
   await createNotification(
@@ -506,6 +529,106 @@ export async function openDispute(
 /**
  * Get requests for a specific listing
  */
+/**
+ * Resolve a dispute — either refund (cancel) or release payment (confirm)
+ * Can be called by either party. In production, an admin panel would handle this.
+ */
+export async function resolveDispute(
+  requestId: string,
+  userId: string,
+  resolution: 'refund' | 'release'
+): Promise<ApiResponse<ShipmentRequest>> {
+  const supabase = await createClient();
+
+  const { data: request, error: fetchError } = await supabase
+    .from('shipment_requests')
+    .select('*, listing:listings!listing_id(*)')
+    .eq('id', requestId)
+    .eq('status', 'disputed')
+    .single();
+
+  if (fetchError || !request) {
+    return { data: null, error: 'Litige introuvable', status: 404 };
+  }
+
+  const isSender = request.sender_id === userId;
+  const isTraveler = request.listing.traveler_id === userId;
+
+  if (!isSender && !isTraveler) {
+    return { data: null, error: 'Non autoris\u00e9', status: 403 };
+  }
+
+  if (resolution === 'refund') {
+    // Refund the sender — cancel the request
+    await refundPayment(requestId, request.sender_id);
+
+    const { data, error } = await supabase
+      .from('shipment_requests')
+      .update({ status: 'cancelled', updated_at: new Date().toISOString() })
+      .eq('id', requestId)
+      .select()
+      .single();
+
+    if (error) return { data: null, error: error.message, status: 400 };
+
+    // Restore kg
+    await supabase
+      .from('listings')
+      .update({
+        available_kg: request.listing.available_kg + request.weight_kg,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', request.listing_id);
+
+    // Notify both parties
+    await createNotification(
+      request.sender_id,
+      'delivery_confirmed',
+      'Litige r\u00e9solu — Remboursement',
+      'Le litige a \u00e9t\u00e9 r\u00e9solu en votre faveur. Vous serez rembours\u00e9.',
+      { request_id: requestId }
+    );
+    await createNotification(
+      request.listing.traveler_id,
+      'delivery_confirmed',
+      'Litige r\u00e9solu — Remboursement',
+      "Le litige a \u00e9t\u00e9 r\u00e9solu. L'exp\u00e9diteur sera rembours\u00e9.",
+      { request_id: requestId }
+    );
+
+    return { data: data as ShipmentRequest, error: null, status: 200 };
+  }
+
+  // resolution === 'release' — release payment to traveler
+  await capturePayment(requestId);
+
+  const { data, error } = await supabase
+    .from('shipment_requests')
+    .update({ status: 'confirmed', updated_at: new Date().toISOString() })
+    .eq('id', requestId)
+    .select()
+    .single();
+
+  if (error) return { data: null, error: error.message, status: 400 };
+
+  await createNotification(
+    request.listing.traveler_id,
+    'delivery_confirmed',
+    'Litige r\u00e9solu — Paiement lib\u00e9r\u00e9',
+    'Le litige a \u00e9t\u00e9 r\u00e9solu en votre faveur. Votre paiement va \u00eatre lib\u00e9r\u00e9.',
+    { request_id: requestId }
+  );
+  await createNotification(
+    request.sender_id,
+    'delivery_confirmed',
+    'Litige r\u00e9solu — Paiement lib\u00e9r\u00e9',
+    'Le litige a \u00e9t\u00e9 r\u00e9solu. Le paiement a \u00e9t\u00e9 lib\u00e9r\u00e9 au voyageur.',
+    { request_id: requestId }
+  );
+
+  return { data: data as ShipmentRequest, error: null, status: 200 };
+}
+
 export async function getRequestsByListing(listingId: string): Promise<ShipmentRequest[]> {
   const supabase = await createClient();
 

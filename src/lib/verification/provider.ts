@@ -16,7 +16,7 @@ export interface VerificationProvider {
 }
 
 export function getVerificationProvider(): VerificationProvider {
-  const mode = process.env.NEXT_PUBLIC_KYC_MODE || 'mock';
+  const mode = process.env.KYC_MODE || 'mock';
 
   if (mode === 'stripe') {
     // eslint-disable-next-line @typescript-eslint/no-require-imports

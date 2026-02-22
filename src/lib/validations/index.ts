@@ -115,8 +115,9 @@ export const createRequestSchema = z.object({
     .max(MAX_WEIGHT_KG, `Maximum ${MAX_WEIGHT_KG} kg`),
   item_description: z
     .string()
-    .min(10, 'Décrivez votre colis en au moins 10 caractères')
+    .min(10, 'D\u00e9crivez votre colis en au moins 10 caract\u00e8res')
     .max(500, 'Description trop longue'),
+  item_photos: z.array(z.string().url()).max(5, 'Maximum 5 photos').optional().default([]),
   special_instructions: z.string().max(500, 'Instructions trop longues').nullable().optional(),
 });
 

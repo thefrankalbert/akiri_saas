@@ -8,10 +8,20 @@ import {
   markInTransit,
   markDelivered,
   openDispute,
+  resolveDispute,
 } from '@/lib/services/requests';
 
 const updateStatusSchema = z.object({
-  action: z.enum(['accept', 'cancel', 'collect', 'in_transit', 'deliver', 'dispute']),
+  action: z.enum([
+    'accept',
+    'cancel',
+    'collect',
+    'in_transit',
+    'deliver',
+    'dispute',
+    'resolve_refund',
+    'resolve_release',
+  ]),
   reason: z.string().max(500).optional(),
 });
 
@@ -56,6 +66,16 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     case 'dispute': {
       if (!body.reason) return apiError('Raison du litige requise', 400);
       const result = await openDispute(id, user.id, body.reason);
+      if (result.error) return apiError(result.error, result.status);
+      return apiSuccess(result.data);
+    }
+    case 'resolve_refund': {
+      const result = await resolveDispute(id, user.id, 'refund');
+      if (result.error) return apiError(result.error, result.status);
+      return apiSuccess(result.data);
+    }
+    case 'resolve_release': {
+      const result = await resolveDispute(id, user.id, 'release');
       if (result.error) return apiError(result.error, result.status);
       return apiSuccess(result.data);
     }

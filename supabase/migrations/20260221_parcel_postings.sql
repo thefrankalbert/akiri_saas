@@ -78,7 +78,7 @@ ALTER PUBLICATION supabase_realtime ADD TABLE carry_offers;
 -- Updated_at trigger
 CREATE TRIGGER update_parcel_postings_updated_at
   BEFORE UPDATE ON parcel_postings
-  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at();
 
 -- Storage bucket for parcel photos
 INSERT INTO storage.buckets (id, name, public) VALUES ('parcel-photos', 'parcel-photos', true)

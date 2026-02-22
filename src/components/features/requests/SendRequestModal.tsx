@@ -38,7 +38,8 @@ export function SendRequestModal({ listing, children }: SendRequestModalProps) {
     watch,
     formState: { errors, isSubmitting },
   } = useForm<CreateRequestInput>({
-    resolver: zodResolver(createRequestSchema),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Zod v4 output type diverges from input type due to .optional().default([])
+    resolver: zodResolver(createRequestSchema) as any,
     defaultValues: {
       listing_id: listing.id,
       weight_kg: 1,

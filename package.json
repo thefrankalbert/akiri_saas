@@ -32,6 +32,8 @@
     "@radix-ui/react-tooltip": "^1.2.8",
     "@supabase/ssr": "^0.8.0",
     "@supabase/supabase-js": "^2.95.3",
+    "@upstash/ratelimit": "^2.0.8",
+    "@upstash/redis": "^1.36.2",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
     "framer-motion": "^12.34.2",

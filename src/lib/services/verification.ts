@@ -7,7 +7,7 @@ import { getVerificationProvider } from '@/lib/verification/provider';
 import { sendOtpEmail } from '@/lib/email';
 import type { ApiResponse, VerificationSession } from '@/types';
 
-const KYC_MODE = process.env.NEXT_PUBLIC_KYC_MODE || 'mock';
+const KYC_MODE = process.env.KYC_MODE || 'mock';
 
 // OTP expiration in minutes
 const OTP_EXPIRATION_MINUTES = 10;

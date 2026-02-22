@@ -17,6 +17,8 @@ const jetbrainsMono = JetBrains_Mono({
   weight: ['400', '500', '600'],
 });
 
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://akiri.app';
+
 export const metadata: Metadata = {
   title: {
     default: 'Akiri - Transport collaboratif de colis',
@@ -30,7 +32,46 @@ export const metadata: Metadata = {
     'envoi colis Afrique',
     'transport collaboratif',
     'kilos disponibles',
+    'envoyer colis',
+    'voyageur',
+    'marketplace colis',
   ],
+  metadataBase: new URL(APP_URL),
+  openGraph: {
+    type: 'website',
+    locale: 'fr_FR',
+    url: APP_URL,
+    siteName: 'Akiri',
+    title: 'Akiri - Transport collaboratif de colis pour la diaspora',
+    description:
+      'Envoyez vos colis en Afrique avec des voyageurs de confiance. Moins cher, plus rapide, 100% s\u00e9curis\u00e9.',
+    images: [
+      {
+        url: `${APP_URL}/og-image.png`,
+        width: 1200,
+        height: 630,
+        alt: 'Akiri - Transport collaboratif de colis',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Akiri - Transport collaboratif de colis',
+    description:
+      'Envoyez vos colis en Afrique avec des voyageurs de confiance. Moins cher, plus rapide.',
+    images: [`${APP_URL}/og-image.png`],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
   manifest: '/manifest.webmanifest',
   appleWebApp: {
     capable: true,
@@ -52,6 +93,27 @@ export const viewport: Viewport = {
   themeColor: '#0A0A0F',
 };
 
+// JSON-LD structured data for the marketplace
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebApplication',
+  name: 'Akiri',
+  url: APP_URL,
+  description: 'Plateforme de transport collaboratif de colis pour la diaspora africaine.',
+  applicationCategory: 'BusinessApplication',
+  operatingSystem: 'Web',
+  offers: {
+    '@type': 'AggregateOffer',
+    priceCurrency: 'EUR',
+    availability: 'https://schema.org/InStock',
+  },
+  provider: {
+    '@type': 'Organization',
+    name: 'Akiri',
+    url: APP_URL,
+  },
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -63,6 +125,12 @@ export default function RootLayout({
       className={`${inter.variable} ${jetbrainsMono.variable}`}
       suppressHydrationWarning
     >
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      </head>
       <body className="font-sans" suppressHydrationWarning>
         {children}
         <Toaster position="top-right" richColors closeButton />
