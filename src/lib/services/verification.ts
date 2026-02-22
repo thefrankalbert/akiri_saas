@@ -4,6 +4,7 @@
 
 import { createClient } from '@/lib/supabase/server';
 import { getVerificationProvider } from '@/lib/verification/provider';
+import { sendOtpEmail } from '@/lib/email';
 import type { ApiResponse, VerificationSession } from '@/types';
 
 const KYC_MODE = process.env.NEXT_PUBLIC_KYC_MODE || 'mock';
@@ -34,9 +35,15 @@ export async function sendPhoneOtp(
     if (process.env.NODE_ENV === 'development') {
       console.info(`[MOCK OTP] Phone: ${phone}, Code: ${otpCode}`);
     }
-  } else {
-    // In production, send via Twilio or other SMS provider
-    // TODO: Implement Twilio SMS sending
+  }
+
+  // Also send OTP via email as a reliable fallback
+  const supabaseForEmail = await createClient();
+  const {
+    data: { user: authUser },
+  } = await supabaseForEmail.auth.getUser();
+  if (authUser?.email) {
+    await sendOtpEmail(authUser.email, otpCode);
   }
 
   // Store the OTP session in the database

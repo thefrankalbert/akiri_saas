@@ -4,6 +4,7 @@
 
 import { createClient } from '@/lib/supabase/server';
 import type { Conversation, Message, ApiResponse } from '@/types';
+import { createNotification } from './notifications';
 
 /**
  * Get or create a conversation between two users
@@ -139,6 +140,19 @@ export async function sendMessage(
       last_message_at: new Date().toISOString(),
     })
     .eq('id', conversationId);
+
+  // Notify other participants
+  const otherParticipants = (conv.participant_ids as string[]).filter((id) => id !== senderId);
+  const preview = content.length > 80 ? content.slice(0, 80) + '...' : content;
+  for (const recipientId of otherParticipants) {
+    await createNotification(
+      recipientId,
+      'new_message',
+      'Nouveau message',
+      contentType === 'image' ? 'Vous avez re\u00e7u une image.' : preview,
+      { conversation_id: conversationId }
+    );
+  }
 
   return { data: message as Message, error: null, status: 201 };
 }

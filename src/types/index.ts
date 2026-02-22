@@ -24,6 +24,8 @@ export interface Profile {
   bio: string | null;
   is_verified: boolean;
   id_verified: boolean;
+  stripe_connect_account_id: string | null;
+  stripe_connect_onboarded: boolean;
   rating: number;
   total_reviews: number;
   total_trips: number;
@@ -153,7 +155,9 @@ export interface Transaction {
   amount: number;
   currency: string;
   platform_fee: number;
+  payout_amount: number | null;
   stripe_payment_intent_id: string | null;
+  stripe_transfer_id: string | null;
   status: TransactionStatus;
   created_at: string;
   updated_at: string;

@@ -5,6 +5,7 @@
 import { createClient } from '@/lib/supabase/server';
 import type { Review, ApiResponse } from '@/types';
 import type { CreateReviewInput } from '@/lib/validations';
+import { createNotification } from './notifications';
 
 /**
  * Create a review
@@ -74,6 +75,15 @@ export async function createReview(
 
   // Update the reviewed user's average rating
   await updateUserRating(input.reviewed_id);
+
+  // Notify the reviewed user
+  await createNotification(
+    input.reviewed_id,
+    'new_review',
+    'Nouvel avis',
+    `Vous avez re\u00e7u un avis de ${input.rating}/5.`,
+    { request_id: input.request_id, rating: input.rating }
+  );
 
   return { data: data as Review, error: null, status: 201 };
 }

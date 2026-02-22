@@ -1,10 +1,18 @@
 import { NextRequest } from 'next/server';
 import { z } from 'zod/v4';
 import { getAuthUser, apiError, apiSuccess, parseBody } from '@/lib/api/helpers';
-import { acceptRequest } from '@/lib/services/requests';
+import {
+  acceptRequest,
+  cancelRequest,
+  collectParcel,
+  markInTransit,
+  markDelivered,
+  openDispute,
+} from '@/lib/services/requests';
 
 const updateStatusSchema = z.object({
-  action: z.enum(['accept', 'cancel']),
+  action: z.enum(['accept', 'cancel', 'collect', 'in_transit', 'deliver', 'dispute']),
+  reason: z.string().max(500).optional(),
 });
 
 interface RouteParams {
@@ -19,11 +27,39 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
   const body = await parseBody(request, updateStatusSchema);
   if (!body) return apiError('Donn\u00e9es invalides', 400);
 
-  if (body.action === 'accept') {
-    const result = await acceptRequest(id, user.id);
-    if (result.error) return apiError(result.error, result.status);
-    return apiSuccess(result.data);
+  switch (body.action) {
+    case 'accept': {
+      const result = await acceptRequest(id, user.id);
+      if (result.error) return apiError(result.error, result.status);
+      return apiSuccess(result.data);
+    }
+    case 'cancel': {
+      const result = await cancelRequest(id, user.id);
+      if (result.error) return apiError(result.error, result.status);
+      return apiSuccess(result.data);
+    }
+    case 'collect': {
+      const result = await collectParcel(id, user.id);
+      if (result.error) return apiError(result.error, result.status);
+      return apiSuccess(result.data);
+    }
+    case 'in_transit': {
+      const result = await markInTransit(id, user.id);
+      if (result.error) return apiError(result.error, result.status);
+      return apiSuccess(result.data);
+    }
+    case 'deliver': {
+      const result = await markDelivered(id, user.id);
+      if (result.error) return apiError(result.error, result.status);
+      return apiSuccess(result.data);
+    }
+    case 'dispute': {
+      if (!body.reason) return apiError('Raison du litige requise', 400);
+      const result = await openDispute(id, user.id, body.reason);
+      if (result.error) return apiError(result.error, result.status);
+      return apiSuccess(result.data);
+    }
+    default:
+      return apiError('Action non support\u00e9e', 400);
   }
-
-  return apiError('Action non support\u00e9e', 400);
 }

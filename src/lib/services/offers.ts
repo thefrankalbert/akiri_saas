@@ -5,6 +5,7 @@
 import { createClient } from '@/lib/supabase/server';
 import type { CarryOffer, ApiResponse } from '@/types';
 import type { CreateCarryOfferInput } from '@/lib/validations';
+import { createNotification } from './notifications';
 
 /**
  * Get all carry offers for a parcel with traveler profile and listing
@@ -34,6 +35,13 @@ export async function createOffer(
 ): Promise<ApiResponse<CarryOffer>> {
   const supabase = await createClient();
 
+  // Fetch the parcel to get sender_id for notification
+  const { data: parcel } = await supabase
+    .from('parcel_postings')
+    .select('sender_id, departure_city, arrival_city')
+    .eq('id', input.parcel_id)
+    .single();
+
   const { data, error } = await supabase
     .from('carry_offers')
     .insert({
@@ -46,6 +54,17 @@ export async function createOffer(
 
   if (error) {
     return { data: null, error: error.message, status: 400 };
+  }
+
+  // Notify parcel owner about the new offer
+  if (parcel) {
+    await createNotification(
+      parcel.sender_id,
+      'new_request',
+      'Nouvelle offre de transport',
+      `Un voyageur propose de transporter votre colis ${parcel.departure_city} \u2192 ${parcel.arrival_city} pour ${input.proposed_price}\u20ac.`,
+      { parcel_id: input.parcel_id, offer_id: data.id }
+    );
   }
 
   return { data: data as CarryOffer, error: null, status: 201 };
@@ -103,6 +122,15 @@ export async function acceptOffer(
     .from('parcel_postings')
     .update({ status: 'matched', updated_at: new Date().toISOString() })
     .eq('id', (offer as CarryOffer).parcel_id);
+
+  // Notify the traveler their offer was accepted
+  await createNotification(
+    (offer as CarryOffer).traveler_id,
+    'request_accepted',
+    'Offre accept\u00e9e',
+    'Votre offre de transport a \u00e9t\u00e9 accept\u00e9e par l\u2019exp\u00e9diteur.',
+    { parcel_id: (offer as CarryOffer).parcel_id, offer_id: offerId }
+  );
 
   return { data: accepted as CarryOffer, error: null, status: 200 };
 }

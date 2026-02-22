@@ -7,6 +7,7 @@ import { createClient, createAdminClient } from '@/lib/supabase/server';
 import type { Transaction, ApiResponse, PaginatedResponse } from '@/types';
 import { PLATFORM_FEE_PERCENT } from '@/constants';
 import { DEFAULT_PAGE_SIZE } from '@/constants';
+import { sendPayoutEmail } from '@/lib/email';
 
 /**
  * Create a Stripe Checkout Session for an accepted request
@@ -53,6 +54,7 @@ export async function createCheckoutSession(
   // Calculate fees
   const totalPrice = Number(request.total_price);
   const platformFee = Math.round(totalPrice * (PLATFORM_FEE_PERCENT / 100) * 100) / 100;
+  const payoutAmount = Math.round((totalPrice - platformFee) * 100) / 100;
   const amountInCents = Math.round(totalPrice * 100);
 
   // Determine currency
@@ -117,6 +119,7 @@ export async function createCheckoutSession(
       amount: totalPrice,
       currency: currency.toUpperCase(),
       platform_fee: platformFee,
+      payout_amount: payoutAmount,
       stripe_payment_intent_id: session.payment_intent as string,
       status: 'pending',
     });
@@ -128,6 +131,7 @@ export async function createCheckoutSession(
 /**
  * Capture a held payment (release escrow to traveler)
  * Called when sender confirms delivery with 6-digit code
+ * If traveler has Stripe Connect, creates a transfer to their connected account
  */
 export async function capturePayment(requestId: string): Promise<ApiResponse<Transaction>> {
   const adminSupabase = await createAdminClient();
@@ -148,16 +152,61 @@ export async function capturePayment(requestId: string): Promise<ApiResponse<Tra
     // Capture the payment in Stripe
     await getStripe().paymentIntents.capture(transaction.stripe_payment_intent_id!);
 
+    // Calculate payout amount (amount minus platform fee)
+    const payoutAmount =
+      transaction.payout_amount ||
+      Math.round((transaction.amount - transaction.platform_fee) * 100) / 100;
+
+    // Try to create Stripe Transfer if traveler has Connect account
+    let transferId: string | null = null;
+    const { data: payeeProfile } = await adminSupabase
+      .from('profiles')
+      .select('stripe_connect_account_id, stripe_connect_onboarded')
+      .eq('user_id', transaction.payee_id)
+      .single();
+
+    if (payeeProfile?.stripe_connect_account_id && payeeProfile?.stripe_connect_onboarded) {
+      try {
+        const transfer = await getStripe().transfers.create({
+          amount: Math.round(payoutAmount * 100),
+          currency: transaction.currency.toLowerCase(),
+          destination: payeeProfile.stripe_connect_account_id,
+          transfer_group: `request_${requestId}`,
+          metadata: {
+            request_id: requestId,
+            transaction_id: transaction.id,
+          },
+        });
+        transferId = transfer.id;
+      } catch (transferError) {
+        // Log transfer failure but don't fail the capture
+        console.error('[PAYOUT] Transfer failed:', transferError);
+      }
+    }
+
     // Update transaction status
     const { data, error } = await adminSupabase
       .from('transactions')
-      .update({ status: 'released', updated_at: new Date().toISOString() })
+      .update({
+        status: 'released',
+        payout_amount: payoutAmount,
+        stripe_transfer_id: transferId,
+        updated_at: new Date().toISOString(),
+      })
       .eq('id', transaction.id)
       .select()
       .single();
 
     if (error) {
       return { data: null, error: error.message, status: 400 };
+    }
+
+    // Send payout email to traveler
+    const {
+      data: { user: payeeUser },
+    } = await adminSupabase.auth.admin.getUserById(transaction.payee_id);
+    if (payeeUser?.email) {
+      await sendPayoutEmail(payeeUser.email, payoutAmount, transaction.currency);
     }
 
     return { data: data as Transaction, error: null, status: 200 };
@@ -191,7 +240,11 @@ export async function refundPayment(
 
   // Verify the user is the payer
   if (transaction.payer_id !== userId) {
-    return { data: null, error: 'Non autorisé à rembourser cette transaction', status: 403 };
+    return {
+      data: null,
+      error: 'Non autoris\u00e9 \u00e0 rembourser cette transaction',
+      status: 403,
+    };
   }
 
   try {
@@ -225,6 +278,93 @@ export async function refundPayment(
       stripeError instanceof Error ? stripeError.message : 'Erreur lors du remboursement';
     return { data: null, error: message, status: 500 };
   }
+}
+
+/**
+ * Create a Stripe Connect onboarding link for a traveler
+ */
+export async function createConnectOnboardingLink(
+  userId: string
+): Promise<ApiResponse<{ url: string }>> {
+  const adminSupabase = await createAdminClient();
+
+  // Check if traveler already has a connected account
+  const { data: profile } = await adminSupabase
+    .from('profiles')
+    .select('stripe_connect_account_id, first_name, last_name')
+    .eq('user_id', userId)
+    .single();
+
+  if (!profile) {
+    return { data: null, error: 'Profil introuvable', status: 404 };
+  }
+
+  let accountId = profile.stripe_connect_account_id;
+
+  if (!accountId) {
+    // Create a new Stripe Connect Express account
+    const account = await getStripe().accounts.create({
+      type: 'express',
+      metadata: { user_id: userId },
+      capabilities: {
+        transfers: { requested: true },
+      },
+    });
+
+    accountId = account.id;
+
+    // Save the account ID to the profile
+    await adminSupabase
+      .from('profiles')
+      .update({
+        stripe_connect_account_id: accountId,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('user_id', userId);
+  }
+
+  // Create an onboarding link
+  const accountLink = await getStripe().accountLinks.create({
+    account: accountId,
+    refresh_url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/profil?connect=refresh`,
+    return_url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/profil?connect=success`,
+    type: 'account_onboarding',
+  });
+
+  return { data: { url: accountLink.url }, error: null, status: 200 };
+}
+
+/**
+ * Check and update Stripe Connect onboarding status
+ */
+export async function checkConnectStatus(
+  userId: string
+): Promise<ApiResponse<{ onboarded: boolean }>> {
+  const adminSupabase = await createAdminClient();
+
+  const { data: profile } = await adminSupabase
+    .from('profiles')
+    .select('stripe_connect_account_id')
+    .eq('user_id', userId)
+    .single();
+
+  if (!profile?.stripe_connect_account_id) {
+    return { data: { onboarded: false }, error: null, status: 200 };
+  }
+
+  const account = await getStripe().accounts.retrieve(profile.stripe_connect_account_id);
+  const onboarded = account.charges_enabled && account.payouts_enabled;
+
+  // Update profile if status changed
+  await adminSupabase
+    .from('profiles')
+    .update({
+      stripe_connect_onboarded: onboarded || false,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('user_id', userId);
+
+  return { data: { onboarded: onboarded || false }, error: null, status: 200 };
 }
 
 /**

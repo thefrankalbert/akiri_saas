@@ -6,6 +6,7 @@ import { NextResponse } from 'next/server';
 import { getStripe } from '@/lib/stripe';
 import { createAdminClient } from '@/lib/supabase/server';
 import { createNotification } from '@/lib/services/notifications';
+import { sendConfirmationCodeEmail, sendPaymentEmail } from '@/lib/email';
 import type Stripe from 'stripe';
 
 export async function POST(request: Request) {
@@ -81,6 +82,50 @@ export async function POST(request: Request) {
           );
         }
 
+        // Send confirmation code to sender via email
+        if (payerId && requestId) {
+          const { data: req } = await adminSupabase
+            .from('shipment_requests')
+            .select('confirmation_code, listing:listings!listing_id(departure_city, arrival_city)')
+            .eq('id', requestId)
+            .single();
+
+          const { data: profile } = await adminSupabase
+            .from('profiles')
+            .select('user_id')
+            .eq('user_id', payerId)
+            .single();
+
+          if (req && profile) {
+            // Get sender email from auth
+            const {
+              data: { user: authUser },
+            } = await adminSupabase.auth.admin.getUserById(payerId);
+            const listing = req.listing as unknown as {
+              departure_city: string;
+              arrival_city: string;
+            } | null;
+            const route = listing
+              ? `${listing.departure_city} \u2192 ${listing.arrival_city}`
+              : 'votre trajet';
+
+            if (authUser?.email && req.confirmation_code) {
+              await sendConfirmationCodeEmail(authUser.email, req.confirmation_code, route);
+            }
+
+            // Send payment confirmation email
+            const amountCents = session.amount_total;
+            if (authUser?.email && amountCents) {
+              await sendPaymentEmail(
+                authUser.email,
+                amountCents / 100,
+                (session.currency || 'EUR').toUpperCase(),
+                route
+              );
+            }
+          }
+        }
+
         break;
       }
 
@@ -136,6 +181,24 @@ export async function POST(request: Request) {
               { request_id: tx.request_id }
             );
           }
+        }
+
+        break;
+      }
+
+      // ─── Connect account updated (onboarding) ──────────
+      case 'account.updated': {
+        const account = event.data.object as Stripe.Account;
+        const userId = account.metadata?.user_id;
+
+        if (userId && account.charges_enabled && account.payouts_enabled) {
+          await adminSupabase
+            .from('profiles')
+            .update({
+              stripe_connect_onboarded: true,
+              updated_at: new Date().toISOString(),
+            })
+            .eq('user_id', userId);
         }
 
         break;
