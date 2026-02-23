@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server';
 import { getAuthUser, apiError, apiSuccess } from '@/lib/api/helpers';
 import { createClient } from '@/lib/supabase/server';
+import { validateImageUpload, getMimeExtension } from '@/lib/utils/upload-validation';
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
@@ -30,7 +31,16 @@ export async function POST(request: NextRequest) {
     return apiError('Fichier trop volumineux. Maximum 5 Mo.', 400);
   }
 
-  const ext = file.name.split('.').pop() || 'jpg';
+  // Validate magic bytes match declared MIME type
+  const isValid = await validateImageUpload(file, file.type);
+  if (!isValid) {
+    return apiError('Le contenu du fichier ne correspond pas au type d\u00e9clar\u00e9', 400);
+  }
+
+  // Derive extension from MIME type (not from user-supplied filename)
+  const ext = getMimeExtension(file.type);
+  if (!ext) return apiError('Type de fichier non autoris\u00e9', 400);
+
   const fileName = `${user.id}/${crypto.randomUUID()}.${ext}`;
 
   const supabase = await createClient();

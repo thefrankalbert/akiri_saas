@@ -93,7 +93,7 @@ export function LoginForm() {
       router.refresh();
     } catch (err) {
       // Network error or Supabase not configured properly
-      console.error('Login error:', err);
+      // Login network error — shown to user via serverError state
       setServerError(
         'Impossible de se connecter au serveur. Vérifiez votre connexion ou utilisez le mode démo.'
       );

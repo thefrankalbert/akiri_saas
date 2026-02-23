@@ -45,12 +45,7 @@ export function DatePicker({
     }
   }, [open]);
 
-  const handleSelect = (
-    day: Date | undefined,
-    _triggerDate: Date,
-    _modifiers: Record<string, boolean>,
-    _e: React.MouseEvent | React.KeyboardEvent
-  ) => {
+  const handleSelect = (day: Date | undefined) => {
     if (day) {
       onChange?.(day.toISOString());
     } else {

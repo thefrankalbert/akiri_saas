@@ -50,7 +50,7 @@ export function usePushNotifications() {
 
       setIsSubscribed(true);
     } catch (err) {
-      console.error('Push subscription failed:', err);
+      // Push subscription failed — user may have denied permission
     } finally {
       setLoading(false);
     }
@@ -76,7 +76,7 @@ export function usePushNotifications() {
 
       setIsSubscribed(false);
     } catch (err) {
-      console.error('Push unsubscribe failed:', err);
+      // Push unsubscribe failed
     } finally {
       setLoading(false);
     }

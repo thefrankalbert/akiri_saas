@@ -113,6 +113,7 @@ export async function updateSession(request: NextRequest) {
     '/parametres',
     '/activite',
     '/demandes',
+    '/colis',
     '/admin',
   ];
 

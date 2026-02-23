@@ -66,7 +66,7 @@ export function useAuth() {
         .single();
 
       if (error) {
-        console.error('Error fetching profile:', error.message);
+        // Profile fetch failed — silently return null
         return null;
       }
       return data as Profile;

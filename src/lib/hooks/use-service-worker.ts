@@ -27,7 +27,7 @@ export function useServiceWorker() {
     }
 
     navigator.serviceWorker.register('/sw.js').catch((error) => {
-      console.error('Service worker registration failed:', error);
+      // Service worker registration failed — non-critical
     });
   }, []);
 }

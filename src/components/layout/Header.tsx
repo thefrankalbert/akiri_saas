@@ -16,11 +16,10 @@ import { Avatar } from '@/components/ui';
 import { APP_NAME } from '@/constants';
 import { useAuth } from '@/lib/hooks';
 import { getMobileMenuItems } from '@/lib/navigation';
-import { cn } from '@/lib/utils';
 
 export function Header() {
   const router = useRouter();
-  const { user, profile, isAuthenticated, isDemo, signOut } = useAuth();
+  const { profile, isAuthenticated, isDemo, signOut } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const mobileMenuItems = getMobileMenuItems();
