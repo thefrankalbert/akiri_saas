@@ -1,7 +1,7 @@
 'use client';
 
 import { MagnifyingGlass, Sliders } from '@phosphor-icons/react';
-import { Button, Input } from '@/components/ui';
+import { Button, Input, Select } from '@/components/ui';
 import { SUPPORTED_COUNTRIES } from '@/constants';
 
 interface ListingFiltersProps {
@@ -35,68 +35,48 @@ export function ListingFilters({
       {showFilters && (
         <div className="bg-surface-800 rounded-xl border border-white/[0.08] p-4">
           <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-4">
-            <div>
-              <label className="text-surface-50 mb-1.5 block text-sm font-medium">
-                Pays de départ
-              </label>
-              <select
-                className="bg-surface-700 h-10 w-full appearance-none rounded-lg border border-white/[0.08] px-3 pr-8 text-sm text-neutral-100"
-                onChange={(e) =>
-                  onUpdateFilters({ departure_country: e.target.value || undefined })
-                }
-              >
-                <option value="">Tous</option>
-                {SUPPORTED_COUNTRIES.map((c) => (
-                  <option key={c.code} value={c.code}>
-                    {c.flag} {c.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="text-surface-50 mb-1.5 block text-sm font-medium">
-                Pays d&apos;arriv&eacute;e
-              </label>
-              <select
-                className="bg-surface-700 h-10 w-full appearance-none rounded-lg border border-white/[0.08] px-3 pr-8 text-sm text-neutral-100"
-                onChange={(e) => onUpdateFilters({ arrival_country: e.target.value || undefined })}
-              >
-                <option value="">Tous</option>
-                {SUPPORTED_COUNTRIES.map((c) => (
-                  <option key={c.code} value={c.code}>
-                    {c.flag} {c.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="text-surface-50 mb-1.5 block text-sm font-medium">
-                Poids minimum (kg)
-              </label>
-              <Input
-                type="number"
-                placeholder="0"
-                onChange={(e) =>
-                  onUpdateFilters({
-                    min_kg: e.target.value ? Number(e.target.value) : undefined,
-                  })
-                }
-              />
-            </div>
-            <div>
-              <label className="text-surface-50 mb-1.5 block text-sm font-medium">
-                Prix max (/kg)
-              </label>
-              <Input
-                type="number"
-                placeholder="50"
-                onChange={(e) =>
-                  onUpdateFilters({
-                    max_price: e.target.value ? Number(e.target.value) : undefined,
-                  })
-                }
-              />
-            </div>
+            <Select
+              label="Pays de départ"
+              onChange={(e) => onUpdateFilters({ departure_country: e.target.value || undefined })}
+            >
+              <option value="">Tous</option>
+              {SUPPORTED_COUNTRIES.map((c) => (
+                <option key={c.code} value={c.code}>
+                  {c.flag} {c.name}
+                </option>
+              ))}
+            </Select>
+            <Select
+              label="Pays d'arrivée"
+              onChange={(e) => onUpdateFilters({ arrival_country: e.target.value || undefined })}
+            >
+              <option value="">Tous</option>
+              {SUPPORTED_COUNTRIES.map((c) => (
+                <option key={c.code} value={c.code}>
+                  {c.flag} {c.name}
+                </option>
+              ))}
+            </Select>
+            <Input
+              label="Poids minimum (kg)"
+              type="number"
+              placeholder="0"
+              onChange={(e) =>
+                onUpdateFilters({
+                  min_kg: e.target.value ? Number(e.target.value) : undefined,
+                })
+              }
+            />
+            <Input
+              label="Prix max (/kg)"
+              type="number"
+              placeholder="50"
+              onChange={(e) =>
+                onUpdateFilters({
+                  max_price: e.target.value ? Number(e.target.value) : undefined,
+                })
+              }
+            />
           </div>
         </div>
       )}

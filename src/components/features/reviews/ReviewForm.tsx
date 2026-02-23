@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Star } from '@phosphor-icons/react';
-import { Button } from '@/components/ui';
+import { Button, Textarea } from '@/components/ui';
 import { createReviewSchema, type CreateReviewInput } from '@/lib/validations';
 import { toasts } from '@/lib/utils/toast';
 import { supabaseConfigured } from '@/lib/supabase/client';
@@ -116,26 +116,20 @@ export function ReviewForm({
           )}
         </div>
         {errors.rating?.message && (
-          <p className="text-error mt-1 text-xs">{errors.rating.message}</p>
+          <p className="text-error mt-1.5 text-xs">{errors.rating.message}</p>
         )}
       </div>
 
       {/* Comment */}
-      <div>
-        <label className="text-surface-50 mb-1.5 block text-sm font-medium">
-          Commentaire (optionnel)
-        </label>
-        <textarea
-          placeholder="Partagez votre expérience..."
-          className="bg-surface-700 placeholder:text-surface-200 focus:border-primary-500 focus:ring-primary-500 w-full rounded-lg border border-white/[0.08] px-3 py-2 text-sm text-neutral-100 focus:ring-1 focus:outline-none"
-          rows={3}
-          maxLength={1000}
-          {...register('comment')}
-        />
-        <div className="mt-1 flex justify-end">
-          <span className="text-surface-200 text-xs">{commentValue.length}/1000</span>
-        </div>
-      </div>
+      <Textarea
+        label="Commentaire (optionnel)"
+        placeholder="Partagez votre expérience..."
+        rows={3}
+        maxLength={1000}
+        maxChars={1000}
+        currentLength={commentValue.length}
+        {...register('comment')}
+      />
 
       <Button
         type="submit"

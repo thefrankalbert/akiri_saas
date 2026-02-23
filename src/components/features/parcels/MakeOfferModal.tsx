@@ -16,6 +16,7 @@ import {
   ModalFooter,
   Button,
   Input,
+  Textarea,
   DatePicker,
 } from '@/components/ui';
 import { toasts } from '@/lib/utils/toast';
@@ -148,17 +149,12 @@ export function MakeOfferModal({ parcel, children }: MakeOfferModalProps) {
             )}
           />
 
-          <div>
-            <label className="text-surface-50 mb-1.5 block text-sm font-medium">
-              Message (optionnel)
-            </label>
-            <textarea
-              placeholder="Precisions sur votre voyage, points de collecte..."
-              className="bg-surface-700 placeholder:text-surface-200 focus:border-primary-500 focus:ring-primary-500 w-full rounded-lg border border-white/[0.08] px-3 py-2 text-sm text-neutral-100 focus:ring-1 focus:outline-none"
-              rows={3}
-              {...register('message')}
-            />
-          </div>
+          <Textarea
+            label="Message (optionnel)"
+            placeholder="Précisions sur votre voyage, points de collecte..."
+            rows={3}
+            {...register('message')}
+          />
 
           <ModalFooter className="px-0">
             <Button type="submit" isLoading={isSubmitting} className="w-full">

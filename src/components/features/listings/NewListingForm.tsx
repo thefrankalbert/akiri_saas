@@ -8,6 +8,8 @@ import { AirplaneTilt, Cube, Plus, X } from '@phosphor-icons/react';
 import {
   Button,
   Input,
+  Select,
+  Textarea,
   TypeToggle,
   DatePicker,
   PhotoUpload,
@@ -37,11 +39,8 @@ const TOGGLE_OPTIONS = [
   { value: 'parcel', label: 'Colis à envoyer', icon: <Cube size={16} weight="duotone" /> },
 ];
 
-// ─── Shared select classes ─────────────────────────────────
-const selectCls =
-  'bg-surface-700 flex h-10 w-full rounded-lg border border-white/[0.08] px-3 text-sm text-neutral-100 focus:border-primary-500 focus:ring-primary-500/20 focus:ring-2 focus:outline-none';
-
-const compactInputCls = 'h-10 !rounded-lg';
+// ─── Compact variant for grid forms ─────────────────────────
+const compactCls = 'h-10 !rounded-lg';
 
 // ─── Listing Sub-Form ──────────────────────────────────────
 function ListingSubForm({ onSuccess }: { onSuccess: () => void }) {
@@ -126,24 +125,23 @@ function ListingSubForm({ onSuccess }: { onSuccess: () => void }) {
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-2.5">
       {/* Row 1: Departure country + city */}
       <div className="grid grid-cols-2 gap-2.5">
-        <div>
-          <label className="text-surface-50 mb-1 block text-xs font-medium">Pays de départ</label>
-          <select className={selectCls} {...register('departure_country')}>
-            <option value="">Sélectionner</option>
-            {SUPPORTED_COUNTRIES.map((c) => (
-              <option key={c.code} value={c.code}>
-                {c.flag} {c.name}
-              </option>
-            ))}
-          </select>
-          {errors.departure_country && (
-            <p className="text-error mt-0.5 text-[10px]">{errors.departure_country.message}</p>
-          )}
-        </div>
+        <Select
+          label="Pays de départ"
+          className={compactCls}
+          error={errors.departure_country?.message}
+          {...register('departure_country')}
+        >
+          <option value="">Sélectionner</option>
+          {SUPPORTED_COUNTRIES.map((c) => (
+            <option key={c.code} value={c.code}>
+              {c.flag} {c.name}
+            </option>
+          ))}
+        </Select>
         <Input
           label="Ville de départ"
           placeholder="Paris"
-          className={compactInputCls}
+          className={compactCls}
           error={errors.departure_city?.message}
           {...register('departure_city')}
         />
@@ -151,26 +149,23 @@ function ListingSubForm({ onSuccess }: { onSuccess: () => void }) {
 
       {/* Row 2: Arrival country + city */}
       <div className="grid grid-cols-2 gap-2.5">
-        <div>
-          <label className="text-surface-50 mb-1 block text-xs font-medium">
-            Pays d&apos;arrivée
-          </label>
-          <select className={selectCls} {...register('arrival_country')}>
-            <option value="">Sélectionner</option>
-            {SUPPORTED_COUNTRIES.map((c) => (
-              <option key={c.code} value={c.code}>
-                {c.flag} {c.name}
-              </option>
-            ))}
-          </select>
-          {errors.arrival_country && (
-            <p className="text-error mt-0.5 text-[10px]">{errors.arrival_country.message}</p>
-          )}
-        </div>
+        <Select
+          label="Pays d'arrivée"
+          className={compactCls}
+          error={errors.arrival_country?.message}
+          {...register('arrival_country')}
+        >
+          <option value="">Sélectionner</option>
+          {SUPPORTED_COUNTRIES.map((c) => (
+            <option key={c.code} value={c.code}>
+              {c.flag} {c.name}
+            </option>
+          ))}
+        </Select>
         <Input
           label="Ville d'arrivée"
           placeholder="Douala"
-          className={compactInputCls}
+          className={compactCls}
           error={errors.arrival_city?.message}
           {...register('arrival_city')}
         />
@@ -197,7 +192,7 @@ function ListingSubForm({ onSuccess }: { onSuccess: () => void }) {
           label="Kilos disponibles"
           type="number"
           placeholder="10"
-          className={compactInputCls}
+          className={compactCls}
           error={errors.available_kg?.message}
           {...register('available_kg', { valueAsNumber: true })}
         />
@@ -206,7 +201,7 @@ function ListingSubForm({ onSuccess }: { onSuccess: () => void }) {
           type="number"
           step="0.5"
           placeholder="8"
-          className={compactInputCls}
+          className={compactCls}
           error={errors.price_per_kg?.message}
           {...register('price_per_kg', { valueAsNumber: true })}
         />
@@ -232,7 +227,7 @@ function ListingSubForm({ onSuccess }: { onSuccess: () => void }) {
           ))}
         </div>
         {errors.accepted_items && (
-          <p className="text-error mt-0.5 text-[10px]">{errors.accepted_items.message}</p>
+          <p className="text-error mt-1.5 text-xs">{errors.accepted_items.message}</p>
         )}
       </div>
 
@@ -245,7 +240,7 @@ function ListingSubForm({ onSuccess }: { onSuccess: () => void }) {
               <Input
                 placeholder="Ex: Gare du Nord"
                 value={point}
-                className={compactInputCls}
+                className={compactCls}
                 onChange={(e) => updateCollectionPoint(i, e.target.value)}
               />
               {collectionPoints.length > 1 && (
@@ -269,25 +264,18 @@ function ListingSubForm({ onSuccess }: { onSuccess: () => void }) {
           Ajouter un point
         </button>
         {errors.collection_points && (
-          <p className="text-error mt-0.5 text-[10px]">{errors.collection_points.message}</p>
+          <p className="text-error mt-1.5 text-xs">{errors.collection_points.message}</p>
         )}
       </div>
 
       {/* Row 7: Description */}
-      <div>
-        <label className="text-surface-50 mb-1 block text-xs font-medium">
-          Description (optionnel)
-        </label>
-        <textarea
-          className="bg-surface-700 placeholder:text-surface-200 focus:border-primary-500 focus:ring-primary-500/20 flex min-h-[56px] w-full rounded-lg border border-white/[0.08] px-3 py-2 text-sm text-neutral-100 focus:ring-2 focus:outline-none"
-          placeholder="Infos complémentaires..."
-          rows={2}
-          {...register('description')}
-        />
-        {errors.description && (
-          <p className="text-error mt-0.5 text-[10px]">{errors.description.message}</p>
-        )}
-      </div>
+      <Textarea
+        label="Description (optionnel)"
+        placeholder="Infos complémentaires..."
+        rows={2}
+        error={errors.description?.message}
+        {...register('description')}
+      />
 
       {/* Submit */}
       <Button
@@ -412,24 +400,23 @@ function ParcelSubForm({ onSuccess }: { onSuccess: () => void }) {
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-2.5">
       {/* Row 1: Departure country + city */}
       <div className="grid grid-cols-2 gap-2.5">
-        <div>
-          <label className="text-surface-50 mb-1 block text-xs font-medium">Pays de départ</label>
-          <select className={selectCls} {...register('departure_country')}>
-            <option value="">Sélectionner</option>
-            {SUPPORTED_COUNTRIES.map((c) => (
-              <option key={c.code} value={c.code}>
-                {c.flag} {c.name}
-              </option>
-            ))}
-          </select>
-          {errors.departure_country && (
-            <p className="text-error mt-0.5 text-[10px]">{errors.departure_country.message}</p>
-          )}
-        </div>
+        <Select
+          label="Pays de départ"
+          className={compactCls}
+          error={errors.departure_country?.message}
+          {...register('departure_country')}
+        >
+          <option value="">Sélectionner</option>
+          {SUPPORTED_COUNTRIES.map((c) => (
+            <option key={c.code} value={c.code}>
+              {c.flag} {c.name}
+            </option>
+          ))}
+        </Select>
         <Input
           label="Ville de départ"
           placeholder="Paris"
-          className={compactInputCls}
+          className={compactCls}
           error={errors.departure_city?.message}
           {...register('departure_city')}
         />
@@ -437,26 +424,23 @@ function ParcelSubForm({ onSuccess }: { onSuccess: () => void }) {
 
       {/* Row 2: Arrival country + city */}
       <div className="grid grid-cols-2 gap-2.5">
-        <div>
-          <label className="text-surface-50 mb-1 block text-xs font-medium">
-            Pays d&apos;arrivée
-          </label>
-          <select className={selectCls} {...register('arrival_country')}>
-            <option value="">Sélectionner</option>
-            {SUPPORTED_COUNTRIES.map((c) => (
-              <option key={c.code} value={c.code}>
-                {c.flag} {c.name}
-              </option>
-            ))}
-          </select>
-          {errors.arrival_country && (
-            <p className="text-error mt-0.5 text-[10px]">{errors.arrival_country.message}</p>
-          )}
-        </div>
+        <Select
+          label="Pays d'arrivée"
+          className={compactCls}
+          error={errors.arrival_country?.message}
+          {...register('arrival_country')}
+        >
+          <option value="">Sélectionner</option>
+          {SUPPORTED_COUNTRIES.map((c) => (
+            <option key={c.code} value={c.code}>
+              {c.flag} {c.name}
+            </option>
+          ))}
+        </Select>
         <Input
           label="Ville d'arrivée"
           placeholder="Douala"
-          className={compactInputCls}
+          className={compactCls}
           error={errors.arrival_city?.message}
           {...register('arrival_city')}
         />
@@ -484,41 +468,33 @@ function ParcelSubForm({ onSuccess }: { onSuccess: () => void }) {
           type="number"
           step="0.5"
           placeholder="5"
-          className={compactInputCls}
+          className={compactCls}
           error={errors.weight_kg?.message}
           {...register('weight_kg', { valueAsNumber: true })}
         />
-        <div>
-          <label className="text-surface-50 mb-1 block text-xs font-medium">Catégorie</label>
-          <select className={selectCls} {...register('category')}>
-            <option value="">Sélectionner</option>
-            {PARCEL_CATEGORIES.map((c) => (
-              <option key={c.value} value={c.value}>
-                {c.label}
-              </option>
-            ))}
-          </select>
-          {errors.category && (
-            <p className="text-error mt-0.5 text-[10px]">{errors.category.message}</p>
-          )}
-        </div>
+        <Select
+          label="Catégorie"
+          className={compactCls}
+          error={errors.category?.message}
+          {...register('category')}
+        >
+          <option value="">Sélectionner</option>
+          {PARCEL_CATEGORIES.map((c) => (
+            <option key={c.value} value={c.value}>
+              {c.label}
+            </option>
+          ))}
+        </Select>
       </div>
 
       {/* Row 5: Description */}
-      <div>
-        <label className="text-surface-50 mb-1 block text-xs font-medium">
-          Description du colis
-        </label>
-        <textarea
-          className="bg-surface-700 placeholder:text-surface-200 focus:border-primary-500 focus:ring-primary-500/20 flex min-h-[56px] w-full rounded-lg border border-white/[0.08] px-3 py-2 text-sm text-neutral-100 focus:ring-2 focus:outline-none"
-          placeholder="Décrivez votre colis..."
-          rows={2}
-          {...register('description')}
-        />
-        {errors.description && (
-          <p className="text-error mt-0.5 text-[10px]">{errors.description.message}</p>
-        )}
-      </div>
+      <Textarea
+        label="Description du colis"
+        placeholder="Décrivez votre colis..."
+        rows={2}
+        error={errors.description?.message}
+        {...register('description')}
+      />
 
       {/* Row 6: Photos */}
       <div>
@@ -583,7 +559,7 @@ function ParcelSubForm({ onSuccess }: { onSuccess: () => void }) {
         type="number"
         step="0.5"
         placeholder="10"
-        className={compactInputCls}
+        className={compactCls}
         error={errors.budget_per_kg?.message}
         {...register('budget_per_kg', { setValueAs: (v: string) => (v === '' ? null : Number(v)) })}
       />

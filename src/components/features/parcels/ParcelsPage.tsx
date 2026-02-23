@@ -1,14 +1,16 @@
 'use client';
 
-import { Package, CaretDown } from '@phosphor-icons/react';
-import { Badge, Skeleton } from '@/components/ui';
+import { Package, CaretDown, CaretUp } from '@phosphor-icons/react';
+import { Badge, Select, Skeleton } from '@/components/ui';
 import { StaggerContainer, StaggerItem } from '@/components/ui/Motion';
 import { useParcels } from '@/lib/hooks';
 import { SUPPORTED_COUNTRIES, PARCEL_CATEGORIES, URGENCY_LEVELS } from '@/constants';
 import { ParcelCard } from './ParcelCard';
 
+const compactSelectCls = 'h-9 !rounded-lg';
+
 export function ParcelsPage() {
-  const { parcels, total, loading, updateFilters } = useParcels();
+  const { parcels, total, loading, filters, updateFilters } = useParcels();
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 md:px-7 lg:px-8">
@@ -21,46 +23,35 @@ export function ParcelsPage() {
       </div>
 
       {/* Filter row */}
-      <div className="mb-4 flex flex-wrap items-center gap-2">
-        {/* Departure country */}
-        <select
-          className="bg-surface-700 min-w-0 appearance-none rounded-lg border border-white/[0.08] px-2 py-1.5 pr-7 text-sm text-neutral-100"
-          onChange={(e) =>
-            updateFilters({
-              departure_country: e.target.value || undefined,
-            })
-          }
+      <div className="mb-4 flex flex-wrap items-end gap-2">
+        <Select
+          className={compactSelectCls}
+          onChange={(e) => updateFilters({ departure_country: e.target.value || undefined })}
           defaultValue=""
         >
-          <option value="">Depart</option>
+          <option value="">Départ</option>
           {SUPPORTED_COUNTRIES.map((c) => (
             <option key={c.code} value={c.code}>
               {c.flag} {c.name}
             </option>
           ))}
-        </select>
+        </Select>
 
-        {/* Arrival country */}
-        <select
-          className="bg-surface-700 min-w-0 appearance-none rounded-lg border border-white/[0.08] px-2 py-1.5 pr-7 text-sm text-neutral-100"
-          onChange={(e) =>
-            updateFilters({
-              arrival_country: e.target.value || undefined,
-            })
-          }
+        <Select
+          className={compactSelectCls}
+          onChange={(e) => updateFilters({ arrival_country: e.target.value || undefined })}
           defaultValue=""
         >
-          <option value="">Arrivee</option>
+          <option value="">Arrivée</option>
           {SUPPORTED_COUNTRIES.map((c) => (
             <option key={c.code} value={c.code}>
               {c.flag} {c.name}
             </option>
           ))}
-        </select>
+        </Select>
 
-        {/* Category */}
-        <select
-          className="bg-surface-700 min-w-0 appearance-none rounded-lg border border-white/[0.08] px-2 py-1.5 pr-7 text-sm text-neutral-100"
+        <Select
+          className={compactSelectCls}
           onChange={(e) =>
             updateFilters({
               category:
@@ -69,17 +60,16 @@ export function ParcelsPage() {
           }
           defaultValue=""
         >
-          <option value="">Categorie</option>
+          <option value="">Catégorie</option>
           {PARCEL_CATEGORIES.map((c) => (
             <option key={c.value} value={c.value}>
               {c.label}
             </option>
           ))}
-        </select>
+        </Select>
 
-        {/* Urgency */}
-        <select
-          className="bg-surface-700 min-w-0 appearance-none rounded-lg border border-white/[0.08] px-2 py-1.5 pr-7 text-sm text-neutral-100"
+        <Select
+          className={compactSelectCls}
           onChange={(e) =>
             updateFilters({
               urgency: (e.target.value as (typeof URGENCY_LEVELS)[number]['value']) || undefined,
@@ -93,27 +83,31 @@ export function ParcelsPage() {
               {u.label}
             </option>
           ))}
-        </select>
+        </Select>
 
         {/* Sort */}
         <div className="ml-auto flex shrink-0 items-center gap-2">
           <span className="text-surface-100 hidden text-sm sm:inline">Trier par</span>
-          <select
-            className="bg-surface-700 appearance-none rounded-lg border border-white/[0.08] px-2 py-1 pr-7 text-sm text-neutral-100"
+          <Select
+            className={compactSelectCls}
             onChange={(e) =>
-              updateFilters({
-                sort_by: e.target.value as 'created_at' | 'weight_kg',
-              })
+              updateFilters({ sort_by: e.target.value as 'created_at' | 'weight_kg' })
             }
           >
-            <option value="created_at">Plus recent</option>
+            <option value="created_at">Plus récent</option>
             <option value="weight_kg">Poids</option>
-          </select>
+          </Select>
           <button
-            className="text-surface-200 hover:text-neutral-100"
-            onClick={() => updateFilters({ sort_order: 'desc' })}
+            className="text-surface-200 hover:bg-surface-700 rounded-lg p-1.5 transition-colors hover:text-neutral-100"
+            onClick={() =>
+              updateFilters({ sort_order: filters.sort_order === 'desc' ? 'asc' : 'desc' })
+            }
           >
-            <CaretDown weight="bold" size={16} />
+            {filters.sort_order === 'desc' ? (
+              <CaretDown weight="bold" size={16} />
+            ) : (
+              <CaretUp weight="bold" size={16} />
+            )}
           </button>
         </div>
       </div>

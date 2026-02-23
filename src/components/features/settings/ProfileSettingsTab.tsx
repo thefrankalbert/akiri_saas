@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Button, Input } from '@/components/ui';
+import { Button, Input, Textarea } from '@/components/ui';
 import { updateProfileSchema, type UpdateProfileInput } from '@/lib/validations';
 import { toasts } from '@/lib/utils/toast';
 import { supabaseConfigured } from '@/lib/supabase/client';
@@ -102,20 +102,16 @@ export function ProfileSettingsTab({ profile }: ProfileSettingsTabProps) {
           {...register('phone')}
         />
 
-        <div>
-          <label className="text-surface-50 mb-1.5 block text-sm font-medium">Bio</label>
-          <textarea
-            placeholder="Décrivez-vous en quelques mots..."
-            className="bg-surface-700 placeholder:text-surface-200 focus:border-primary-500 focus:ring-primary-500 w-full rounded-lg border border-white/[0.08] px-3 py-2 text-sm text-neutral-100 focus:ring-1 focus:outline-none"
-            rows={3}
-            maxLength={500}
-            {...register('bio')}
-          />
-          <div className="mt-1 flex justify-end">
-            <span className="text-surface-200 text-xs">{bioValue.length}/500</span>
-          </div>
-          {errors.bio?.message && <p className="text-error mt-1 text-xs">{errors.bio.message}</p>}
-        </div>
+        <Textarea
+          label="Bio"
+          placeholder="Décrivez-vous en quelques mots..."
+          rows={3}
+          maxLength={500}
+          maxChars={500}
+          currentLength={bioValue.length}
+          error={errors.bio?.message}
+          {...register('bio')}
+        />
 
         <Button type="submit" isLoading={isSubmitting} className="w-full sm:w-auto">
           Enregistrer les modifications

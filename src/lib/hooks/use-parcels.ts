@@ -57,6 +57,17 @@ export function useParcels(initialFilters?: Partial<SearchParcelsInput>) {
           filtered = filtered.filter((p) => p.urgency === filters.urgency);
         }
 
+        // Sorting
+        const sortBy = filters.sort_by || 'created_at';
+        const desc = filters.sort_order === 'desc';
+        filtered.sort((a, b) => {
+          const aVal = a[sortBy as keyof ParcelPosting];
+          const bVal = b[sortBy as keyof ParcelPosting];
+          if (aVal == null || bVal == null) return 0;
+          const cmp = aVal < bVal ? -1 : aVal > bVal ? 1 : 0;
+          return desc ? -cmp : cmp;
+        });
+
         setState({
           parcels: filtered,
           total: filtered.length,

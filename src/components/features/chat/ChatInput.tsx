@@ -119,8 +119,9 @@ export function ChatInput({ onSendMessage, onTyping, disabled }: ChatInputProps)
           rows={1}
           className={cn(
             'bg-surface-700 placeholder:text-surface-200 flex-1 resize-none rounded-2xl border border-white/[0.08] px-4 py-2.5 text-sm text-neutral-100',
-            'focus:border-primary-500 focus:ring-primary-500 focus:ring-1 focus:outline-none',
-            'disabled:opacity-50'
+            'transition-all duration-150',
+            'focus:border-primary-500 focus:ring-primary-500/20 focus:ring-2 focus:outline-none',
+            'disabled:bg-surface-800 disabled:cursor-not-allowed disabled:opacity-40'
           )}
         />
 

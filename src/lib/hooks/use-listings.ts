@@ -39,12 +39,45 @@ export function useListings(initialFilters?: Partial<SearchListingsInput>) {
 
   // Fetch listings within the effect to satisfy React Compiler rules
   useEffect(() => {
-    // Skip when Supabase is not configured (local dev without env vars)
+    // Skip when Supabase is not configured — apply filters client-side on mock data
     if (!supabaseConfigured) {
       queueMicrotask(() => {
+        let filtered = [...mockListings];
+
+        // Apply filters
+        if (filters.departure_country) {
+          filtered = filtered.filter((l) => l.departure_country === filters.departure_country);
+        }
+        if (filters.arrival_country) {
+          filtered = filtered.filter((l) => l.arrival_country === filters.arrival_country);
+        }
+        if (filters.min_kg) {
+          filtered = filtered.filter((l) => l.available_kg >= (filters.min_kg ?? 0));
+        }
+        if (filters.max_price) {
+          filtered = filtered.filter((l) => l.price_per_kg <= (filters.max_price ?? Infinity));
+        }
+
+        // Sorting
+        const sortBy = filters.sort_by || 'departure_date';
+        const desc = filters.sort_order === 'desc';
+        filtered.sort((a, b) => {
+          const aVal = a[sortBy as keyof Listing];
+          const bVal = b[sortBy as keyof Listing];
+          if (aVal == null || bVal == null) return 0;
+          const cmp = aVal < bVal ? -1 : aVal > bVal ? 1 : 0;
+          return desc ? -cmp : cmp;
+        });
+
+        // Pagination
+        const page = filters.page || 1;
+        const perPage = filters.per_page || DEFAULT_PAGE_SIZE;
+        const start = (page - 1) * perPage;
+        const paginated = filtered.slice(start, start + perPage);
+
         setState({
-          listings: mockListings,
-          total: mockListings.length,
+          listings: paginated,
+          total: filtered.length,
           loading: false,
           error: null,
         });

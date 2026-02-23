@@ -15,6 +15,7 @@ import {
   ModalFooter,
   Button,
   Input,
+  Textarea,
 } from '@/components/ui';
 import { createRequestSchema, type CreateRequestInput } from '@/lib/validations';
 import { toasts } from '@/lib/utils/toast';
@@ -109,32 +110,20 @@ export function SendRequestModal({ listing, children }: SendRequestModalProps) {
             {...register('weight_kg', { valueAsNumber: true })}
           />
 
-          <div>
-            <label className="text-surface-50 mb-1.5 block text-sm font-medium">
-              Description du colis
-            </label>
-            <textarea
-              placeholder="Décrivez le contenu de votre colis..."
-              className="bg-surface-700 placeholder:text-surface-200 focus:border-primary-500 focus:ring-primary-500 w-full rounded-lg border border-white/[0.08] px-3 py-2 text-sm text-neutral-100 focus:ring-1 focus:outline-none"
-              rows={3}
-              {...register('item_description')}
-            />
-            {errors.item_description?.message && (
-              <p className="text-error mt-1 text-xs">{errors.item_description.message}</p>
-            )}
-          </div>
+          <Textarea
+            label="Description du colis"
+            placeholder="Décrivez le contenu de votre colis..."
+            rows={3}
+            error={errors.item_description?.message}
+            {...register('item_description')}
+          />
 
-          <div>
-            <label className="text-surface-50 mb-1.5 block text-sm font-medium">
-              Instructions spéciales
-            </label>
-            <textarea
-              placeholder="Consignes particulières (optionnel)"
-              className="bg-surface-700 placeholder:text-surface-200 focus:border-primary-500 focus:ring-primary-500 w-full rounded-lg border border-white/[0.08] px-3 py-2 text-sm text-neutral-100 focus:ring-1 focus:outline-none"
-              rows={2}
-              {...register('special_instructions')}
-            />
-          </div>
+          <Textarea
+            label="Instructions spéciales"
+            placeholder="Consignes particulières (optionnel)"
+            rows={2}
+            {...register('special_instructions')}
+          />
 
           {/* Dynamic price */}
           <div className="bg-surface-700 flex items-center justify-between gap-3 rounded-xl border border-white/[0.08] px-4 py-3">

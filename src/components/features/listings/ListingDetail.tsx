@@ -13,11 +13,7 @@ import {
   Clock,
   CheckCircle,
 } from '@phosphor-icons/react';
-import { Button } from '@/components/ui';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui';
-import { Badge } from '@/components/ui';
-import { Avatar } from '@/components/ui';
-import { Skeleton } from '@/components/ui';
+import { Button, Card, CardContent, Badge, Avatar, Skeleton } from '@/components/ui';
 import { SendRequestModal } from '@/components/features/requests/SendRequestModal';
 import { createClient, supabaseConfigured } from '@/lib/supabase/client';
 import type { Listing } from '@/types';
@@ -113,11 +109,11 @@ export function ListingDetail({ listingId }: ListingDetailProps) {
         Retour aux annonces
       </Link>
 
-      <div className="grid gap-6 md:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-3">
         {/* Main content */}
         <div className="md:col-span-2">
-          <Card>
-            <CardContent className="p-6">
+          <Card padding="none">
+            <CardContent className="p-5">
               {/* Route */}
               <div className="flex items-center gap-3">
                 <MapPin className="text-primary-400 shrink-0" size={20} />
@@ -133,7 +129,7 @@ export function ListingDetail({ listingId }: ListingDetailProps) {
               </div>
 
               {/* Date & Status */}
-              <div className="mt-4 flex flex-wrap gap-3">
+              <div className="mt-4 flex flex-wrap gap-2">
                 <Badge variant="info" size="md">
                   <CalendarBlank className="mr-1" size={14} />
                   {formatDate(listing.departure_date)}
@@ -144,27 +140,27 @@ export function ListingDetail({ listingId }: ListingDetailProps) {
               </div>
 
               {/* Key info */}
-              <div className="mt-6 grid grid-cols-2 gap-4">
-                <div className="bg-surface-700 rounded-xl p-4 text-center">
-                  <Package className="text-primary-400 mx-auto" size={24} />
-                  <p className="mt-2 font-mono text-xl font-bold text-neutral-100 sm:text-2xl">
+              <div className="mt-5 grid grid-cols-2 gap-3">
+                <div className="bg-surface-700 rounded-xl px-3 py-3 text-center">
+                  <Package className="text-primary-400 mx-auto" size={20} />
+                  <p className="mt-1 font-mono text-lg font-bold text-neutral-100">
                     {listing.available_kg} kg
                   </p>
-                  <p className="text-surface-100 text-sm">disponibles</p>
+                  <p className="text-surface-100 text-xs">disponibles</p>
                 </div>
-                <div className="bg-surface-700 rounded-xl p-4 text-center">
-                  <span className="text-primary-400 font-mono text-xl font-bold sm:text-2xl">
+                <div className="bg-surface-700 rounded-xl px-3 py-3 text-center">
+                  <span className="text-primary-400 font-mono text-lg font-bold">
                     {formatCurrency(listing.price_per_kg)}
                   </span>
-                  <p className="text-surface-100 text-sm">par kilo</p>
+                  <p className="text-surface-100 text-xs">par kilo</p>
                 </div>
               </div>
 
               {/* Description */}
               {listing.description && (
-                <div className="mt-6">
+                <div className="mt-5">
                   <h3 className="text-surface-50 text-sm font-semibold">Description</h3>
-                  <p className="text-surface-100 mt-2 text-sm leading-relaxed">
+                  <p className="text-surface-100 mt-1.5 text-sm leading-relaxed">
                     {listing.description}
                   </p>
                 </div>
@@ -172,9 +168,9 @@ export function ListingDetail({ listingId }: ListingDetailProps) {
 
               {/* Accepted items */}
               {listing.accepted_items.length > 0 && (
-                <div className="mt-6">
+                <div className="mt-5">
                   <h3 className="text-surface-50 text-sm font-semibold">Articles acceptés</h3>
-                  <div className="mt-2 flex flex-wrap gap-2">
+                  <div className="mt-1.5 flex flex-wrap gap-1.5">
                     {listing.accepted_items.map((item) => (
                       <Badge key={item} variant="outline">
                         <CheckCircle className="text-success mr-1" size={12} />
@@ -187,9 +183,9 @@ export function ListingDetail({ listingId }: ListingDetailProps) {
 
               {/* Collection points */}
               {listing.collection_points.length > 0 && (
-                <div className="mt-6">
+                <div className="mt-5">
                   <h3 className="text-surface-50 text-sm font-semibold">Points de collecte</h3>
-                  <ul className="mt-2 space-y-1">
+                  <ul className="mt-1.5 space-y-1">
                     {listing.collection_points.map((point, i) => (
                       <li key={i} className="text-surface-100 flex items-center gap-2 text-sm">
                         <MapPin className="text-surface-200" size={14} />
@@ -201,7 +197,7 @@ export function ListingDetail({ listingId }: ListingDetailProps) {
               )}
 
               {/* Published date */}
-              <div className="mt-6 border-t border-white/[0.06] pt-4">
+              <div className="mt-5 border-t border-white/[0.06] pt-3">
                 <p className="text-surface-200 flex items-center gap-1 text-xs">
                   <Clock size={14} />
                   Publiée {formatRelativeDate(listing.created_at)}
@@ -212,14 +208,11 @@ export function ListingDetail({ listingId }: ListingDetailProps) {
         </div>
 
         {/* Sidebar */}
-        <div className="space-y-4">
-          {/* Price summary */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Résumé</CardTitle>
-            </CardHeader>
-            <CardContent className="p-6 pt-0">
-              <div className="space-y-3">
+        <div className="space-y-3">
+          {/* Price summary + CTA + Trust — single compact card */}
+          <Card padding="none">
+            <CardContent className="p-4">
+              <div className="space-y-2.5">
                 <div className="flex justify-between text-sm">
                   <span className="text-surface-100">Prix par kg</span>
                   <span className="font-medium text-neutral-100">
@@ -230,9 +223,9 @@ export function ListingDetail({ listingId }: ListingDetailProps) {
                   <span className="text-surface-100">Kilos disponibles</span>
                   <span className="font-medium text-neutral-100">{listing.available_kg} kg</span>
                 </div>
-                <div className="border-t border-white/[0.06] pt-3">
+                <div className="border-t border-white/[0.06] pt-2.5">
                   <div className="flex justify-between">
-                    <span className="text-surface-50 font-medium">Total max</span>
+                    <span className="text-surface-50 text-sm font-medium">Total max</span>
                     <span className="text-primary-400 font-mono text-lg font-bold">
                       {formatCurrency(totalCost)}
                     </span>
@@ -240,82 +233,76 @@ export function ListingDetail({ listingId }: ListingDetailProps) {
                 </div>
               </div>
 
-              <div className="mt-5 flex flex-col gap-3">
+              <div className="mt-4 flex flex-col gap-2">
                 <SendRequestModal listing={listing}>
-                  <Button className="w-full" size="lg">
-                    Envoyer une demande
-                  </Button>
+                  <Button className="w-full">Envoyer une demande</Button>
                 </SendRequestModal>
                 <Link href="/messages" className="block">
-                  <Button variant="outline" className="w-full" leftIcon={<ChatCircle size={16} />}>
-                    Contacter le voyageur
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    size="sm"
+                    leftIcon={<ChatCircle size={14} />}
+                  >
+                    Contacter
                   </Button>
                 </Link>
+              </div>
+
+              {/* Trust badges inline */}
+              <div className="mt-3 space-y-1.5 border-t border-white/[0.06] pt-3">
+                <div className="text-surface-200 flex items-center gap-1.5 text-xs">
+                  <ShieldCheck className="text-success shrink-0" size={14} />
+                  Paiement sécurisé par Stripe
+                </div>
+                <div className="text-surface-200 flex items-center gap-1.5 text-xs">
+                  <ShieldCheck className="text-success shrink-0" size={14} />
+                  Argent bloqué jusqu&apos;à la livraison
+                </div>
               </div>
             </CardContent>
           </Card>
 
-          {/* Traveler card */}
+          {/* Traveler card — compact */}
           {listing.traveler && (
-            <Card>
-              <CardContent className="p-6">
+            <Card padding="none">
+              <CardContent className="p-4">
                 <div className="flex items-center gap-3">
                   <Avatar
                     src={listing.traveler.avatar_url}
                     firstName={listing.traveler.first_name}
                     lastName={listing.traveler.last_name}
-                    size="lg"
+                    size="md"
                     isVerified={listing.traveler.is_verified}
                   />
-                  <div>
-                    <p className="font-semibold text-neutral-100">
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-semibold text-neutral-100">
                       {listing.traveler.first_name} {listing.traveler.last_name}
                     </p>
-                    {listing.traveler.rating > 0 && (
-                      <div className="flex items-center gap-1">
-                        <Star className="fill-accent-500 text-accent-500" size={16} />
-                        <span className="text-sm font-medium text-neutral-100">
-                          {listing.traveler.rating.toFixed(1)}
-                        </span>
-                        <span className="text-surface-200 text-xs">
-                          ({listing.traveler.total_reviews} avis)
-                        </span>
-                      </div>
-                    )}
+                    <div className="flex items-center gap-2">
+                      {listing.traveler.rating > 0 && (
+                        <div className="flex items-center gap-1">
+                          <Star className="fill-accent-500 text-accent-500" size={13} />
+                          <span className="text-xs font-medium text-neutral-100">
+                            {listing.traveler.rating.toFixed(1)}
+                          </span>
+                        </div>
+                      )}
+                      <span className="text-surface-300 text-xs">
+                        {listing.traveler.total_trips} trajets · {listing.traveler.total_shipments}{' '}
+                        envois
+                      </span>
+                    </div>
                   </div>
+                  <Link href={`/profil/${listing.traveler.user_id}`}>
+                    <Button variant="ghost" size="sm">
+                      Profil
+                    </Button>
+                  </Link>
                 </div>
-                <div className="mt-4 grid grid-cols-2 gap-2 text-center text-xs">
-                  <div className="bg-surface-700 rounded-lg p-2">
-                    <p className="font-bold text-neutral-100">{listing.traveler.total_trips}</p>
-                    <p className="text-surface-100">trajets</p>
-                  </div>
-                  <div className="bg-surface-700 rounded-lg p-2">
-                    <p className="font-bold text-neutral-100">{listing.traveler.total_shipments}</p>
-                    <p className="text-surface-100">envois</p>
-                  </div>
-                </div>
-                <Link href={`/profil/${listing.traveler.user_id}`} className="mt-3 block">
-                  <Button variant="ghost" className="w-full" size="sm">
-                    Voir le profil
-                  </Button>
-                </Link>
               </CardContent>
             </Card>
           )}
-
-          {/* Trust */}
-          <Card>
-            <CardContent className="space-y-2 p-4">
-              <div className="text-surface-100 flex items-center gap-2 text-sm">
-                <ShieldCheck className="text-success" size={16} />
-                Paiement sécurisé par Stripe
-              </div>
-              <div className="text-surface-100 flex items-center gap-2 text-sm">
-                <ShieldCheck className="text-success" size={16} />
-                Argent bloqué jusqu&apos;à la livraison
-              </div>
-            </CardContent>
-          </Card>
         </div>
       </div>
     </div>

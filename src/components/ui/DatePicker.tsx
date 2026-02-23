@@ -56,15 +56,17 @@ export function DatePicker({
 
   return (
     <div ref={ref} className={cn('relative', className)}>
-      {label && <label className="text-surface-50 mb-1.5 block text-sm font-medium">{label}</label>}
+      {label && <label className="text-surface-50 mb-2 block text-sm font-medium">{label}</label>}
       <button
         type="button"
         disabled={disabled}
         onClick={() => setOpen(!open)}
         className={cn(
-          'bg-surface-700 flex h-10 w-full items-center gap-2 rounded-xl border px-3 text-sm transition-colors',
-          error ? 'border-error' : 'focus:border-primary-500 border-white/[0.08]',
-          disabled && 'cursor-not-allowed opacity-50',
+          'bg-surface-700 flex h-12 w-full items-center gap-2 rounded-xl border px-4 text-sm',
+          'transition-all duration-150',
+          'focus:border-primary-500 focus:ring-primary-500/20 focus:ring-2 focus:outline-none',
+          'disabled:bg-surface-800 disabled:cursor-not-allowed disabled:opacity-40',
+          error ? 'border-error ring-error/20 ring-2' : 'border-white/[0.08]',
           selected ? 'text-neutral-100' : 'text-surface-200'
         )}
       >
@@ -104,7 +106,7 @@ export function DatePicker({
         </div>
       )}
 
-      {error && <p className="text-error mt-1 text-xs">{error}</p>}
+      {error && <p className="text-error mt-1.5 text-xs">{error}</p>}
     </div>
   );
 }
