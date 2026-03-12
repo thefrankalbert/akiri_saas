@@ -19,10 +19,10 @@ Akiri is a collaborative parcel transport marketplace for the African diaspora. 
 | CI/CD | None — relies on Vercel auto-deploy |
 | Services | 14 service files, stateless functions, direct Supabase imports |
 | Error handling | `apiError()`/`apiSuccess()` helpers in routes — good but ad-hoc in services |
-| Tests | 5 test files (Vitest), coverage on 5 files only |
+| Tests | Vitest configured, limited coverage (transactions, verification, utils, validations, constants) |
 | Logging | `console.*` throughout |
 | Middleware | Auth + rate limiting via Upstash Redis — functional |
-| API Routes | 43 routes, manual error checking on service return values |
+| API Routes | 38 routes, manual error checking on service return values |
 
 ### Target State
 
@@ -66,7 +66,7 @@ typecheck → lint → format:check → test → build
 - `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`
 
 ### Package.json addition
-- Add `"format:check": "prettier --check ."` script if not present
+- Add `"format:check": "prettier --check \"src/**/*.{ts,tsx,css,json}\""` to match existing `format` script scope
 
 ---
 
@@ -135,6 +135,10 @@ export function serviceErrorToStatus(code: ServiceErrorCode): number {
 - Error messages remain in French (user-facing)
 - `details` field holds technical context (logged, never sent to client)
 
+### 401 vs 403 distinction
+- **401 (Unauthenticated)**: Handled in the route layer via `getAuthUser()` check *before* calling services. Services never need to signal "not logged in".
+- **403 (Forbidden)**: Signaled by services via `ServiceError` with code `AUTH` when a logged-in user lacks permission (e.g., non-admin accessing admin endpoints, user accessing another user's data).
+
 ### Coexistence with existing helpers
 - `apiError()` / `apiSuccess()` / `parseBody()` / `getAuthUser()` remain unchanged
 - `ServiceError` is the service-layer mechanism; `apiError` is the route-layer response builder
@@ -145,13 +149,15 @@ export function serviceErrorToStatus(code: ServiceErrorCode): number {
 
 ### Pattern
 
-Every service file converts from stateless exported functions to a factory that accepts `SupabaseClient`:
+Every service file converts from stateless exported functions to a factory that accepts injected dependencies:
 
 ```typescript
 // Before
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 export async function doSomething(id: string) {
   const supabase = await createClient();
+  const admin = createAdminClient();
   // ...
 }
 
@@ -170,6 +176,41 @@ export function createSomethingService(supabase: SupabaseClient) {
   };
 }
 ```
+
+### Dual-client pattern (user-scoped vs admin)
+
+Some services use both `createClient()` (user-scoped, respects RLS) and `createAdminClient()` (service-role, bypasses RLS). The factory handles this by accepting both when needed:
+
+```typescript
+// Services that only need user-scoped access
+export function createListingsService(supabase: SupabaseClient) { ... }
+
+// Services that need admin access (e.g., inserts bypassing RLS, cross-user queries)
+export function createTransactionService(
+  supabase: SupabaseClient,
+  adminSupabase: SupabaseClient,
+  stripe: Stripe,
+) { ... }
+
+// In the API route:
+const supabase = await createClient();
+const adminSupabase = createAdminClient();
+const stripe = getStripe();
+const service = createTransactionService(supabase, adminSupabase, stripe);
+```
+
+Services requiring `adminSupabase`: `transactions`, `verification`, `admin`, `notifications`.
+All other services receive only user-scoped `supabase`.
+
+### External dependencies (Stripe, email)
+
+- **Stripe**: Injected as parameter for `transactions` service (replaces all `getStripe()` calls)
+- **Email**: Remains as module import (`vi.mock('@/lib/email')` in tests). Email functions are pure side effects with no state — DI adds complexity without testability benefit here.
+- **`process.env`**: Acceptable inside services for config values (URLs, feature flags). Use `vi.stubEnv()` in tests when needed.
+
+### Incremental migration and coexistence
+
+Old-pattern (bare functions) and new-pattern (factories) coexist during migration. Each phase migrates a group of services and their corresponding routes atomically. The barrel export (`index.ts`) is updated per phase to re-export factories instead of bare functions. Unmigrated services continue to work as-is until their phase.
 
 ### Migration order (by business criticality)
 
@@ -242,7 +283,7 @@ Vitest (already configured). Extend `vitest.config.ts` coverage to include all s
 
 ## 6. API Route Updates
 
-### Pattern (uniform across all 43 routes)
+### Pattern (uniform across all 38 routes)
 
 ```typescript
 export async function POST(request: NextRequest) {
