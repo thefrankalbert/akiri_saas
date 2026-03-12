@@ -157,7 +157,7 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 export async function doSomething(id: string) {
   const supabase = await createClient();
-  const admin = createAdminClient();
+  const admin = await createAdminClient();
   // ...
 }
 
@@ -194,7 +194,7 @@ export function createTransactionService(
 
 // In the API route:
 const supabase = await createClient();
-const adminSupabase = createAdminClient();
+const adminSupabase = await createAdminClient();
 const stripe = getStripe();
 const service = createTransactionService(supabase, adminSupabase, stripe);
 ```
@@ -230,15 +230,19 @@ Old-pattern (bare functions) and new-pattern (factories) coexist during migratio
 - [ ] Write tests (see Section 5)
 
 ### Services with Stripe dependency
-`transactions.ts` also depends on Stripe. The factory accepts both:
+`transactions.ts` also depends on Stripe. See the dual-client section above for the full signature:
 
 ```typescript
-export function createTransactionService(supabase: SupabaseClient, stripe: Stripe) {
+export function createTransactionService(
+  supabase: SupabaseClient,
+  adminSupabase: SupabaseClient,
+  stripe: Stripe,
+) {
   return { ... };
 }
 ```
 
-This makes Stripe mockable in tests as well.
+This makes both Supabase clients and Stripe mockable in tests.
 
 ---
 
