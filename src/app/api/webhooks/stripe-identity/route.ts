@@ -20,7 +20,7 @@ export async function POST(request: Request) {
   const webhookSecret = process.env.STRIPE_IDENTITY_WEBHOOK_SECRET;
 
   if (!webhookSecret) {
-    console.error('Missing STRIPE_IDENTITY_WEBHOOK_SECRET environment variable');
+    logger.error('Missing STRIPE_IDENTITY_WEBHOOK_SECRET environment variable');
     return NextResponse.json({ error: 'Webhook not configured' }, { status: 500 });
   }
 
@@ -29,7 +29,7 @@ export async function POST(request: Request) {
   try {
     event = getStripe().webhooks.constructEvent(body, signature, webhookSecret);
   } catch (err) {
-    console.error('Webhook signature verification failed:', err);
+    logger.error('Webhook signature verification failed:', err);
     return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
   }
 

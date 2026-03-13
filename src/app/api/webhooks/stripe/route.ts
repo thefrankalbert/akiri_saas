@@ -8,6 +8,7 @@ import { createAdminClient } from '@/lib/supabase/server';
 import { createNotification } from '@/lib/services/notifications';
 import { sendConfirmationCodeEmail, sendPaymentEmail } from '@/lib/email';
 import type Stripe from 'stripe';
+import { logger } from '@/lib/logger';
 
 export async function POST(request: Request) {
   const rawBody = await request.text();
@@ -27,7 +28,7 @@ export async function POST(request: Request) {
     );
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Webhook signature verification failed';
-    console.error('Stripe webhook error:', message);
+    logger.error('Stripe webhook error:', message);
     return NextResponse.json({ error: message }, { status: 400 });
   }
 
@@ -208,7 +209,7 @@ export async function POST(request: Request) {
       // Unhandled event type — no action needed
     }
   } catch (err) {
-    console.error('Stripe webhook processing error:', err);
+    logger.error('Stripe webhook processing error:', err);
     // Still return 200 to prevent Stripe from retrying
   }
 
