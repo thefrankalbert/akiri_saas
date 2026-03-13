@@ -149,11 +149,13 @@ export function createListingsService(supabase: SupabaseClient) {
         .update({ status: 'cancelled', updated_at: new Date().toISOString() })
         .eq('id', id)
         .eq('traveler_id', travelerId)
-        .eq('status', 'active');
+        .eq('status', 'active')
+        .select()
+        .single();
 
       if (error) {
         if (error.code === 'PGRST116') {
-          throw new ServiceError('Non autorisé à annuler cette annonce', 'AUTH');
+          throw new ServiceError('Annonce introuvable ou non autorisé', 'NOT_FOUND');
         }
         logger.error("cancelListing: erreur lors de l'annulation", error);
         throw new ServiceError(error.message, 'VALIDATION', error);

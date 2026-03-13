@@ -5,6 +5,8 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import type { ZodType } from 'zod/v4';
+import { ServiceError, serviceErrorToStatus } from '@/lib/services/errors';
+import { logger } from '@/lib/logger';
 
 /**
  * Get the authenticated user from the request
@@ -50,6 +52,25 @@ export async function parseBody<T>(request: Request, schema: ZodType<T>): Promis
     return result.data;
   } catch {
     return null;
+  }
+}
+
+/**
+ * Wrap a route handler with standardized ServiceError handling.
+ * Eliminates repeated try/catch boilerplate across all API routes.
+ */
+export async function withServiceHandler(
+  routeLabel: string,
+  fn: () => Promise<NextResponse>
+): Promise<NextResponse> {
+  try {
+    return await fn();
+  } catch (error) {
+    if (error instanceof ServiceError) {
+      return apiError(error.message, serviceErrorToStatus(error.code));
+    }
+    logger.error(routeLabel, error);
+    return apiError('Erreur interne', 500);
   }
 }
 

@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { createMockSupabase, asSupabase } from './helpers';
-import { createRequestService, calculateFee } from '@/lib/services/requests';
+import { createRequestService } from '@/lib/services/requests';
+import { calculateTransactionFees } from '@/lib/utils';
 import { ServiceError } from '@/lib/services/errors';
 
 vi.mock('@/lib/logger', () => ({
@@ -543,27 +544,27 @@ describe('Request Service', () => {
 // ============================================
 // Pure utility function tests
 // ============================================
-describe('calculateFee', () => {
+describe('calculateTransactionFees', () => {
   it('calculates 10% fee on 100', () => {
-    const { platformFee, travelerPayout } = calculateFee(100);
+    const { platformFee, payoutAmount } = calculateTransactionFees(100);
     expect(platformFee).toBe(10);
-    expect(travelerPayout).toBe(90);
+    expect(payoutAmount).toBe(90);
   });
 
   it('calculates 10% fee on 50', () => {
-    const { platformFee, travelerPayout } = calculateFee(50);
+    const { platformFee, payoutAmount } = calculateTransactionFees(50);
     expect(platformFee).toBe(5);
-    expect(travelerPayout).toBe(45);
+    expect(payoutAmount).toBe(45);
   });
 
   it('rounds correctly for 33.33', () => {
-    const { platformFee } = calculateFee(33.33);
+    const { platformFee } = calculateTransactionFees(33.33);
     expect(platformFee).toBe(3.33);
   });
 
   it('handles 0', () => {
-    const { platformFee, travelerPayout } = calculateFee(0);
+    const { platformFee, payoutAmount } = calculateTransactionFees(0);
     expect(platformFee).toBe(0);
-    expect(travelerPayout).toBe(0);
+    expect(payoutAmount).toBe(0);
   });
 });

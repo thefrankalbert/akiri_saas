@@ -436,7 +436,7 @@ export function createRequestService(
     const notifyUserId = isSender ? request.listing.traveler_id : request.sender_id;
     await createNotification(
       notifyUserId,
-      'request_accepted', // Closest type — ideally we'd add 'request_cancelled'
+      'request_cancelled',
       'Demande annulée',
       isSender
         ? "L'expéditeur a annulé sa demande de transport."
@@ -499,7 +499,7 @@ export function createRequestService(
     const notifyUserId = isSender ? request.listing.traveler_id : request.sender_id;
     await createNotification(
       notifyUserId,
-      'request_accepted', // Closest type
+      'dispute_opened',
       'Litige ouvert',
       `Un litige a été ouvert sur votre demande de transport. Raison : ${reason}`,
       { request_id: requestId, reason }
@@ -564,20 +564,22 @@ export function createRequestService(
         .eq('id', request.listing_id);
 
       // Notify both parties
-      await createNotification(
-        request.sender_id,
-        'delivery_confirmed',
-        'Litige résolu — Remboursement',
-        'Le litige a été résolu en votre faveur. Vous serez remboursé.',
-        { request_id: requestId }
-      );
-      await createNotification(
-        request.listing.traveler_id,
-        'delivery_confirmed',
-        'Litige résolu — Remboursement',
-        "Le litige a été résolu. L'expéditeur sera remboursé.",
-        { request_id: requestId }
-      );
+      await Promise.all([
+        createNotification(
+          request.sender_id,
+          'delivery_confirmed',
+          'Litige résolu — Remboursement',
+          'Le litige a été résolu en votre faveur. Vous serez remboursé.',
+          { request_id: requestId }
+        ),
+        createNotification(
+          request.listing.traveler_id,
+          'delivery_confirmed',
+          'Litige résolu — Remboursement',
+          "Le litige a été résolu. L'expéditeur sera remboursé.",
+          { request_id: requestId }
+        ),
+      ]);
 
       return data as ShipmentRequest;
     }
@@ -600,20 +602,22 @@ export function createRequestService(
 
     if (error) throw new ServiceError(error.message, 'VALIDATION');
 
-    await createNotification(
-      request.listing.traveler_id,
-      'delivery_confirmed',
-      'Litige résolu — Paiement libéré',
-      'Le litige a été résolu en votre faveur. Votre paiement va être libéré.',
-      { request_id: requestId }
-    );
-    await createNotification(
-      request.sender_id,
-      'delivery_confirmed',
-      'Litige résolu — Paiement libéré',
-      'Le litige a été résolu. Le paiement a été libéré au voyageur.',
-      { request_id: requestId }
-    );
+    await Promise.all([
+      createNotification(
+        request.listing.traveler_id,
+        'delivery_confirmed',
+        'Litige résolu — Paiement libéré',
+        'Le litige a été résolu en votre faveur. Votre paiement va être libéré.',
+        { request_id: requestId }
+      ),
+      createNotification(
+        request.sender_id,
+        'delivery_confirmed',
+        'Litige résolu — Paiement libéré',
+        'Le litige a été résolu. Le paiement a été libéré au voyageur.',
+        { request_id: requestId }
+      ),
+    ]);
 
     return data as ShipmentRequest;
   }
@@ -661,17 +665,4 @@ export function createRequestService(
     getRequestsByListing,
     getRequestsBySender,
   };
-}
-
-// ============================================
-// Pure utility function — standalone export
-// ============================================
-
-export function calculateFee(totalPrice: number): {
-  platformFee: number;
-  travelerPayout: number;
-} {
-  const platformFee = Math.round(totalPrice * (PLATFORM_FEE_PERCENT / 100) * 100) / 100;
-  const travelerPayout = Math.round((totalPrice - platformFee) * 100) / 100;
-  return { platformFee, travelerPayout };
 }

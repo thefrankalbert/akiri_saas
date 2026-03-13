@@ -42,43 +42,43 @@ export function createAdminService(supabase: SupabaseClient, adminSupabase: Supa
       pendingVerifications: number;
       revenue: number;
     }> {
-      const [users, listings, requests, transactions, disputes, verifications] = await Promise.all([
-        adminSupabase.from('profiles').select('*', { count: 'exact', head: true }),
-        adminSupabase.from('listings').select('*', { count: 'exact', head: true }),
-        adminSupabase.from('shipment_requests').select('*', { count: 'exact', head: true }),
-        adminSupabase.from('transactions').select('*', { count: 'exact', head: true }),
-        adminSupabase
-          .from('shipment_requests')
-          .select('*', { count: 'exact', head: true })
-          .eq('status', 'disputed'),
-        adminSupabase
-          .from('profiles')
-          .select('*', { count: 'exact', head: true })
-          .eq('id_verification_status', 'pending'),
-      ]);
+      const [users, listings, requests, transactions, disputes, verifications, revenueResult] =
+        await Promise.all([
+          adminSupabase.from('profiles').select('*', { count: 'exact', head: true }),
+          adminSupabase.from('listings').select('*', { count: 'exact', head: true }),
+          adminSupabase.from('shipment_requests').select('*', { count: 'exact', head: true }),
+          adminSupabase.from('transactions').select('*', { count: 'exact', head: true }),
+          adminSupabase
+            .from('shipment_requests')
+            .select('*', { count: 'exact', head: true })
+            .eq('status', 'disputed'),
+          adminSupabase
+            .from('profiles')
+            .select('*', { count: 'exact', head: true })
+            .eq('id_verification_status', 'pending'),
+          adminSupabase.from('transactions').select('platform_fee').eq('status', 'completed'),
+        ]);
 
       // Check for errors in any of the queries
-      const queryError = [users, listings, requests, transactions, disputes, verifications].find(
-        (r) => r.error
-      )?.error;
+      const queryError = [
+        users,
+        listings,
+        requests,
+        transactions,
+        disputes,
+        verifications,
+        revenueResult,
+      ].find((r) => r.error)?.error;
 
       if (queryError) {
         logger.error('Failed to fetch admin stats', queryError);
         throw new ServiceError('Failed to fetch admin statistics', 'INTERNAL');
       }
 
-      // Calculate total revenue (platform fees)
-      const { data: txData, error: txError } = await adminSupabase
-        .from('transactions')
-        .select('platform_fee')
-        .eq('status', 'completed');
-
-      if (txError) {
-        logger.error('Failed to fetch revenue data', txError);
-        throw new ServiceError('Failed to fetch revenue data', 'INTERNAL');
-      }
-
-      const revenue = (txData || []).reduce((sum, t) => sum + Number(t.platform_fee || 0), 0);
+      const revenue = (revenueResult.data || []).reduce(
+        (sum, t) => sum + Number(t.platform_fee || 0),
+        0
+      );
 
       return {
         totalUsers: users.count || 0,

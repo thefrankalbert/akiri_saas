@@ -209,17 +209,27 @@ describe('createListingsService', () => {
   describe('cancelListing', () => {
     it('cancels a listing with ownership and status check', async () => {
       const chain = mock._getChain('listings');
-      // .eq('id').eq('traveler_id').eq('status') — 3 calls, last resolves
-      chain.eq
-        .mockReturnValueOnce(chain) // eq('id', ...)
-        .mockReturnValueOnce(chain) // eq('traveler_id', ...)
-        .mockResolvedValueOnce({ error: null }); // eq('status', 'active')
+      chain.single.mockResolvedValueOnce({ data: { id: 'l-1' }, error: null });
 
       await service.cancelListing('l-1', 'user-1');
 
       expect(chain.update).toHaveBeenCalled();
       expect(chain.eq).toHaveBeenCalledWith('id', 'l-1');
       expect(chain.eq).toHaveBeenCalledWith('traveler_id', 'user-1');
+    });
+
+    it('throws NOT_FOUND when listing not found or not owner', async () => {
+      const chain = mock._getChain('listings');
+      chain.single.mockResolvedValueOnce({
+        data: null,
+        error: { code: 'PGRST116', message: 'no rows' },
+      });
+
+      try {
+        await service.cancelListing('l-1', 'wrong-user');
+      } catch (e) {
+        expect((e as ServiceError).code).toBe('NOT_FOUND');
+      }
     });
   });
 

@@ -48,7 +48,7 @@ describe('createMatchingService', () => {
         },
       ];
 
-      mock._getChain('listings').gte.mockResolvedValue({
+      mock._getChain('listings').limit.mockResolvedValue({
         data: listings,
         error: null,
       });
@@ -63,7 +63,7 @@ describe('createMatchingService', () => {
     });
 
     it('returns empty array when no listings found', async () => {
-      mock._getChain('listings').gte.mockResolvedValue({
+      mock._getChain('listings').limit.mockResolvedValue({
         data: null,
         error: null,
       });
@@ -82,7 +82,7 @@ describe('createMatchingService', () => {
         price_per_kg: 8,
       }));
 
-      mock._getChain('listings').gte.mockResolvedValue({
+      mock._getChain('listings').limit.mockResolvedValue({
         data: listings,
         error: null,
       });
@@ -92,7 +92,7 @@ describe('createMatchingService', () => {
     });
 
     it('throws ServiceError on database error', async () => {
-      mock._getChain('listings').gte.mockResolvedValue({
+      mock._getChain('listings').limit.mockResolvedValue({
         data: null,
         error: { message: 'DB error' },
       });
@@ -132,12 +132,10 @@ describe('createMatchingService', () => {
         },
       ];
 
-      const chain = mock._getChain('parcel_postings');
-      // .eq('status').eq('departure_country').eq('arrival_country') — 3 calls
-      chain.eq
-        .mockReturnValueOnce(chain)
-        .mockReturnValueOnce(chain)
-        .mockResolvedValueOnce({ data: parcels, error: null });
+      mock._getChain('parcel_postings').limit.mockResolvedValueOnce({
+        data: parcels,
+        error: null,
+      });
 
       const result = await service.findMatchingParcels(listing as any);
 
@@ -147,11 +145,10 @@ describe('createMatchingService', () => {
     });
 
     it('returns empty array when no parcels found', async () => {
-      const chain = mock._getChain('parcel_postings');
-      chain.eq
-        .mockReturnValueOnce(chain)
-        .mockReturnValueOnce(chain)
-        .mockResolvedValueOnce({ data: null, error: null });
+      mock._getChain('parcel_postings').limit.mockResolvedValueOnce({
+        data: null,
+        error: null,
+      });
 
       const result = await service.findMatchingParcels(listing as any);
       expect(result).toEqual([]);
@@ -167,22 +164,20 @@ describe('createMatchingService', () => {
         budget_per_kg: 10,
       }));
 
-      const chain = mock._getChain('parcel_postings');
-      chain.eq
-        .mockReturnValueOnce(chain)
-        .mockReturnValueOnce(chain)
-        .mockResolvedValueOnce({ data: parcels, error: null });
+      mock._getChain('parcel_postings').limit.mockResolvedValueOnce({
+        data: parcels,
+        error: null,
+      });
 
       const result = await service.findMatchingParcels(listing as any);
       expect(result.length).toBe(5);
     });
 
     it('throws ServiceError on database error', async () => {
-      const chain = mock._getChain('parcel_postings');
-      chain.eq
-        .mockReturnValueOnce(chain)
-        .mockReturnValueOnce(chain)
-        .mockResolvedValueOnce({ data: null, error: { message: 'DB error' } });
+      mock._getChain('parcel_postings').limit.mockResolvedValueOnce({
+        data: null,
+        error: { message: 'DB error' },
+      });
 
       await expect(service.findMatchingParcels(listing as any)).rejects.toThrow(ServiceError);
     });

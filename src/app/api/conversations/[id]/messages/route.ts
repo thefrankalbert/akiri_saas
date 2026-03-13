@@ -1,16 +1,14 @@
 import { NextRequest } from 'next/server';
-import { getAuthUser, apiError, apiSuccess } from '@/lib/api/helpers';
+import { getAuthUser, apiError, apiSuccess, withServiceHandler } from '@/lib/api/helpers';
 import { createClient } from '@/lib/supabase/server';
 import { createMessagesService } from '@/lib/services/messages';
-import { ServiceError, serviceErrorToStatus } from '@/lib/services/errors';
-import { logger } from '@/lib/logger';
 
 interface RouteParams {
   params: Promise<{ id: string }>;
 }
 
 export async function GET(request: NextRequest, { params }: RouteParams) {
-  try {
+  return withServiceHandler('GET /api/conversations/[id]/messages', async () => {
     const user = await getAuthUser();
     if (!user) return apiError('Non autorisé', 401);
 
@@ -35,11 +33,5 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     const service = createMessagesService(supabase);
     const data = await service.getMessages(id, limit, before);
     return apiSuccess(data);
-  } catch (error) {
-    if (error instanceof ServiceError) {
-      return apiError(error.message, serviceErrorToStatus(error.code));
-    }
-    logger.error('GET /api/conversations/[id]/messages', error);
-    return apiError('Erreur interne', 500);
-  }
+  });
 }

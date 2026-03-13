@@ -70,6 +70,25 @@ export function calculatePlatformFee(amount: number, feePercent = 10): number {
 }
 
 /**
+ * Calculate platform fee and payout amount for a transaction
+ */
+export function calculateTransactionFees(
+  amount: number,
+  feePercent = 10
+): { platformFee: number; payoutAmount: number } {
+  const platformFee = calculatePlatformFee(amount, feePercent);
+  const payoutAmount = Math.round((amount - platformFee) * 100) / 100;
+  return { platformFee, payoutAmount };
+}
+
+/**
+ * Calculate pagination offset from page number
+ */
+export function calculatePaginationOffset(page: number, perPage: number): number {
+  return (page - 1) * perPage;
+}
+
+/**
  * Format time for chat messages — "14:30"
  */
 export function formatMessageTime(date: string | Date): string {

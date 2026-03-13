@@ -1,17 +1,21 @@
 import { NextRequest } from 'next/server';
 import { z } from 'zod/v4';
-import { getAuthUser, apiError, apiSuccess, parseBody } from '@/lib/api/helpers';
+import {
+  getAuthUser,
+  apiError,
+  apiSuccess,
+  parseBody,
+  withServiceHandler,
+} from '@/lib/api/helpers';
 import { createClient } from '@/lib/supabase/server';
 import { createNotificationsService } from '@/lib/services/notifications';
-import { ServiceError, serviceErrorToStatus } from '@/lib/services/errors';
-import { logger } from '@/lib/logger';
 
 const markReadSchema = z.object({
   notification_ids: z.array(z.string().uuid()),
 });
 
 export async function GET(request: NextRequest) {
-  try {
+  return withServiceHandler('GET /api/notifications', async () => {
     const user = await getAuthUser();
     if (!user) return apiError('Non autorisé', 401);
 
@@ -23,17 +27,11 @@ export async function GET(request: NextRequest) {
     const service = createNotificationsService(supabase);
     const data = await service.getNotifications(user.id, page, perPage);
     return apiSuccess(data);
-  } catch (error) {
-    if (error instanceof ServiceError) {
-      return apiError(error.message, serviceErrorToStatus(error.code));
-    }
-    logger.error('GET /api/notifications', error);
-    return apiError('Erreur interne', 500);
-  }
+  });
 }
 
 export async function PATCH(request: NextRequest) {
-  try {
+  return withServiceHandler('PATCH /api/notifications', async () => {
     const user = await getAuthUser();
     if (!user) return apiError('Non autorisé', 401);
 
@@ -44,11 +42,5 @@ export async function PATCH(request: NextRequest) {
     const service = createNotificationsService(supabase);
     await service.markNotificationsAsRead(user.id, body.notification_ids);
     return apiSuccess(null);
-  } catch (error) {
-    if (error instanceof ServiceError) {
-      return apiError(error.message, serviceErrorToStatus(error.code));
-    }
-    logger.error('PATCH /api/notifications', error);
-    return apiError('Erreur interne', 500);
-  }
+  });
 }

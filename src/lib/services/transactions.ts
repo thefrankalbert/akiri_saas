@@ -7,8 +7,8 @@ import type Stripe from 'stripe';
 import { ServiceError } from './errors';
 import { logger } from '@/lib/logger';
 import type { Transaction, PaginatedResponse } from '@/types';
-import { PLATFORM_FEE_PERCENT } from '@/constants';
-import { DEFAULT_PAGE_SIZE } from '@/constants';
+import { DEFAULT_PAGE_SIZE, APP_URL } from '@/constants';
+import { calculateTransactionFees } from '@/lib/utils';
 import { sendPayoutEmail } from '@/lib/email';
 
 export function createTransactionService(
@@ -54,8 +54,7 @@ export function createTransactionService(
 
     // Calculate fees
     const totalPrice = Number(request.total_price);
-    const platformFee = Math.round(totalPrice * (PLATFORM_FEE_PERCENT / 100) * 100) / 100;
-    const payoutAmount = Math.round((totalPrice - platformFee) * 100) / 100;
+    const { platformFee, payoutAmount } = calculateTransactionFees(totalPrice);
     const amountInCents = Math.round(totalPrice * 100);
 
     // Determine currency
@@ -91,8 +90,8 @@ export function createTransactionService(
           payer_id: userId,
           payee_id: request.listing.traveler_id,
         },
-        success_url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/transactions?payment=success`,
-        cancel_url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/annonces/${request.listing_id}?payment=cancelled`,
+        success_url: `${APP_URL}/transactions?payment=success`,
+        cancel_url: `${APP_URL}/annonces/${request.listing_id}?payment=cancelled`,
       },
       {
         idempotencyKey: `checkout_${requestId}_${userId}`,
@@ -313,8 +312,8 @@ export function createTransactionService(
     // Create an onboarding link
     const accountLink = await stripe.accountLinks.create({
       account: accountId,
-      refresh_url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/profil?connect=refresh`,
-      return_url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/profil?connect=success`,
+      refresh_url: `${APP_URL}/profil?connect=refresh`,
+      return_url: `${APP_URL}/profil?connect=success`,
       type: 'account_onboarding',
     });
 
@@ -327,7 +326,7 @@ export function createTransactionService(
   async function checkConnectStatus(userId: string): Promise<{ onboarded: boolean }> {
     const { data: profile } = await adminSupabase
       .from('profiles')
-      .select('stripe_connect_account_id')
+      .select('stripe_connect_account_id, stripe_connect_onboarded')
       .eq('user_id', userId)
       .single();
 
@@ -336,18 +335,20 @@ export function createTransactionService(
     }
 
     const account = await stripe.accounts.retrieve(profile.stripe_connect_account_id);
-    const onboarded = account.charges_enabled && account.payouts_enabled;
+    const onboarded = (account.charges_enabled && account.payouts_enabled) || false;
 
-    // Update profile if status changed
-    await adminSupabase
-      .from('profiles')
-      .update({
-        stripe_connect_onboarded: onboarded || false,
-        updated_at: new Date().toISOString(),
-      })
-      .eq('user_id', userId);
+    // Only write if status actually changed
+    if (profile.stripe_connect_onboarded !== onboarded) {
+      await adminSupabase
+        .from('profiles')
+        .update({
+          stripe_connect_onboarded: onboarded,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('user_id', userId);
+    }
 
-    return { onboarded: onboarded || false };
+    return { onboarded };
   }
 
   /**
@@ -415,16 +416,6 @@ export function createTransactionService(
 // Pure utility functions — standalone exports
 // ============================================
 
-export function calculateFees(amount: number): { platformFee: number; payoutAmount: number } {
-  const platformFee = Math.round(amount * (PLATFORM_FEE_PERCENT / 100) * 100) / 100;
-  const payoutAmount = Math.round((amount - platformFee) * 100) / 100;
-  return { platformFee, payoutAmount };
-}
-
 export function amountToCents(amount: number): number {
   return Math.round(amount * 100);
-}
-
-export function calculatePaginationOffset(page: number, perPage: number): number {
-  return (page - 1) * perPage;
 }

@@ -148,15 +148,17 @@ export function createMessagesService(supabase: SupabaseClient) {
       // Notify other participants
       const otherParticipants = (conv.participant_ids as string[]).filter((id) => id !== senderId);
       const preview = content.length > 80 ? content.slice(0, 80) + '...' : content;
-      for (const recipientId of otherParticipants) {
-        await createNotification(
-          recipientId,
-          'new_message',
-          'Nouveau message',
-          contentType === 'image' ? 'Vous avez reçu une image.' : preview,
-          { conversation_id: conversationId }
-        );
-      }
+      await Promise.all(
+        otherParticipants.map((recipientId) =>
+          createNotification(
+            recipientId,
+            'new_message',
+            'Nouveau message',
+            contentType === 'image' ? 'Vous avez reçu une image.' : preview,
+            { conversation_id: conversationId }
+          )
+        )
+      );
 
       return message as Message;
     },

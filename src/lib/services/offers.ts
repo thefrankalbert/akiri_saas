@@ -99,32 +99,32 @@ export function createOffersService(supabase: SupabaseClient) {
         throw new ServiceError('Non autorisé', 'AUTH');
       }
 
-      // Accept this offer
-      const { data: accepted, error: acceptError } = await supabase
-        .from('carry_offers')
-        .update({ status: 'accepted' })
-        .eq('id', offerId)
-        .select()
-        .single();
+      // Accept this offer, reject siblings, and update parcel status in parallel
+      const [acceptResult] = await Promise.all([
+        supabase
+          .from('carry_offers')
+          .update({ status: 'accepted' })
+          .eq('id', offerId)
+          .select()
+          .single(),
+        supabase
+          .from('carry_offers')
+          .update({ status: 'rejected' })
+          .eq('parcel_id', (offer as CarryOffer).parcel_id)
+          .eq('status', 'pending')
+          .neq('id', offerId),
+        supabase
+          .from('parcel_postings')
+          .update({ status: 'matched', updated_at: new Date().toISOString() })
+          .eq('id', (offer as CarryOffer).parcel_id),
+      ]);
+
+      const { data: accepted, error: acceptError } = acceptResult;
 
       if (acceptError) {
         logger.error("acceptOffer: erreur lors de l'acceptation", acceptError);
         throw new ServiceError(acceptError.message, 'INTERNAL', acceptError);
       }
-
-      // Reject all other pending offers for the same parcel
-      await supabase
-        .from('carry_offers')
-        .update({ status: 'rejected' })
-        .eq('parcel_id', (offer as CarryOffer).parcel_id)
-        .eq('status', 'pending')
-        .neq('id', offerId);
-
-      // Update parcel status to 'matched'
-      await supabase
-        .from('parcel_postings')
-        .update({ status: 'matched', updated_at: new Date().toISOString() })
-        .eq('id', (offer as CarryOffer).parcel_id);
 
       // Notify the traveler their offer was accepted
       await createNotification(

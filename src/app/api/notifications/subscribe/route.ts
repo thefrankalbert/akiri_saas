@@ -1,11 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient, createAdminClient } from '@/lib/supabase/server';
 import { createPushService } from '@/lib/services/push';
-import { ServiceError, serviceErrorToStatus } from '@/lib/services/errors';
-import { logger } from '@/lib/logger';
+import { withServiceHandler } from '@/lib/api/helpers';
 
 export async function POST(request: NextRequest) {
-  try {
+  return withServiceHandler('POST /api/notifications/subscribe', async () => {
     const supabase = await createClient();
     const {
       data: { user },
@@ -27,20 +26,11 @@ export async function POST(request: NextRequest) {
     await service.saveSubscription(user.id, subscription);
 
     return NextResponse.json({ success: true });
-  } catch (error) {
-    if (error instanceof ServiceError) {
-      return NextResponse.json(
-        { error: error.message },
-        { status: serviceErrorToStatus(error.code) }
-      );
-    }
-    logger.error('POST /api/notifications/subscribe', error);
-    return NextResponse.json({ error: 'Erreur interne' }, { status: 500 });
-  }
+  });
 }
 
 export async function DELETE(request: NextRequest) {
-  try {
+  return withServiceHandler('DELETE /api/notifications/subscribe', async () => {
     const supabase = await createClient();
     const {
       data: { user },
@@ -61,14 +51,5 @@ export async function DELETE(request: NextRequest) {
     const service = createPushService(adminSupabase);
     await service.removeSubscription(user.id, endpoint);
     return NextResponse.json({ success: true });
-  } catch (error) {
-    if (error instanceof ServiceError) {
-      return NextResponse.json(
-        { error: error.message },
-        { status: serviceErrorToStatus(error.code) }
-      );
-    }
-    logger.error('DELETE /api/notifications/subscribe', error);
-    return NextResponse.json({ error: 'Erreur interne' }, { status: 500 });
-  }
+  });
 }

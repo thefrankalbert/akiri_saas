@@ -1,11 +1,15 @@
 import { NextRequest } from 'next/server';
 import { z } from 'zod/v4';
-import { getAuthUser, apiError, apiSuccess, parseBody } from '@/lib/api/helpers';
+import {
+  getAuthUser,
+  apiError,
+  apiSuccess,
+  parseBody,
+  withServiceHandler,
+} from '@/lib/api/helpers';
 import { createClient, createAdminClient } from '@/lib/supabase/server';
 import { createRequestService } from '@/lib/services/requests';
 import { createTransactionService } from '@/lib/services/transactions';
-import { ServiceError, serviceErrorToStatus } from '@/lib/services/errors';
-import { logger } from '@/lib/logger';
 import { getStripe } from '@/lib/stripe';
 
 const updateStatusSchema = z.object({
@@ -34,7 +38,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
   const body = await parseBody(request, updateStatusSchema);
   if (!body) return apiError('Données invalides', 400);
 
-  try {
+  return withServiceHandler(`PATCH /api/requests/${id}`, async () => {
     const supabase = await createClient();
     const adminSupabase = await createAdminClient();
     const txService = createTransactionService(supabase, adminSupabase, getStripe());
@@ -80,11 +84,5 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       default:
         return apiError('Action non supportée', 400);
     }
-  } catch (error) {
-    if (error instanceof ServiceError) {
-      return apiError(error.message, serviceErrorToStatus(error.code));
-    }
-    logger.error(`PATCH /api/requests/${id}`, error, { userId: user.id });
-    return apiError('Erreur interne', 500);
-  }
+  });
 }

@@ -207,10 +207,12 @@ export interface Conversation {
 export type NotificationType =
   | 'new_request'
   | 'request_accepted'
+  | 'request_cancelled'
   | 'payment_received'
   | 'parcel_collected'
   | 'parcel_delivered'
   | 'delivery_confirmed'
+  | 'dispute_opened'
   | 'new_review'
   | 'new_message';
 

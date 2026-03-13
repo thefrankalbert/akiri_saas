@@ -1,13 +1,17 @@
 import { NextRequest } from 'next/server';
-import { getAuthUser, apiError, apiSuccess, parseBody } from '@/lib/api/helpers';
+import {
+  getAuthUser,
+  apiError,
+  apiSuccess,
+  parseBody,
+  withServiceHandler,
+} from '@/lib/api/helpers';
 import { createClient } from '@/lib/supabase/server';
 import { createReviewsService } from '@/lib/services/reviews';
-import { ServiceError, serviceErrorToStatus } from '@/lib/services/errors';
-import { logger } from '@/lib/logger';
 import { createReviewSchema } from '@/lib/validations';
 
 export async function POST(request: NextRequest) {
-  try {
+  return withServiceHandler('POST /api/reviews', async () => {
     const user = await getAuthUser();
     if (!user) return apiError('Non autorisé', 401);
 
@@ -18,11 +22,5 @@ export async function POST(request: NextRequest) {
     const service = createReviewsService(supabase);
     const data = await service.createReview(user.id, body);
     return apiSuccess(data, 201);
-  } catch (error) {
-    if (error instanceof ServiceError) {
-      return apiError(error.message, serviceErrorToStatus(error.code));
-    }
-    logger.error('POST /api/reviews', error);
-    return apiError('Erreur interne', 500);
-  }
+  });
 }

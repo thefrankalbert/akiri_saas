@@ -38,7 +38,8 @@ export function createMatchingService(supabase: SupabaseClient) {
         .eq('status', 'active')
         .eq('departure_country', parcel.departure_country)
         .eq('arrival_country', parcel.arrival_country)
-        .gte('departure_date', new Date().toISOString());
+        .gte('departure_date', new Date().toISOString())
+        .limit(200);
 
       if (error) {
         logger.error('findMatchingListings: erreur lors de la recherche', error);
@@ -103,7 +104,8 @@ export function createMatchingService(supabase: SupabaseClient) {
         .select('*, sender:profiles!sender_id(*)')
         .eq('status', 'active')
         .eq('departure_country', listing.departure_country)
-        .eq('arrival_country', listing.arrival_country);
+        .eq('arrival_country', listing.arrival_country)
+        .limit(200);
 
       if (error) {
         logger.error('findMatchingParcels: erreur lors de la recherche', error);

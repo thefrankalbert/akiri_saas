@@ -1,11 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { createMockSupabase, asSupabase, createMockStripe, asStripe } from './helpers';
-import {
-  createTransactionService,
-  calculateFees,
-  amountToCents,
-  calculatePaginationOffset,
-} from '@/lib/services/transactions';
+import { createTransactionService, amountToCents } from '@/lib/services/transactions';
+import { calculateTransactionFees, calculatePaginationOffset } from '@/lib/utils';
 import { ServiceError } from '@/lib/services/errors';
 import { PLATFORM_FEE_PERCENT, DEFAULT_PAGE_SIZE } from '@/constants';
 
@@ -492,31 +488,31 @@ describe('Transactions Service', () => {
 // Pure Business Logic Tests (no mocks needed)
 // ============================================
 describe('Transaction Business Logic', () => {
-  describe('calculateFees', () => {
+  describe('calculateTransactionFees', () => {
     it('calculates 10% platform fee of 100€', () => {
-      const { platformFee, payoutAmount } = calculateFees(100);
+      const { platformFee, payoutAmount } = calculateTransactionFees(100);
       expect(platformFee).toBe(10);
       expect(payoutAmount).toBe(90);
     });
 
     it('calculates 10% of 0€', () => {
-      const { platformFee, payoutAmount } = calculateFees(0);
+      const { platformFee, payoutAmount } = calculateTransactionFees(0);
       expect(platformFee).toBe(0);
       expect(payoutAmount).toBe(0);
     });
 
     it('rounds correctly for 33.33€', () => {
-      const { platformFee } = calculateFees(33.33);
+      const { platformFee } = calculateTransactionFees(33.33);
       expect(platformFee).toBe(3.33);
     });
 
     it('calculates 10% of 49.99€', () => {
-      const { platformFee } = calculateFees(49.99);
+      const { platformFee } = calculateTransactionFees(49.99);
       expect(platformFee).toBe(5);
     });
 
     it('handles large amounts', () => {
-      const { platformFee } = calculateFees(9999);
+      const { platformFee } = calculateTransactionFees(9999);
       expect(platformFee).toBe(999.9);
     });
   });
