@@ -6,7 +6,10 @@
 // import { createTransactionService } from '@/lib/services/transactions';
 // import { createVerificationService } from '@/lib/services/verification';
 // import { createRequestService } from '@/lib/services/requests';
-// import { getListings, createListing } from '@/lib/services/listings';
+// import { createListingsService } from '@/lib/services/listings';
+// import { createParcelsService } from '@/lib/services/parcels';
+// import { createOffersService } from '@/lib/services/offers';
+// import { createMatchingService } from '@/lib/services/matching';
 // import { createReview, getReviewsByUser } from '@/lib/services/reviews';
 // import { sendMessage, getConversations } from '@/lib/services/messages';
 

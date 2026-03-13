@@ -5,7 +5,9 @@
 import { NextResponse } from 'next/server';
 import type Stripe from 'stripe';
 import { getStripe } from '@/lib/stripe';
-import { handleIdentityVerificationResult } from '@/lib/services/verification';
+import { createAdminClient } from '@/lib/supabase/server';
+import { createVerificationService } from '@/lib/services/verification';
+import { logger } from '@/lib/logger';
 
 export async function POST(request: Request) {
   const body = await request.text();
@@ -32,17 +34,20 @@ export async function POST(request: Request) {
   }
 
   try {
+    const adminSupabase = await createAdminClient();
+    const service = createVerificationService(adminSupabase, adminSupabase);
+
     switch (event.type) {
       case 'identity.verification_session.verified': {
         const session = event.data.object as Stripe.Identity.VerificationSession;
-        await handleIdentityVerificationResult(session.id, 'verified');
+        await service.handleIdentityVerificationResult(session.id, 'verified');
         break;
       }
 
       case 'identity.verification_session.requires_input':
       case 'identity.verification_session.canceled': {
         const session = event.data.object as Stripe.Identity.VerificationSession;
-        await handleIdentityVerificationResult(session.id, 'failed');
+        await service.handleIdentityVerificationResult(session.id, 'failed');
         break;
       }
 
@@ -50,7 +55,7 @@ export async function POST(request: Request) {
       // Unhandled event type — no action needed
     }
   } catch (err) {
-    console.error('Stripe Identity webhook processing error:', err);
+    logger.error('Stripe Identity webhook processing error:', err);
     // Still return 200 to prevent Stripe from retrying
   }
 

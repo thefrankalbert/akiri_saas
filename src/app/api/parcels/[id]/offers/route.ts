@@ -1,6 +1,9 @@
 import { NextRequest } from 'next/server';
 import { getAuthUser, apiError, apiSuccess, parseBody } from '@/lib/api/helpers';
-import { getOffersByParcel, createOffer, acceptOffer, rejectOffer } from '@/lib/services/offers';
+import { createClient } from '@/lib/supabase/server';
+import { createOffersService } from '@/lib/services/offers';
+import { ServiceError, serviceErrorToStatus } from '@/lib/services/errors';
+import { logger } from '@/lib/logger';
 import { createCarryOfferSchema } from '@/lib/validations';
 
 interface RouteParams {
@@ -8,49 +11,75 @@ interface RouteParams {
 }
 
 export async function GET(_request: NextRequest, { params }: RouteParams) {
-  const { id } = await params;
-
-  const offers = await getOffersByParcel(id);
-  return apiSuccess(offers);
+  try {
+    const { id } = await params;
+    const supabase = await createClient();
+    const service = createOffersService(supabase);
+    const data = await service.getOffersByParcel(id);
+    return apiSuccess(data);
+  } catch (error) {
+    if (error instanceof ServiceError) {
+      return apiError(error.message, serviceErrorToStatus(error.code));
+    }
+    logger.error('GET /api/parcels/[id]/offers', error);
+    return apiError('Erreur interne', 500);
+  }
 }
 
 export async function POST(request: NextRequest, { params }: RouteParams) {
-  const user = await getAuthUser();
-  if (!user) return apiError('Non autoris\u00e9', 401);
+  try {
+    const user = await getAuthUser();
+    if (!user) return apiError('Non autorisé', 401);
 
-  const { id } = await params;
-  const body = await parseBody(request, createCarryOfferSchema);
-  if (!body) return apiError('Donn\u00e9es invalides', 400);
+    const { id } = await params;
+    const body = await parseBody(request, createCarryOfferSchema);
+    if (!body) return apiError('Données invalides', 400);
 
-  // Ensure parcel_id in body matches URL param
-  if (body.parcel_id !== id) return apiError('ID de colis incoh\u00e9rent', 400);
+    // Ensure parcel_id in body matches URL param
+    if (body.parcel_id !== id) return apiError('ID de colis incohérent', 400);
 
-  const result = await createOffer(user.id, body);
-
-  if (result.error) return apiError(result.error, result.status);
-  return apiSuccess(result.data, 201);
+    const supabase = await createClient();
+    const service = createOffersService(supabase);
+    const data = await service.createOffer(user.id, body);
+    return apiSuccess(data, 201);
+  } catch (error) {
+    if (error instanceof ServiceError) {
+      return apiError(error.message, serviceErrorToStatus(error.code));
+    }
+    logger.error('POST /api/parcels/[id]/offers', error);
+    return apiError('Erreur interne', 500);
+  }
 }
 
 export async function PATCH(request: NextRequest) {
-  const user = await getAuthUser();
-  if (!user) return apiError('Non autoris\u00e9', 401);
+  try {
+    const user = await getAuthUser();
+    if (!user) return apiError('Non autorisé', 401);
 
-  const body = await request.json();
-  const { offer_id, action } = body;
+    const body = await request.json();
+    const { offer_id, action } = body;
 
-  if (!offer_id || !action) return apiError('offer_id et action requis', 400);
+    if (!offer_id || !action) return apiError('offer_id et action requis', 400);
 
-  if (action === 'accept') {
-    const result = await acceptOffer(offer_id, user.id);
-    if (result.error) return apiError(result.error, result.status);
-    return apiSuccess(result.data);
+    const supabase = await createClient();
+    const service = createOffersService(supabase);
+
+    if (action === 'accept') {
+      const data = await service.acceptOffer(offer_id, user.id);
+      return apiSuccess(data);
+    }
+
+    if (action === 'reject') {
+      const data = await service.rejectOffer(offer_id, user.id);
+      return apiSuccess(data);
+    }
+
+    return apiError('Action invalide', 400);
+  } catch (error) {
+    if (error instanceof ServiceError) {
+      return apiError(error.message, serviceErrorToStatus(error.code));
+    }
+    logger.error('PATCH /api/parcels/[id]/offers', error);
+    return apiError('Erreur interne', 500);
   }
-
-  if (action === 'reject') {
-    const result = await rejectOffer(offer_id, user.id);
-    if (result.error) return apiError(result.error, result.status);
-    return apiSuccess(result.data);
-  }
-
-  return apiError('Action invalide', 400);
 }

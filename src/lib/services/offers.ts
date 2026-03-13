@@ -1,177 +1,178 @@
 // ============================================
-// Offers Service — Server-side business logic
+// Offers Service — DI factory pattern
 // ============================================
 
-import { createClient } from '@/lib/supabase/server';
-import type { CarryOffer, ApiResponse } from '@/types';
+import type { SupabaseClient } from '@supabase/supabase-js';
+import type { CarryOffer } from '@/types';
 import type { CreateCarryOfferInput } from '@/lib/validations';
+import { ServiceError } from './errors';
+import { logger } from '@/lib/logger';
 import { createNotification } from './notifications';
 
-/**
- * Get all carry offers for a parcel with traveler profile and listing
- */
-export async function getOffersByParcel(parcelId: string): Promise<CarryOffer[]> {
-  const supabase = await createClient();
+export function createOffersService(supabase: SupabaseClient) {
+  return {
+    /**
+     * Get all carry offers for a parcel with traveler profile and listing
+     */
+    async getOffersByParcel(parcelId: string): Promise<CarryOffer[]> {
+      const { data, error } = await supabase
+        .from('carry_offers')
+        .select('*, traveler:profiles!traveler_id(*), listing:listings!listing_id(*)')
+        .eq('parcel_id', parcelId)
+        .order('created_at', { ascending: false });
 
-  const { data, error } = await supabase
-    .from('carry_offers')
-    .select('*, traveler:profiles!traveler_id(*), listing:listings!listing_id(*)')
-    .eq('parcel_id', parcelId)
-    .order('created_at', { ascending: false });
+      if (error) {
+        logger.error('getOffersByParcel: erreur lors de la récupération', error);
+        throw new ServiceError('Erreur lors de la récupération des offres', 'INTERNAL', error);
+      }
 
-  if (error) {
-    return [];
-  }
+      return (data as CarryOffer[]) || [];
+    },
 
-  return (data as CarryOffer[]) || [];
-}
+    /**
+     * Create a carry offer on a parcel posting
+     */
+    async createOffer(travelerId: string, input: CreateCarryOfferInput): Promise<CarryOffer> {
+      // Fetch the parcel to get sender_id for notification and ownership check
+      const { data: parcel } = await supabase
+        .from('parcel_postings')
+        .select('sender_id, departure_city, arrival_city')
+        .eq('id', input.parcel_id)
+        .single();
 
-/**
- * Create a carry offer on a parcel posting
- */
-export async function createOffer(
-  travelerId: string,
-  input: CreateCarryOfferInput
-): Promise<ApiResponse<CarryOffer>> {
-  const supabase = await createClient();
+      // Prevent travelers from offering on their own parcels
+      if (parcel && parcel.sender_id === travelerId) {
+        throw new ServiceError(
+          'Vous ne pouvez pas faire une offre sur votre propre colis',
+          'CONFLICT'
+        );
+      }
 
-  // Fetch the parcel to get sender_id for notification
-  const { data: parcel } = await supabase
-    .from('parcel_postings')
-    .select('sender_id, departure_city, arrival_city')
-    .eq('id', input.parcel_id)
-    .single();
+      const { data, error } = await supabase
+        .from('carry_offers')
+        .insert({
+          traveler_id: travelerId,
+          ...input,
+          status: 'pending',
+        })
+        .select()
+        .single();
 
-  const { data, error } = await supabase
-    .from('carry_offers')
-    .insert({
-      traveler_id: travelerId,
-      ...input,
-      status: 'pending',
-    })
-    .select()
-    .single();
+      if (error) {
+        logger.error('createOffer: erreur lors de la création', error);
+        throw new ServiceError(error.message, 'VALIDATION', error);
+      }
 
-  if (error) {
-    return { data: null, error: error.message, status: 400 };
-  }
+      // Notify parcel owner about the new offer
+      if (parcel) {
+        await createNotification(
+          parcel.sender_id,
+          'new_request',
+          'Nouvelle offre de transport',
+          `Un voyageur propose de transporter votre colis ${parcel.departure_city} → ${parcel.arrival_city} pour ${input.proposed_price}€.`,
+          { parcel_id: input.parcel_id, offer_id: data.id }
+        );
+      }
 
-  // Notify parcel owner about the new offer
-  if (parcel) {
-    await createNotification(
-      parcel.sender_id,
-      'new_request',
-      'Nouvelle offre de transport',
-      `Un voyageur propose de transporter votre colis ${parcel.departure_city} \u2192 ${parcel.arrival_city} pour ${input.proposed_price}\u20ac.`,
-      { parcel_id: input.parcel_id, offer_id: data.id }
-    );
-  }
+      return data as CarryOffer;
+    },
 
-  return { data: data as CarryOffer, error: null, status: 201 };
-}
+    /**
+     * Accept a carry offer — verify sender owns the parcel, accept the offer,
+     * reject all other pending offers for the same parcel, update parcel status to 'matched'
+     */
+    async acceptOffer(offerId: string, senderId: string): Promise<CarryOffer> {
+      // Fetch the offer with its parcel to verify ownership
+      const { data: offer, error: fetchError } = await supabase
+        .from('carry_offers')
+        .select('*, parcel:parcel_postings!parcel_id(*)')
+        .eq('id', offerId)
+        .single();
 
-/**
- * Accept a carry offer — verify sender owns the parcel, accept the offer,
- * reject all other pending offers for the same parcel, update parcel status to 'matched'
- */
-export async function acceptOffer(
-  offerId: string,
-  senderId: string
-): Promise<ApiResponse<CarryOffer>> {
-  const supabase = await createClient();
+      if (fetchError || !offer) {
+        throw new ServiceError('Offre introuvable', 'NOT_FOUND');
+      }
 
-  // Fetch the offer with its parcel to verify ownership
-  const { data: offer, error: fetchError } = await supabase
-    .from('carry_offers')
-    .select('*, parcel:parcel_postings!parcel_id(*)')
-    .eq('id', offerId)
-    .single();
+      // Verify the sender owns the parcel
+      const parcel = (offer as CarryOffer).parcel;
+      if (!parcel || parcel.sender_id !== senderId) {
+        throw new ServiceError('Non autorisé', 'AUTH');
+      }
 
-  if (fetchError || !offer) {
-    return { data: null, error: 'Offre introuvable', status: 404 };
-  }
+      // Accept this offer
+      const { data: accepted, error: acceptError } = await supabase
+        .from('carry_offers')
+        .update({ status: 'accepted' })
+        .eq('id', offerId)
+        .select()
+        .single();
 
-  // Verify the sender owns the parcel
-  const parcel = (offer as CarryOffer).parcel;
-  if (!parcel || parcel.sender_id !== senderId) {
-    return { data: null, error: 'Non autorise', status: 403 };
-  }
+      if (acceptError) {
+        logger.error("acceptOffer: erreur lors de l'acceptation", acceptError);
+        throw new ServiceError(acceptError.message, 'INTERNAL', acceptError);
+      }
 
-  // Accept this offer
-  const { data: accepted, error: acceptError } = await supabase
-    .from('carry_offers')
-    .update({ status: 'accepted' })
-    .eq('id', offerId)
-    .select()
-    .single();
+      // Reject all other pending offers for the same parcel
+      await supabase
+        .from('carry_offers')
+        .update({ status: 'rejected' })
+        .eq('parcel_id', (offer as CarryOffer).parcel_id)
+        .eq('status', 'pending')
+        .neq('id', offerId);
 
-  if (acceptError) {
-    return { data: null, error: acceptError.message, status: 400 };
-  }
+      // Update parcel status to 'matched'
+      await supabase
+        .from('parcel_postings')
+        .update({ status: 'matched', updated_at: new Date().toISOString() })
+        .eq('id', (offer as CarryOffer).parcel_id);
 
-  // Reject all other pending offers for the same parcel
-  await supabase
-    .from('carry_offers')
-    .update({ status: 'rejected' })
-    .eq('parcel_id', (offer as CarryOffer).parcel_id)
-    .eq('status', 'pending')
-    .neq('id', offerId);
+      // Notify the traveler their offer was accepted
+      await createNotification(
+        (offer as CarryOffer).traveler_id,
+        'request_accepted',
+        'Offre acceptée',
+        "Votre offre de transport a été acceptée par l'expéditeur.",
+        { parcel_id: (offer as CarryOffer).parcel_id, offer_id: offerId }
+      );
 
-  // Update parcel status to 'matched'
-  await supabase
-    .from('parcel_postings')
-    .update({ status: 'matched', updated_at: new Date().toISOString() })
-    .eq('id', (offer as CarryOffer).parcel_id);
+      return accepted as CarryOffer;
+    },
 
-  // Notify the traveler their offer was accepted
-  await createNotification(
-    (offer as CarryOffer).traveler_id,
-    'request_accepted',
-    'Offre accept\u00e9e',
-    'Votre offre de transport a \u00e9t\u00e9 accept\u00e9e par l\u2019exp\u00e9diteur.',
-    { parcel_id: (offer as CarryOffer).parcel_id, offer_id: offerId }
-  );
+    /**
+     * Reject a carry offer — verify sender owns the parcel, reject the offer
+     */
+    async rejectOffer(offerId: string, senderId: string): Promise<CarryOffer> {
+      // Fetch the offer with its parcel to verify ownership
+      const { data: offer, error: fetchError } = await supabase
+        .from('carry_offers')
+        .select('*, parcel:parcel_postings!parcel_id(*)')
+        .eq('id', offerId)
+        .single();
 
-  return { data: accepted as CarryOffer, error: null, status: 200 };
-}
+      if (fetchError || !offer) {
+        throw new ServiceError('Offre introuvable', 'NOT_FOUND');
+      }
 
-/**
- * Reject a carry offer — verify sender owns the parcel, reject the offer
- */
-export async function rejectOffer(
-  offerId: string,
-  senderId: string
-): Promise<ApiResponse<CarryOffer>> {
-  const supabase = await createClient();
+      // Verify the sender owns the parcel
+      const parcel = (offer as CarryOffer).parcel;
+      if (!parcel || parcel.sender_id !== senderId) {
+        throw new ServiceError('Non autorisé', 'AUTH');
+      }
 
-  // Fetch the offer with its parcel to verify ownership
-  const { data: offer, error: fetchError } = await supabase
-    .from('carry_offers')
-    .select('*, parcel:parcel_postings!parcel_id(*)')
-    .eq('id', offerId)
-    .single();
+      // Reject the offer
+      const { data: rejected, error: rejectError } = await supabase
+        .from('carry_offers')
+        .update({ status: 'rejected' })
+        .eq('id', offerId)
+        .select()
+        .single();
 
-  if (fetchError || !offer) {
-    return { data: null, error: 'Offre introuvable', status: 404 };
-  }
+      if (rejectError) {
+        logger.error('rejectOffer: erreur lors du rejet', rejectError);
+        throw new ServiceError(rejectError.message, 'INTERNAL', rejectError);
+      }
 
-  // Verify the sender owns the parcel
-  const parcel = (offer as CarryOffer).parcel;
-  if (!parcel || parcel.sender_id !== senderId) {
-    return { data: null, error: 'Non autorise', status: 403 };
-  }
-
-  // Reject the offer
-  const { data: rejected, error: rejectError } = await supabase
-    .from('carry_offers')
-    .update({ status: 'rejected' })
-    .eq('id', offerId)
-    .select()
-    .single();
-
-  if (rejectError) {
-    return { data: null, error: rejectError.message, status: 400 };
-  }
-
-  return { data: rejected as CarryOffer, error: null, status: 200 };
+      return rejected as CarryOffer;
+    },
+  };
 }
