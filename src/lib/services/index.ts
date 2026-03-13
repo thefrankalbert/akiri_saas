@@ -3,8 +3,10 @@
 // ============================================
 // Import individual services as needed:
 //
+// import { createTransactionService } from '@/lib/services/transactions';
+// import { createVerificationService } from '@/lib/services/verification';
+// import { createRequestService } from '@/lib/services/requests';
 // import { getListings, createListing } from '@/lib/services/listings';
-// import { createRequest, confirmDelivery } from '@/lib/services/requests';
 // import { createReview, getReviewsByUser } from '@/lib/services/reviews';
 // import { sendMessage, getConversations } from '@/lib/services/messages';
 
