@@ -1,36 +1,90 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Akiri
+
+Marketplace collaborative de transport de colis pour la diaspora africaine. Les voyageurs vendent leurs kilos de bagages disponibles, les expéditeurs envoient des colis à moindre coût.
+
+## Tech Stack
+
+- **Framework**: Next.js 16 (App Router, React 19, Server Components)
+- **Language**: TypeScript 5.9 (strict mode)
+- **Styling**: Tailwind CSS v4
+- **Database**: Supabase (PostgreSQL + Auth + Realtime + Storage)
+- **Payments**: Stripe (escrow via PaymentIntents)
+- **Emails**: Resend
+- **Deployment**: Vercel
+- **Package Manager**: pnpm
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js 20+
+- pnpm 10+
+
+### Environment Setup
+
+1. Copy the example env file:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+cp .env.example .env.local
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Fill in the required variables:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| Variable                             | Required | Where to get it                          |
+| ------------------------------------ | -------- | ---------------------------------------- |
+| `NEXT_PUBLIC_SUPABASE_URL`           | Yes      | Supabase Dashboard > Settings > API      |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY`      | Yes      | Supabase Dashboard > Settings > API      |
+| `SUPABASE_SERVICE_ROLE_KEY`          | Yes      | Supabase Dashboard > Settings > API      |
+| `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | Yes      | Stripe Dashboard > Developers > API keys |
+| `STRIPE_SECRET_KEY`                  | Yes      | Stripe Dashboard > Developers > API keys |
+| `RESEND_API_KEY`                     | Yes      | Resend Dashboard > API Keys              |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Optional variables (features degrade gracefully without them):
 
-## Learn More
+| Variable                                             | Purpose                     |
+| ---------------------------------------------------- | --------------------------- |
+| `STRIPE_WEBHOOK_SECRET`                              | Stripe webhook verification |
+| `UPSTASH_REDIS_REST_URL` / `TOKEN`                   | Production rate limiting    |
+| `NEXT_PUBLIC_SENTRY_DSN`                             | Error tracking              |
+| `NEXT_PUBLIC_POSTHOG_KEY`                            | Product analytics           |
+| `NEXT_PUBLIC_VAPID_PUBLIC_KEY` / `VAPID_PRIVATE_KEY` | Web push notifications      |
 
-To learn more about Next.js, take a look at the following resources:
+### Install & Run
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+pnpm install
+pnpm dev
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Open [http://localhost:3000](http://localhost:3000).
 
-## Deploy on Vercel
+## Scripts
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+pnpm dev            # Start dev server
+pnpm build          # Production build
+pnpm lint           # Run ESLint
+pnpm format         # Format with Prettier
+pnpm format:check   # Check formatting
+pnpm typecheck      # TypeScript check
+pnpm test           # Run tests
+pnpm test:watch     # Run tests in watch mode
+pnpm test:coverage  # Run tests with coverage
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Database
+
+SQL migrations are in `supabase/migrations/`. Apply them via the Supabase SQL Editor or `supabase db push`.
+
+## Project Structure
+
+```
+src/
+├── app/            # Next.js App Router pages + API routes
+├── components/     # UI, layout, and feature components
+├── lib/            # Services, utilities, hooks, validations
+├── types/          # TypeScript type definitions
+└── constants/      # App constants
+```
+
+See `CLAUDE.md` for full conventions and architecture details.
