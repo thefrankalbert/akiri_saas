@@ -146,7 +146,7 @@ export function ProfileSettingsTab({ profile }: ProfileSettingsTabProps) {
       </form>
 
       {/* Stripe Connect — Recevoir des paiements */}
-      <div className="border-neutral-200 space-y-3 border-t pt-6">
+      <div className="space-y-3 border-t border-neutral-200 pt-6">
         <h3 className="text-lg font-semibold">Recevoir des paiements</h3>
 
         {profile?.stripe_connect_onboarded ? (
@@ -156,7 +156,7 @@ export function ProfileSettingsTab({ profile }: ProfileSettingsTabProps) {
           </div>
         ) : (
           <div className="space-y-3">
-            <p className="text-neutral-600 text-sm">
+            <p className="text-sm text-neutral-600">
               Pour recevoir des paiements en tant que voyageur, vous devez configurer votre compte
               de paiement. Vous serez redirigé vers notre partenaire Stripe pour compléter la
               vérification.
