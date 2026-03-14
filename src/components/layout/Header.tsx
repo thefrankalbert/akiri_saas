@@ -31,7 +31,10 @@ export function Header() {
   };
 
   return (
-    <header className="bg-surface-950/80 sticky top-0 z-50 border-b border-white/[0.06] backdrop-blur-xl md:ml-16 lg:ml-60">
+    <header
+      role="banner"
+      className="bg-surface-950/80 sticky top-0 z-50 border-b border-white/[0.06] backdrop-blur-xl md:ml-16 lg:ml-60"
+    >
       {/* Demo Mode Banner */}
       {isDemo && (
         <div className="border-warning/20 bg-warning/10 text-warning border-b px-4 py-1.5 text-center text-sm font-medium">
@@ -60,11 +63,17 @@ export function Header() {
 
         {/* Desktop Actions (simplified — sidebar handles main nav) */}
         <div className="hidden items-center gap-2 md:flex">
-          <button className="text-surface-200 hover:bg-surface-800 rounded-lg p-2 transition-colors duration-150 hover:text-neutral-100">
-            <MagnifyingGlass weight="duotone" size={20} />
+          <button
+            aria-label="Rechercher"
+            className="text-surface-200 hover:bg-surface-800 rounded-lg p-2 transition-colors duration-150 hover:text-neutral-100"
+          >
+            <MagnifyingGlass weight="duotone" size={20} aria-hidden="true" />
           </button>
-          <button className="text-surface-100 hover:bg-surface-800 relative rounded-lg p-2 transition-colors duration-150 hover:text-neutral-100">
-            <Bell weight="duotone" size={20} />
+          <button
+            aria-label="Notifications"
+            className="text-surface-100 hover:bg-surface-800 relative rounded-lg p-2 transition-colors duration-150 hover:text-neutral-100"
+          >
+            <Bell weight="duotone" size={20} aria-hidden="true" />
           </button>
           {!isAuthenticated && (
             <>
@@ -87,16 +96,26 @@ export function Header() {
 
         {/* Mobile Menu Button */}
         <button
+          aria-label={mobileMenuOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
+          aria-expanded={mobileMenuOpen}
+          aria-controls="mobile-menu"
           className="rounded-lg p-2.5 text-neutral-200 transition-colors duration-150 hover:text-neutral-100 md:hidden"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
         >
-          {mobileMenuOpen ? <X weight="bold" size={24} /> : <List weight="duotone" size={24} />}
+          {mobileMenuOpen ? (
+            <X weight="bold" size={24} aria-hidden="true" />
+          ) : (
+            <List weight="duotone" size={24} aria-hidden="true" />
+          )}
         </button>
       </div>
 
       {/* Mobile Menu */}
       {mobileMenuOpen && (
-        <div className="bg-surface-950/95 border-t border-white/[0.06] px-4 pb-4 backdrop-blur-xl md:hidden">
+        <div
+          id="mobile-menu"
+          className="bg-surface-950/95 border-t border-white/[0.06] px-4 pb-4 backdrop-blur-xl md:hidden"
+        >
           <nav className="flex flex-col gap-1 pt-2">
             {mobileMenuItems.map((item) => {
               const Icon = item.icon;

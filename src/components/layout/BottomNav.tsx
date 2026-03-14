@@ -13,7 +13,11 @@ export function BottomNav() {
   const navItems = getBottomNavItems();
 
   return (
-    <nav className="safe-bottom bg-surface-950/90 fixed right-0 bottom-0 left-0 z-50 border-t border-white/[0.06] backdrop-blur-xl md:hidden">
+    <nav
+      role="navigation"
+      aria-label="Navigation principale"
+      className="safe-bottom bg-surface-950/90 fixed right-0 bottom-0 left-0 z-50 border-t border-white/[0.06] backdrop-blur-xl md:hidden"
+    >
       <div className="mx-auto flex h-16 max-w-lg items-center justify-around px-1">
         {navItems.map((item) => {
           const isActive =
