@@ -16,15 +16,16 @@ Akiri is a collaborative parcel transport marketplace for the African diaspora. 
 
 ## Infrastructure
 
-| Service      | Purpose                              | Account                                          |
-| ------------ | ------------------------------------ | ------------------------------------------------ |
-| **Supabase** | DB + Auth + Realtime + Storage       | New account — `pcatqnfctteeejbrlqhx.supabase.co` |
-| **Stripe**   | Payments (escrow via PaymentIntents) | New account                                      |
-| **Resend**   | Transactional emails                 | New account                                      |
-| **Vercel**   | Hosting + deployment                 | Existing account, project not yet linked         |
-| **GitHub**   | Source code + CI/CD                  | `thefrankalbert/akiri_saas`                      |
-| **Sentry**   | Error tracking                       | To create                                        |
-| **PostHog**  | Product analytics                    | To create                                        |
+| Service           | Purpose                              | Account                                          |
+| ----------------- | ------------------------------------ | ------------------------------------------------ |
+| **Supabase**      | DB + Auth + Realtime + Storage       | New account — `pcatqnfctteeejbrlqhx.supabase.co` |
+| **Stripe**        | Payments (escrow via PaymentIntents) | New account                                      |
+| **Resend**        | Transactional emails                 | New account                                      |
+| **Vercel**        | Hosting + deployment                 | Existing account, project not yet linked         |
+| **GitHub**        | Source code + CI/CD                  | `thefrankalbert/akiri_saas`                      |
+| **Sentry**        | Error tracking                       | To create                                        |
+| **PostHog**       | Product analytics                    | To create                                        |
+| **Upstash Redis** | Rate limiting (serverless-safe)      | To create (free tier sufficient)                 |
 
 ## Approach: Hybrid by Phases
 
@@ -45,16 +46,21 @@ Alternating between infrastructure and features across 5 phases to maintain both
 ### 1.2 Database Migrations
 
 - SQL migration scripts for all tables matching the TypeScript types in `src/types/index.ts`
-- Tables: profiles, listings, shipment_requests, parcel_postings, carry_offers, transactions, reviews, messages, conversations, notifications, verification_sessions, push_subscriptions
+- Tables: profiles, listings, shipment_requests, parcel_postings, carry_offers, transactions, reviews, messages, conversations, notifications, verification_sessions, push_subscriptions, processed_webhook_events
 - Row Level Security (RLS) policies for each table
+- **Critical RLS**: `profiles.role` column must NOT be updatable by the user — prevent self-elevation to admin
+- Admin bootstrapping: first admin set via migration seed or Supabase dashboard
 - Indexes on frequently queried columns (user IDs, status fields, dates)
 - Seed data script for development
+- **Supabase Storage buckets**: create `avatars` (public read, authenticated write, user-scoped), `parcel-photos` (public read, authenticated write), `chat-media` (authenticated read/write). Apply storage policies via SQL.
 
 ### 1.3 Security Headers
 
 - Vercel `headers` config in `vercel.json`: CSP, X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy
 - CORS configuration for API routes
 - Global rate limiting on API routes (not just auth)
+- **Fix `rateLimit()` bug**: the synchronous function always falls back to in-memory even when Redis is configured. Convert middleware to use `rateLimitAsync()` or fix the synchronous path.
+- Configure `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` in Vercel — without them, all rate limiting is bypassed in production
 
 ### 1.4 Environment Management
 
@@ -68,12 +74,17 @@ Alternating between infrastructure and features across 5 phases to maintain both
 - Configure environment variables in Vercel dashboard
 - Set up preview deployments for PRs
 
-### 1.6 Structured Logger
+### 1.6 Structured Logger & Sentry
 
 - Replace `console.log` with structured logger
-- Sentry integration for error reporting in production
+- Install `@sentry/nextjs` — full integration: SDK init in `sentry.client.config.ts`, `sentry.server.config.ts`, `instrumentation.ts`, source maps upload in CI
 - Console fallback in development
 - Context enrichment: userId, requestId, route
+
+### 1.8 Verify Root Middleware
+
+- Confirm `src/middleware.ts` exists and calls `updateSession` from `src/lib/supabase/middleware.ts`
+- Without this, auth redirects and rate limiting are entirely non-functional
 
 ### 1.7 Supabase Client Update
 
@@ -96,11 +107,13 @@ Alternating between infrastructure and features across 5 phases to maintain both
 - Redirect logic after auth (middleware already exists)
 - Session persistence and refresh
 
-### 2.2 Profile
+### 2.2 Profile & Stripe Connect
 
 - Connect profile page: display, edit, avatar upload
 - Call `profilesService.getProfileByUserId()` and `updateProfile()`
 - Avatar upload via Supabase Storage
+- **Stripe Connect onboarding for travelers**: surface Connect setup in profile, prompt with link to `/api/connect/onboard`, display onboarding status via `/api/connect/status`
+- Gate listing creation or payment acceptance behind a check that Connect is onboarded — travelers cannot receive payouts without it
 
 ### 2.3 Listings (Traveler Journey)
 
@@ -139,10 +152,13 @@ Alternating between infrastructure and features across 5 phases to maintain both
 - Capture after confirmation → `capturePayment()`
 - Refund on dispute/cancellation → `POST /api/payments/refund`
 - Transaction history page → `GET /api/transactions`
+- **Handle PaymentIntent 7-day expiry**: listen to `payment_intent.canceled` webhook event, update transaction status, notify both parties. Display capture deadline in status UI.
+- **Webhook idempotency**: store processed Stripe event IDs in `processed_webhook_events` table, check before acting to prevent duplicate emails on retry delivery
 
 ### 2.9 Delivery Confirmation
 
-- Traveler marks as collected → `markCollected()`
+- All status transitions go through `PATCH /api/requests/[id]` with `action` field
+- Available actions: `accept`, `collect`, `in_transit`, `deliver`, `dispute`, `resolve_refund`, `resolve_release`
 - Status progression UI: pending → accepted → paid → collected → in_transit → delivered → confirmed
 - 6-digit confirmation code entry by sender → `POST /api/requests/[id]/confirm`
 
@@ -160,6 +176,9 @@ Alternating between infrastructure and features across 5 phases to maintain both
 
 ### 2.12 E2E Tests
 
+- **Framework**: Playwright (natural choice for Next.js 16)
+- **Test DB strategy**: dedicated Supabase test project with separate env vars, seeded before each run
+- **Stripe**: test mode with Stripe CLI webhook listener in CI
 - Test: Inscription → Create listing → Send request → Pay → Deliver → Confirm → Review
 - Test: Inscription → Create parcel → Receive offer → Accept → Pay → Confirm
 - Test: Auth flow (login, logout, reset password)
@@ -176,7 +195,7 @@ Alternating between infrastructure and features across 5 phases to maintain both
 
 - Connect conversation pages to API
 - Real-time messages via Supabase Realtime subscriptions
-- Support text, image, voice message types
+- Support text and image message types (voice messages deferred to post-launch — non-trivial mobile browser complexity)
 - Conversation list with last message preview
 - Unread message indicators
 
@@ -224,6 +243,8 @@ Alternating between infrastructure and features across 5 phases to maintain both
 - User management with search
 - Dispute management: list, view, resolve (refund or release)
 - Transaction list
+- All admin operations use `adminSupabase` (service role client), not user-scoped client
+- Admin action audit logging
 
 ### 3.8 Tests
 
@@ -240,12 +261,12 @@ Alternating between infrastructure and features across 5 phases to maintain both
 
 **Objective**: Full visibility in production, legal compliance.
 
-### 4.1 Sentry Integration
+### 4.1 Sentry Alert Rules & Performance
 
-- Install `@sentry/nextjs`
-- Configure for both client and server
-- Source maps upload in CI
-- Alert rules: email on new errors, Slack if available
+- Sentry SDK already installed and configured in Phase 1.6
+- Configure alert rules: email on new errors, Slack if available
+- Performance monitoring: transaction tracing on API routes
+- Set up dashboards for error trends and response times
 
 ### 4.2 PostHog Analytics
 
@@ -268,9 +289,9 @@ Alternating between infrastructure and features across 5 phases to maintain both
 ### 4.5 RGPD Compliance
 
 - Privacy policy page (`/politique-de-confidentialite`)
-- Cookie consent banner (only if using non-essential cookies — PostHog)
+- **Cookie consent banner required** — PostHog analytics cookies need explicit prior consent under RGPD/CNIL. PostHog must only be loaded after consent is given.
 - User data export endpoint (`GET /api/profile/export`)
-- User account deletion endpoint (`DELETE /api/profile`)
+- User account deletion endpoint (`DELETE /api/profile`) — **soft-delete/anonymization approach**: PII fields (name, phone, avatar, bio) are nulled, auth account deleted, but `profiles` row and `transactions` rows retained with `deleted_at` flag. Satisfies both RGPD erasure and financial record retention (10 years in France).
 - Consent storage: checkbox at registration, dated record in DB
 
 ### 4.6 Legal Pages
@@ -329,12 +350,11 @@ Alternating between infrastructure and features across 5 phases to maintain both
 - Keyboard navigation for critical flows
 - Screen reader testing on key pages
 
-### 5.5 i18n Preparation
+### 5.5 i18n Preparation (deferred to post-launch v1.1)
 
-- Install `next-intl`
-- Extract all French strings to translation files
-- No English translation yet — but structure ready for future
-- Default locale: `fr`
+- The project is French-only for launch. Extracting all hardcoded strings across dozens of components, services, and error messages is a full refactor — not a preparation step.
+- Deferred to post-launch to avoid delaying production deployment.
+- When implemented: install `next-intl`, extract strings, default locale `fr`.
 
 ### 5.6 Final Test Suite
 
@@ -348,7 +368,8 @@ Alternating between infrastructure and features across 5 phases to maintain both
 - Configure production env vars in Vercel
 - Deploy to production
 - Verify all flows work on deployed version
-- Configure Stripe webhooks with production URL
+- Configure Stripe payment webhooks with production URL
+- Configure Stripe Identity webhook endpoint (`/api/webhooks/stripe-identity`) and set `STRIPE_IDENTITY_WEBHOOK_SECRET` in Vercel
 
 ### 5.8 Stripe Live Mode
 
