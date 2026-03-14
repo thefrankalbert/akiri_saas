@@ -112,6 +112,11 @@ export function useRequestDetail(requestId: string): RequestDetailData {
             body: JSON.stringify({ request_id: request?.id }),
           });
           if (res.ok) {
+            const json = await res.json();
+            if (json.data?.url) {
+              window.location.href = json.data.url;
+              return;
+            }
             toasts.paymentSuccess();
             setRequest((prev) => (prev ? { ...prev, status: 'paid' } : prev));
           } else {
@@ -133,14 +138,20 @@ export function useRequestDetail(requestId: string): RequestDetailData {
           const res = await fetch(`/api/requests/${request?.id}`, {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ status: action === 'accept' ? 'accepted' : 'cancelled' }),
+            body: JSON.stringify({ action }),
           });
           if (res.ok) {
+            const statusMap: Record<string, string> = {
+              accept: 'accepted',
+              cancel: 'cancelled',
+              collect: 'collected',
+              in_transit: 'in_transit',
+              deliver: 'delivered',
+            };
+            const newStatus = statusMap[action] ?? action;
             if (action === 'accept') toasts.requestAccepted();
-            else toasts.requestCancelled();
-            setRequest((prev) =>
-              prev ? { ...prev, status: action === 'accept' ? 'accepted' : 'cancelled' } : prev
-            );
+            else if (action === 'cancel') toasts.requestCancelled();
+            setRequest((prev) => (prev ? { ...prev, status: newStatus } : prev));
           }
         }
       } catch {
