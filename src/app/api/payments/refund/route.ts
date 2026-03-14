@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
   const user = await getAuthUser();
   if (!user) return apiError('Non autorisé', 401);
 
-  const limit = rateLimit(`refund:${user.id}`, { maxRequests: 3, windowMs: 60_000 });
+  const limit = await rateLimit(`refund:${user.id}`, { maxRequests: 3, windowMs: 60_000 });
   if (!limit.success) return apiError('Trop de tentatives, réessayez plus tard', 429);
 
   const body = await parseBody(request, refundSchema);

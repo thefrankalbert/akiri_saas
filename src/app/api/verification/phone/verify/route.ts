@@ -19,7 +19,7 @@ export async function POST(request: Request) {
       return apiError('Non autorisé', 401);
     }
 
-    const limit = rateLimit(`otp-verify:${user.id}`, { maxRequests: 5, windowMs: 60_000 });
+    const limit = await rateLimit(`otp-verify:${user.id}`, { maxRequests: 5, windowMs: 60_000 });
     if (!limit.success) {
       return apiError('Trop de tentatives, réessayez plus tard', 429);
     }
