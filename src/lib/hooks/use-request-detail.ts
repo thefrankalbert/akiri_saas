@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { createClient, supabaseConfigured } from '@/lib/supabase/client';
 import { toasts } from '@/lib/utils/toast';
 import { mockRequests } from '@/lib/mock-data';
-import type { ShipmentRequest, Profile } from '@/types';
+import type { ShipmentRequest, Profile, RequestStatus } from '@/types';
 
 const CURRENT_USER_ID = 'mock-user-001';
 
@@ -141,14 +141,14 @@ export function useRequestDetail(requestId: string): RequestDetailData {
             body: JSON.stringify({ action }),
           });
           if (res.ok) {
-            const statusMap: Record<string, string> = {
+            const statusMap: Record<string, RequestStatus> = {
               accept: 'accepted',
               cancel: 'cancelled',
               collect: 'collected',
               in_transit: 'in_transit',
               deliver: 'delivered',
             };
-            const newStatus = statusMap[action] ?? action;
+            const newStatus: RequestStatus = statusMap[action] ?? (action as RequestStatus);
             if (action === 'accept') toasts.requestAccepted();
             else if (action === 'cancel') toasts.requestCancelled();
             setRequest((prev) => (prev ? { ...prev, status: newStatus } : prev));
