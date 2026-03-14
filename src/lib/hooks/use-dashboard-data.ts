@@ -61,6 +61,41 @@ const mockActivities: ActivityItem[] = [
   },
 ];
 
+function formatRelativeTime(date: Date): string {
+  const now = Date.now();
+  const diffMs = now - date.getTime();
+  const diffMin = Math.floor(diffMs / 60_000);
+  if (diffMin < 1) return "À l'instant";
+  if (diffMin < 60) return `Il y a ${diffMin}min`;
+  const diffH = Math.floor(diffMin / 60);
+  if (diffH < 24) return `Il y a ${diffH}h`;
+  const diffD = Math.floor(diffH / 24);
+  if (diffD === 1) return 'Hier';
+  if (diffD < 7) return `Il y a ${diffD}j`;
+  return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+}
+
+const requestStatusMap: Record<
+  string,
+  {
+    title: string;
+    icon: ActivityItem['icon'];
+    status: ActivityItem['status'];
+    type: ActivityItem['type'];
+  }
+> = {
+  pending: {
+    title: "Nouvelle demande d'expédition",
+    icon: 'package',
+    status: 'pending',
+    type: 'request',
+  },
+  accepted: { title: 'Demande acceptée', icon: 'package', status: 'info', type: 'request' },
+  paid: { title: 'Paiement reçu', icon: 'payment', status: 'success', type: 'payment' },
+  delivered: { title: 'Colis livré', icon: 'package', status: 'success', type: 'request' },
+  confirmed: { title: 'Livraison confirmée', icon: 'package', status: 'success', type: 'request' },
+};
+
 export interface DashboardData {
   profile: Profile | null;
   stats: DashboardStats;
@@ -77,7 +112,7 @@ export function useDashboardData(): DashboardData {
     unreadMessages: 0,
     totalEarnings: 0,
   });
-  const [activities] = useState<ActivityItem[]>(mockActivities);
+  const [activities, setActivities] = useState<ActivityItem[]>(mockActivities);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -141,6 +176,72 @@ export function useDashboardData(): DashboardData {
         unreadMessages: 0,
         totalEarnings: 0,
       });
+
+      // Fetch recent activities
+      const [requestsActivity, reviewsActivity] = await Promise.all([
+        supabase
+          .from('shipment_requests')
+          .select(
+            'id, status, updated_at, weight_kg, listing:listings(departure_city, arrival_city)'
+          )
+          .or(`sender_id.eq.${user.id},traveler_id.eq.${user.id}`)
+          .order('updated_at', { ascending: false })
+          .limit(10),
+        supabase
+          .from('reviews')
+          .select('id, rating, created_at, comment')
+          .eq('reviewee_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(5),
+      ]);
+
+      if (controller.signal.aborted) return;
+
+      const realActivities: ActivityItem[] = [];
+
+      if (requestsActivity.data) {
+        for (const req of requestsActivity.data) {
+          const mapping = requestStatusMap[req.status as string];
+          if (!mapping) continue;
+          const listing = req.listing as { departure_city?: string; arrival_city?: string } | null;
+          const route =
+            listing?.departure_city && listing?.arrival_city
+              ? `${listing.departure_city} → ${listing.arrival_city}`
+              : '';
+          const desc = [route, req.weight_kg ? `${req.weight_kg}kg` : '']
+            .filter(Boolean)
+            .join(', ');
+          realActivities.push({
+            id: `req-${req.id}`,
+            type: mapping.type,
+            title: mapping.title,
+            description: desc || formatRelativeTime(new Date(req.updated_at as string)),
+            timestamp: new Date(req.updated_at as string),
+            icon: mapping.icon,
+            status: mapping.status,
+          });
+        }
+      }
+
+      if (reviewsActivity.data) {
+        for (const rev of reviewsActivity.data) {
+          realActivities.push({
+            id: `rev-${rev.id}`,
+            type: 'review',
+            title: `Nouvel avis reçu (${rev.rating}/5)`,
+            description: rev.comment ? `"${(rev.comment as string).slice(0, 60)}"` : '',
+            timestamp: new Date(rev.created_at as string),
+            icon: 'star',
+            status: 'success',
+          });
+        }
+      }
+
+      // Sort combined activities by timestamp descending, take top 10
+      realActivities.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+      if (realActivities.length > 0) {
+        setActivities(realActivities.slice(0, 10));
+      }
 
       setLoading(false);
     };
