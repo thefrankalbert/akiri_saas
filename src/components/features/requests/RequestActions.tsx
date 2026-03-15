@@ -1,6 +1,6 @@
 'use client';
 
-import { CheckCircle, CreditCard, XCircle } from '@phosphor-icons/react';
+import { CheckCircle, CreditCard, Package, Truck, XCircle } from '@phosphor-icons/react';
 import { Button, Card, CardContent } from '@/components/ui';
 import { ReviewForm } from '@/components/features/reviews/ReviewForm';
 import { formatCurrency } from '@/lib/utils';
@@ -114,7 +114,40 @@ export function RequestActions({
           </div>
         )}
 
-        {['paid', 'collected', 'in_transit'].includes(request.status) && (
+        {role === 'traveler' && request.status === 'paid' && (
+          <Button
+            className="w-full"
+            onClick={() => onStatusAction('collect')}
+            isLoading={actionLoading}
+            leftIcon={<Package weight="duotone" size={16} />}
+          >
+            Colis collecté
+          </Button>
+        )}
+
+        {role === 'traveler' && request.status === 'collected' && (
+          <Button
+            className="w-full"
+            onClick={() => onStatusAction('in_transit')}
+            isLoading={actionLoading}
+            leftIcon={<Truck weight="duotone" size={16} />}
+          >
+            En transit
+          </Button>
+        )}
+
+        {role === 'traveler' && request.status === 'in_transit' && (
+          <Button
+            className="w-full"
+            onClick={() => onStatusAction('deliver')}
+            isLoading={actionLoading}
+            leftIcon={<CheckCircle weight="duotone" size={16} />}
+          >
+            Marquer comme livré
+          </Button>
+        )}
+
+        {role === 'sender' && ['paid', 'collected', 'in_transit'].includes(request.status) && (
           <p className="text-surface-100 text-center text-sm">
             {request.status === 'paid' && 'En attente de la collecte du colis par le voyageur.'}
             {request.status === 'collected' &&

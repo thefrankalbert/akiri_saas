@@ -26,11 +26,19 @@ import {
   type MockActivityEvent,
   type ActivityEventType,
 } from '@/lib/mock-data';
+import { supabaseConfigured } from '@/lib/supabase/client';
 import type { Listing, Profile } from '@/types';
 
 // ============================================
 // Types & Helpers
 // ============================================
+
+interface ApiCorridor {
+  departure_country: string;
+  arrival_country: string;
+  active_listings: number;
+  avg_price_per_kg: number;
+}
 
 interface ComputedCorridor {
   fromCountry: (typeof SUPPORTED_COUNTRIES)[number];
@@ -94,6 +102,89 @@ const ACTIVITY_CONFIG: Record<
 // Component
 // ============================================
 
+function computeCorridorsFromMock(): ComputedCorridor[] {
+  const corridorMap = new Map<string, Listing[]>();
+
+  for (const listing of mockListings) {
+    const key = `${listing.departure_city}-${listing.arrival_city}`;
+    if (!corridorMap.has(key)) corridorMap.set(key, []);
+    corridorMap.get(key)!.push(listing);
+  }
+
+  const result: ComputedCorridor[] = [];
+
+  Array.from(corridorMap.entries()).forEach(([key, listings], index) => {
+    const first = listings[0];
+    const fromCountry = findCountryByName(first.departure_country);
+    const toCountry = findCountryByName(first.arrival_country);
+
+    if (!fromCountry || !toCountry) return;
+
+    const sorted = [...listings].sort(
+      (a, b) => new Date(a.departure_date).getTime() - new Date(b.departure_date).getTime()
+    );
+
+    const avgPrice = Math.round(
+      listings.reduce((sum, l) => sum + l.price_per_kg, 0) / listings.length
+    );
+
+    const totalKg = listings.reduce((sum, l) => sum + l.available_kg, 0);
+
+    const topTraveler =
+      listings
+        .map((l) => l.traveler)
+        .filter((t): t is Profile => !!t)
+        .sort((a, b) => b.rating - a.rating)[0] || null;
+
+    result.push({
+      fromCountry,
+      toCountry,
+      key,
+      departureCity: first.departure_city,
+      arrivalCity: first.arrival_city,
+      listings,
+      count: listings.length,
+      avgPrice,
+      totalKg,
+      nextDeparture: sorted[0] ?? null,
+      topTraveler,
+      trend: getTrend(index),
+    });
+  });
+
+  return result.sort((a, b) => b.count - a.count);
+}
+
+function mapApiCorridorsToComputed(apiCorridors: ApiCorridor[]): ComputedCorridor[] {
+  const result: ComputedCorridor[] = [];
+
+  apiCorridors.forEach((corridor, index) => {
+    const fromCountry = findCountryByName(corridor.departure_country);
+    const toCountry = findCountryByName(corridor.arrival_country);
+
+    if (!fromCountry || !toCountry) return;
+
+    const key = `${corridor.departure_country}-${corridor.arrival_country}`;
+
+    result.push({
+      fromCountry,
+      toCountry,
+      key,
+      departureCity: fromCountry.name,
+      arrivalCity: toCountry.name,
+      listings: [],
+      count: corridor.active_listings,
+      avgPrice: Math.round(corridor.avg_price_per_kg),
+      totalKg: 0,
+      nextDeparture: null,
+      topTraveler: null,
+      trend: getTrend(index),
+    });
+  });
+
+  return result;
+}
+
 export function CorridorsPage() {
   // --- State ---
   const [visibleEvents, setVisibleEvents] = useState<MockActivityEvent[]>([]);
@@ -105,62 +196,27 @@ export function CorridorsPage() {
     travelers: 0,
   });
   const [statPulseKey, setStatPulseKey] = useState(0);
+  const [apiCorridors, setApiCorridors] = useState<ApiCorridor[] | null>(null);
+  const [isLoading, setIsLoading] = useState(supabaseConfigured);
 
   // --- Computed data ---
   const corridors = useMemo(() => {
-    const corridorMap = new Map<string, Listing[]>();
-
-    for (const listing of mockListings) {
-      const key = `${listing.departure_city}-${listing.arrival_city}`;
-      if (!corridorMap.has(key)) corridorMap.set(key, []);
-      corridorMap.get(key)!.push(listing);
+    if (apiCorridors !== null) {
+      return mapApiCorridorsToComputed(apiCorridors);
     }
-
-    const result: ComputedCorridor[] = [];
-
-    Array.from(corridorMap.entries()).forEach(([key, listings], index) => {
-      const first = listings[0];
-      const fromCountry = findCountryByName(first.departure_country);
-      const toCountry = findCountryByName(first.arrival_country);
-
-      if (!fromCountry || !toCountry) return;
-
-      const sorted = [...listings].sort(
-        (a, b) => new Date(a.departure_date).getTime() - new Date(b.departure_date).getTime()
-      );
-
-      const avgPrice = Math.round(
-        listings.reduce((sum, l) => sum + l.price_per_kg, 0) / listings.length
-      );
-
-      const totalKg = listings.reduce((sum, l) => sum + l.available_kg, 0);
-
-      const topTraveler =
-        listings
-          .map((l) => l.traveler)
-          .filter((t): t is Profile => !!t)
-          .sort((a, b) => b.rating - a.rating)[0] || null;
-
-      result.push({
-        fromCountry,
-        toCountry,
-        key,
-        departureCity: first.departure_city,
-        arrivalCity: first.arrival_city,
-        listings,
-        count: listings.length,
-        avgPrice,
-        totalKg,
-        nextDeparture: sorted[0] ?? null,
-        topTraveler,
-        trend: getTrend(index),
-      });
-    });
-
-    return result.sort((a, b) => b.count - a.count);
-  }, []);
+    return computeCorridorsFromMock();
+  }, [apiCorridors]);
 
   const aggregateStats = useMemo(() => {
+    if (apiCorridors !== null) {
+      const totalListings = apiCorridors.reduce((sum, c) => sum + c.active_listings, 0);
+      return {
+        listings: totalListings,
+        kg: 0,
+        corridors: apiCorridors.length,
+        travelers: 0,
+      };
+    }
     const uniqueTravelerIds = new Set(mockListings.map((l) => l.traveler_id));
     return {
       listings: mockListings.length,
@@ -168,7 +224,7 @@ export function CorridorsPage() {
       corridors: corridors.length,
       travelers: uniqueTravelerIds.size,
     };
-  }, [corridors]);
+  }, [apiCorridors, corridors]);
 
   const upcomingDepartures = useMemo(() => {
     return [...mockListings]
@@ -177,6 +233,28 @@ export function CorridorsPage() {
   }, []);
 
   // --- Effects ---
+
+  // Fetch real corridors from API when Supabase is configured
+  useEffect(() => {
+    if (!supabaseConfigured) return;
+
+    setIsLoading(true);
+    fetch('/api/corridors')
+      .then((res) => {
+        if (!res.ok) throw new Error('Failed to fetch corridors');
+        return res.json() as Promise<{ data: ApiCorridor[] }>;
+      })
+      .then(({ data }) => {
+        setApiCorridors(data);
+      })
+      .catch(() => {
+        // On error, fall back to mock data
+        setApiCorridors(null);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  }, []);
 
   // Animated counter on mount
   useEffect(() => {
@@ -236,6 +314,19 @@ export function CorridorsPage() {
   }, []);
 
   // --- Render ---
+  if (isLoading) {
+    return (
+      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 md:px-7 lg:px-8">
+        <div className="flex h-64 items-center justify-center">
+          <div className="flex flex-col items-center gap-3">
+            <div className="border-primary-500 h-8 w-8 animate-spin rounded-full border-2 border-t-transparent" />
+            <p className="text-surface-100 text-sm">Chargement des corridors…</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 md:px-7 lg:px-8">
       {/* ===== PAGE HEADER ===== */}

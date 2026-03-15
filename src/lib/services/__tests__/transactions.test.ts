@@ -1,87 +1,17 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { createMockSupabase, asSupabase, createMockStripe, asStripe } from './helpers';
+import { createTransactionService, amountToCents } from '@/lib/services/transactions';
+import { calculateTransactionFees, calculatePaginationOffset } from '@/lib/utils';
+import { ServiceError } from '@/lib/services/errors';
 import { PLATFORM_FEE_PERCENT, DEFAULT_PAGE_SIZE } from '@/constants';
 
-// ============================================
-// Mock Setup — Supabase & Stripe
-// ============================================
-
-// Chainable Supabase query builder mock
-function createQueryBuilder(resolvedValue: { data: unknown; error: unknown; count?: number }) {
-  const builder: Record<string, unknown> = {};
-  const methods = [
-    'select',
-    'insert',
-    'update',
-    'delete',
-    'eq',
-    'in',
-    'or',
-    'order',
-    'range',
-    'single',
-    'maybeSingle',
-    'limit',
-  ];
-
-  for (const method of methods) {
-    builder[method] = vi.fn().mockReturnValue(builder);
-  }
-
-  // Terminal methods return the resolved value
-  builder['single'] = vi.fn().mockResolvedValue(resolvedValue);
-  builder['maybeSingle'] = vi.fn().mockResolvedValue(resolvedValue);
-
-  // select with count returns with count property
-  builder['select'] = vi.fn().mockImplementation(() => {
-    const selectBuilder = { ...builder };
-    selectBuilder['range'] = vi.fn().mockResolvedValue({
-      ...resolvedValue,
-      count: resolvedValue.count ?? 0,
-    });
-    return selectBuilder;
-  });
-
-  return builder;
-}
-
-// Supabase mock instances
-const mockSupabaseFrom = vi.fn();
-const mockAdminFrom = vi.fn();
-
-vi.mock('@/lib/supabase/server', () => ({
-  createClient: vi
-    .fn()
-    .mockResolvedValue({ from: (...args: unknown[]) => mockSupabaseFrom(...args) }),
-  createAdminClient: vi
-    .fn()
-    .mockResolvedValue({ from: (...args: unknown[]) => mockAdminFrom(...args) }),
+vi.mock('@/lib/logger', () => ({
+  logger: { error: vi.fn(), warn: vi.fn(), info: vi.fn() },
 }));
 
-// Stripe mock
-const mockStripeCheckoutCreate = vi.fn();
-const mockStripePaymentIntentsCapture = vi.fn();
-const mockStripePaymentIntentsCancel = vi.fn();
-
-vi.mock('@/lib/stripe', () => ({
-  getStripe: vi.fn(() => ({
-    checkout: {
-      sessions: { create: mockStripeCheckoutCreate },
-    },
-    paymentIntents: {
-      capture: mockStripePaymentIntentsCapture,
-      cancel: mockStripePaymentIntentsCancel,
-    },
-  })),
+vi.mock('@/lib/email', () => ({
+  sendPayoutEmail: vi.fn().mockResolvedValue(undefined),
 }));
-
-// Import AFTER mocks are defined
-import {
-  createCheckoutSession,
-  capturePayment,
-  refundPayment,
-  getTransactionsByUser,
-  getTransactionByRequest,
-} from '@/lib/services/transactions';
 
 // ============================================
 // Test Data Factories
@@ -119,12 +49,25 @@ function mockTransaction(overrides: Record<string, unknown> = {}) {
     amount: 50,
     currency: 'EUR',
     platform_fee: 5,
+    payout_amount: 45,
     stripe_payment_intent_id: 'pi_test_123',
     status: 'held',
     created_at: '2026-01-01T00:00:00Z',
     updated_at: '2026-01-01T00:00:00Z',
     ...overrides,
   };
+}
+
+function setup() {
+  const mockSupabase = createMockSupabase();
+  const mockAdminSupabase = createMockSupabase();
+  const mockStripe = createMockStripe();
+  const service = createTransactionService(
+    asSupabase(mockSupabase),
+    asSupabase(mockAdminSupabase),
+    asStripe(mockStripe)
+  );
+  return { mockSupabase, mockAdminSupabase, mockStripe, service };
 }
 
 // ============================================
@@ -140,109 +83,97 @@ describe('Transactions Service', () => {
   // createCheckoutSession
   // -----------------------------------------
   describe('createCheckoutSession', () => {
-    it('returns 404 when request is not found', async () => {
-      mockSupabaseFrom.mockReturnValue(
-        createQueryBuilder({ data: null, error: { message: 'Not found' } })
+    it('throws NOT_FOUND when request is not found', async () => {
+      const { mockSupabase, service } = setup();
+      mockSupabase._getChain('shipment_requests').single.mockResolvedValue({
+        data: null,
+        error: { message: 'Not found' },
+      });
+
+      await expect(service.createCheckoutSession(MOCK_REQUEST_ID, MOCK_USER_ID)).rejects.toThrow(
+        ServiceError
       );
 
-      const result = await createCheckoutSession(MOCK_REQUEST_ID, MOCK_USER_ID);
-
-      expect(result.status).toBe(404);
-      expect(result.error).toContain('introuvable');
-      expect(result.data).toBeNull();
+      try {
+        await service.createCheckoutSession(MOCK_REQUEST_ID, MOCK_USER_ID);
+      } catch (e) {
+        expect(e).toBeInstanceOf(ServiceError);
+        expect((e as ServiceError).code).toBe('NOT_FOUND');
+        expect((e as ServiceError).message).toContain('introuvable');
+      }
     });
 
-    it('returns 403 when user is not the sender', async () => {
+    it('throws AUTH when user is not the sender', async () => {
+      const { mockSupabase, service } = setup();
       const req = mockRequest({ sender_id: 'other-user' });
 
-      // First call: shipment_requests.select -> returns request
-      const reqBuilder = createQueryBuilder({ data: req, error: null });
-      mockSupabaseFrom.mockReturnValue(reqBuilder);
+      mockSupabase._getChain('shipment_requests').single.mockResolvedValue({
+        data: req,
+        error: null,
+      });
 
-      const result = await createCheckoutSession(MOCK_REQUEST_ID, MOCK_USER_ID);
-
-      expect(result.status).toBe(403);
-      expect(result.error).toContain('expéditeur');
+      try {
+        await service.createCheckoutSession(MOCK_REQUEST_ID, MOCK_USER_ID);
+        expect.fail('should have thrown');
+      } catch (e) {
+        expect(e).toBeInstanceOf(ServiceError);
+        expect((e as ServiceError).code).toBe('AUTH');
+        expect((e as ServiceError).message).toContain('expéditeur');
+      }
     });
 
-    it('returns 409 when a non-pending transaction already exists', async () => {
+    it('throws CONFLICT when a non-pending transaction already exists', async () => {
+      const { mockSupabase, service } = setup();
       const req = mockRequest();
       const existingTx = mockTransaction({ status: 'held' });
 
-      // First from() call = shipment_requests
-      // Second from() call = transactions
-      let callCount = 0;
-      mockSupabaseFrom.mockImplementation(() => {
-        callCount++;
-        if (callCount === 1) {
-          return createQueryBuilder({ data: req, error: null });
-        }
-        return createQueryBuilder({ data: existingTx, error: null });
+      // First call: shipment_requests.single
+      mockSupabase._getChain('shipment_requests').single.mockResolvedValue({
+        data: req,
+        error: null,
+      });
+      // Second call: transactions.maybeSingle
+      mockSupabase._getChain('transactions').maybeSingle.mockResolvedValue({
+        data: existingTx,
+        error: null,
       });
 
-      const result = await createCheckoutSession(MOCK_REQUEST_ID, MOCK_USER_ID);
-
-      expect(result.status).toBe(409);
-      expect(result.error).toContain('existe déjà');
-    });
-
-    it('calculates platform fee correctly at 10%', () => {
-      // This tests the fee calculation logic used in createCheckoutSession
-      const totalPrice = 50;
-      const expectedFee = Math.round(totalPrice * (PLATFORM_FEE_PERCENT / 100) * 100) / 100;
-
-      expect(expectedFee).toBe(5);
-      expect(PLATFORM_FEE_PERCENT).toBe(10);
-    });
-
-    it('calculates platform fee with decimal amounts', () => {
-      const totalPrice = 33.33;
-      const fee = Math.round(totalPrice * (PLATFORM_FEE_PERCENT / 100) * 100) / 100;
-
-      expect(fee).toBe(3.33);
-    });
-
-    it('converts amount to cents correctly', () => {
-      const totalPrice = 49.99;
-      const amountInCents = Math.round(totalPrice * 100);
-
-      expect(amountInCents).toBe(4999);
-    });
-
-    it('converts large amount to cents without floating point errors', () => {
-      const totalPrice = 199.99;
-      const amountInCents = Math.round(totalPrice * 100);
-
-      expect(amountInCents).toBe(19999);
+      try {
+        await service.createCheckoutSession(MOCK_REQUEST_ID, MOCK_USER_ID);
+        expect.fail('should have thrown');
+      } catch (e) {
+        expect(e).toBeInstanceOf(ServiceError);
+        expect((e as ServiceError).code).toBe('CONFLICT');
+        expect((e as ServiceError).message).toContain('existe déjà');
+      }
     });
 
     it('creates checkout session with manual capture for escrow', async () => {
+      const { mockSupabase, mockAdminSupabase, mockStripe, service } = setup();
       const req = mockRequest();
 
-      let fromCallCount = 0;
-      mockSupabaseFrom.mockImplementation(() => {
-        fromCallCount++;
-        if (fromCallCount === 1) {
-          return createQueryBuilder({ data: req, error: null });
-        }
-        // No existing transaction
-        return createQueryBuilder({ data: null, error: null });
+      mockSupabase._getChain('shipment_requests').single.mockResolvedValue({
+        data: req,
+        error: null,
       });
-
-      mockAdminFrom.mockReturnValue(createQueryBuilder({ data: { id: 'tx-new' }, error: null }));
-
-      mockStripeCheckoutCreate.mockResolvedValue({
+      mockSupabase._getChain('transactions').maybeSingle.mockResolvedValue({
+        data: null,
+        error: null,
+      });
+      mockAdminSupabase._getChain('transactions').single.mockResolvedValue({
+        data: { id: 'tx-new' },
+        error: null,
+      });
+      mockStripe.checkout.sessions.create.mockResolvedValue({
         url: 'https://checkout.stripe.com/session_123',
         payment_intent: 'pi_test_new',
       });
 
-      const result = await createCheckoutSession(MOCK_REQUEST_ID, MOCK_USER_ID);
+      const result = await service.createCheckoutSession(MOCK_REQUEST_ID, MOCK_USER_ID);
 
-      expect(result.status).toBe(200);
-      expect(result.data?.url).toContain('stripe.com');
+      expect(result.url).toContain('stripe.com');
 
-      // Verify Stripe was called with manual capture (escrow)
-      const stripeCallArgs = mockStripeCheckoutCreate.mock.calls[0][0];
+      const stripeCallArgs = mockStripe.checkout.sessions.create.mock.calls[0][0];
       expect(stripeCallArgs.payment_intent_data.capture_method).toBe('manual');
       expect(stripeCallArgs.mode).toBe('payment');
       expect(stripeCallArgs.metadata.request_id).toBe(MOCK_REQUEST_ID);
@@ -253,53 +184,106 @@ describe('Transactions Service', () => {
   // capturePayment
   // -----------------------------------------
   describe('capturePayment', () => {
-    it('returns 404 when no held transaction exists', async () => {
-      mockAdminFrom.mockReturnValue(
-        createQueryBuilder({ data: null, error: { message: 'Not found' } })
-      );
+    it('throws NOT_FOUND when no held transaction exists', async () => {
+      const { mockAdminSupabase, service } = setup();
+      mockAdminSupabase._getChain('transactions').single.mockResolvedValue({
+        data: null,
+        error: { message: 'Not found' },
+      });
 
-      const result = await capturePayment(MOCK_REQUEST_ID);
-
-      expect(result.status).toBe(404);
-      expect(result.error).toContain('introuvable');
+      try {
+        await service.capturePayment(MOCK_REQUEST_ID);
+        expect.fail('should have thrown');
+      } catch (e) {
+        expect(e).toBeInstanceOf(ServiceError);
+        expect((e as ServiceError).code).toBe('NOT_FOUND');
+        expect((e as ServiceError).message).toContain('introuvable');
+      }
     });
 
     it('captures payment via Stripe and updates status to released', async () => {
+      const { mockAdminSupabase, mockStripe, service } = setup();
       const tx = mockTransaction({ status: 'held' });
       const releasedTx = { ...tx, status: 'released' };
 
       let adminCallCount = 0;
-      mockAdminFrom.mockImplementation(() => {
-        adminCallCount++;
-        if (adminCallCount === 1) {
-          // Find transaction
-          return createQueryBuilder({ data: tx, error: null });
+      mockAdminSupabase.from.mockImplementation((table: string) => {
+        const chain = mockAdminSupabase._getChain(table);
+        if (table === 'transactions') {
+          adminCallCount++;
+          if (adminCallCount === 1) {
+            chain.single.mockResolvedValueOnce({ data: tx, error: null });
+          } else if (adminCallCount === 3) {
+            chain.single.mockResolvedValueOnce({ data: releasedTx, error: null });
+          }
         }
-        // Update transaction
-        return createQueryBuilder({ data: releasedTx, error: null });
+        if (table === 'profiles') {
+          chain.single.mockResolvedValue({ data: null, error: null });
+        }
+        return chain;
       });
 
-      mockStripePaymentIntentsCapture.mockResolvedValue({ id: tx.stripe_payment_intent_id });
+      mockAdminSupabase.auth.admin.getUserById.mockResolvedValue({
+        data: { user: { email: 'traveler@test.com' } },
+      });
 
-      const result = await capturePayment(MOCK_REQUEST_ID);
+      mockStripe.paymentIntents.capture.mockResolvedValue({ id: tx.stripe_payment_intent_id });
 
-      expect(result.status).toBe(200);
-      expect(mockStripePaymentIntentsCapture).toHaveBeenCalledWith('pi_test_123');
+      // Re-setup: use a simpler approach
+      const mockSupabase2 = createMockSupabase();
+      const mockAdminSupabase2 = createMockSupabase();
+      const mockStripe2 = createMockStripe();
+
+      // tx lookup
+      mockAdminSupabase2
+        ._getChain('transactions')
+        .single.mockResolvedValueOnce({ data: tx, error: null }) // find held tx
+        .mockResolvedValueOnce({ data: releasedTx, error: null }); // update result
+
+      // profiles lookup
+      mockAdminSupabase2._getChain('profiles').single.mockResolvedValue({
+        data: null,
+        error: null,
+      });
+
+      mockAdminSupabase2.auth.admin.getUserById.mockResolvedValue({
+        data: { user: { email: 'traveler@test.com' } },
+      });
+
+      mockStripe2.paymentIntents.capture.mockResolvedValue({ id: tx.stripe_payment_intent_id });
+
+      const service2 = createTransactionService(
+        asSupabase(mockSupabase2),
+        asSupabase(mockAdminSupabase2),
+        asStripe(mockStripe2)
+      );
+
+      const result = await service2.capturePayment(MOCK_REQUEST_ID);
+
+      expect(mockStripe2.paymentIntents.capture).toHaveBeenCalledWith('pi_test_123');
+      expect(result).toMatchObject({ status: 'released' });
     });
 
-    it('returns 500 when Stripe capture fails', async () => {
+    it('throws INTERNAL when Stripe capture fails', async () => {
+      const { mockAdminSupabase, mockStripe, service } = setup();
       const tx = mockTransaction({ status: 'held' });
 
-      mockAdminFrom.mockReturnValue(createQueryBuilder({ data: tx, error: null }));
-
-      mockStripePaymentIntentsCapture.mockRejectedValue(
+      mockAdminSupabase._getChain('transactions').single.mockResolvedValue({
+        data: tx,
+        error: null,
+      });
+      mockStripe.paymentIntents.capture.mockRejectedValue(
         new Error('Payment intent has already been captured')
       );
 
-      const result = await capturePayment(MOCK_REQUEST_ID);
-
-      expect(result.status).toBe(500);
-      expect(result.error).toContain('already been captured');
+      try {
+        await service.capturePayment(MOCK_REQUEST_ID);
+        expect.fail('should have thrown');
+      } catch (e) {
+        expect(e).toBeInstanceOf(ServiceError);
+        expect((e as ServiceError).code).toBe('INTERNAL');
+        expect((e as ServiceError).message).toContain('already been captured');
+      }
     });
   });
 
@@ -307,82 +291,107 @@ describe('Transactions Service', () => {
   // refundPayment
   // -----------------------------------------
   describe('refundPayment', () => {
-    it('returns 404 when no refundable transaction exists', async () => {
-      mockAdminFrom.mockReturnValue(
-        createQueryBuilder({ data: null, error: { message: 'Not found' } })
-      );
+    it('throws NOT_FOUND when no refundable transaction exists', async () => {
+      const { mockAdminSupabase, service } = setup();
+      mockAdminSupabase._getChain('transactions').single.mockResolvedValue({
+        data: null,
+        error: { message: 'Not found' },
+      });
 
-      const result = await refundPayment(MOCK_REQUEST_ID, MOCK_USER_ID);
-
-      expect(result.status).toBe(404);
-      expect(result.error).toContain('introuvable');
+      try {
+        await service.refundPayment(MOCK_REQUEST_ID, MOCK_USER_ID);
+        expect.fail('should have thrown');
+      } catch (e) {
+        expect(e).toBeInstanceOf(ServiceError);
+        expect((e as ServiceError).code).toBe('NOT_FOUND');
+        expect((e as ServiceError).message).toContain('introuvable');
+      }
     });
 
     it('cancels Stripe PaymentIntent for held transactions', async () => {
+      const { mockAdminSupabase, mockStripe, service } = setup();
       const tx = mockTransaction({ status: 'held' });
       const refundedTx = { ...tx, status: 'refunded' };
 
-      let adminCallCount = 0;
-      mockAdminFrom.mockImplementation(() => {
-        adminCallCount++;
-        if (adminCallCount === 1) {
-          return createQueryBuilder({ data: tx, error: null });
-        }
-        return createQueryBuilder({ data: refundedTx, error: null });
+      mockAdminSupabase
+        ._getChain('transactions')
+        .single.mockResolvedValueOnce({ data: tx, error: null })
+        .mockResolvedValueOnce({ data: refundedTx, error: null });
+
+      mockAdminSupabase._getChain('shipment_requests').single.mockResolvedValue({
+        data: null,
+        error: null,
       });
 
-      mockStripePaymentIntentsCancel.mockResolvedValue({ id: tx.stripe_payment_intent_id });
+      mockStripe.paymentIntents.cancel.mockResolvedValue({ id: tx.stripe_payment_intent_id });
 
-      const result = await refundPayment(MOCK_REQUEST_ID, MOCK_USER_ID);
+      const result = await service.refundPayment(MOCK_REQUEST_ID, MOCK_USER_ID);
 
-      expect(result.status).toBe(200);
-      expect(mockStripePaymentIntentsCancel).toHaveBeenCalledWith('pi_test_123');
+      expect(mockStripe.paymentIntents.cancel).toHaveBeenCalledWith('pi_test_123');
+      expect(result).toMatchObject({ status: 'refunded' });
     });
 
     it('does not call Stripe for pending transactions', async () => {
+      const { mockAdminSupabase, mockStripe, service } = setup();
       const tx = mockTransaction({ status: 'pending' });
       const refundedTx = { ...tx, status: 'refunded' };
 
-      let adminCallCount = 0;
-      mockAdminFrom.mockImplementation(() => {
-        adminCallCount++;
-        if (adminCallCount === 1) {
-          return createQueryBuilder({ data: tx, error: null });
-        }
-        return createQueryBuilder({ data: refundedTx, error: null });
+      mockAdminSupabase
+        ._getChain('transactions')
+        .single.mockResolvedValueOnce({ data: tx, error: null })
+        .mockResolvedValueOnce({ data: refundedTx, error: null });
+
+      mockAdminSupabase._getChain('shipment_requests').single.mockResolvedValue({
+        data: null,
+        error: null,
       });
 
-      const result = await refundPayment(MOCK_REQUEST_ID, MOCK_USER_ID);
+      const result = await service.refundPayment(MOCK_REQUEST_ID, MOCK_USER_ID);
 
-      expect(result.status).toBe(200);
-      expect(mockStripePaymentIntentsCancel).not.toHaveBeenCalled();
+      expect(result).toMatchObject({ status: 'refunded' });
+      expect(mockStripe.paymentIntents.cancel).not.toHaveBeenCalled();
     });
 
-    it('returns 500 when Stripe cancellation fails', async () => {
+    it('throws INTERNAL when Stripe cancellation fails', async () => {
+      const { mockAdminSupabase, mockStripe, service } = setup();
       const tx = mockTransaction({ status: 'held' });
 
-      mockAdminFrom.mockReturnValue(createQueryBuilder({ data: tx, error: null }));
-
-      mockStripePaymentIntentsCancel.mockRejectedValue(
+      mockAdminSupabase._getChain('transactions').single.mockResolvedValue({
+        data: tx,
+        error: null,
+      });
+      mockStripe.paymentIntents.cancel.mockRejectedValue(
         new Error('PaymentIntent cannot be canceled')
       );
 
-      const result = await refundPayment(MOCK_REQUEST_ID, MOCK_USER_ID);
-
-      expect(result.status).toBe(500);
-      expect(result.error).toContain('cannot be canceled');
+      try {
+        await service.refundPayment(MOCK_REQUEST_ID, MOCK_USER_ID);
+        expect.fail('should have thrown');
+      } catch (e) {
+        expect(e).toBeInstanceOf(ServiceError);
+        expect((e as ServiceError).code).toBe('INTERNAL');
+        expect((e as ServiceError).message).toContain('cannot be canceled');
+      }
     });
 
-    it('returns 403 when user is not the payer', async () => {
+    it('throws AUTH when user is not the payer', async () => {
+      const { mockAdminSupabase, mockStripe, service } = setup();
       const tx = mockTransaction({ payer_id: 'other-user-999' });
 
-      mockAdminFrom.mockReturnValue(createQueryBuilder({ data: tx, error: null }));
+      mockAdminSupabase._getChain('transactions').single.mockResolvedValue({
+        data: tx,
+        error: null,
+      });
 
-      const result = await refundPayment(MOCK_REQUEST_ID, MOCK_USER_ID);
-
-      expect(result.status).toBe(403);
-      expect(result.error).toContain('Non autorisé');
-      expect(mockStripePaymentIntentsCancel).not.toHaveBeenCalled();
+      try {
+        await service.refundPayment(MOCK_REQUEST_ID, MOCK_USER_ID);
+        expect.fail('should have thrown');
+      } catch (e) {
+        expect(e).toBeInstanceOf(ServiceError);
+        expect((e as ServiceError).code).toBe('AUTH');
+        expect((e as ServiceError).message).toContain('Non autorisé');
+      }
+      expect(mockStripe.paymentIntents.cancel).not.toHaveBeenCalled();
     });
   });
 
@@ -390,24 +399,17 @@ describe('Transactions Service', () => {
   // getTransactionsByUser — Pagination logic
   // -----------------------------------------
   describe('getTransactionsByUser', () => {
-    it('calculates pagination offset correctly for page 1', async () => {
+    it('returns paginated transactions for page 1', async () => {
+      const { mockSupabase, service } = setup();
       const txList = [mockTransaction()];
 
-      mockSupabaseFrom.mockReturnValue({
-        select: vi.fn().mockReturnValue({
-          or: vi.fn().mockReturnValue({
-            order: vi.fn().mockReturnValue({
-              range: vi.fn().mockResolvedValue({
-                data: txList,
-                error: null,
-                count: 1,
-              }),
-            }),
-          }),
-        }),
+      mockSupabase._getChain('transactions').range.mockResolvedValue({
+        data: txList,
+        error: null,
+        count: 1,
       });
 
-      const result = await getTransactionsByUser(MOCK_USER_ID, 1, 20);
+      const result = await service.getTransactionsByUser(MOCK_USER_ID, 1, 20);
 
       expect(result.page).toBe(1);
       expect(result.per_page).toBe(20);
@@ -415,42 +417,30 @@ describe('Transactions Service', () => {
     });
 
     it('calculates correct total_pages', async () => {
-      mockSupabaseFrom.mockReturnValue({
-        select: vi.fn().mockReturnValue({
-          or: vi.fn().mockReturnValue({
-            order: vi.fn().mockReturnValue({
-              range: vi.fn().mockResolvedValue({
-                data: [],
-                error: null,
-                count: 45,
-              }),
-            }),
-          }),
-        }),
+      const { mockSupabase, service } = setup();
+
+      mockSupabase._getChain('transactions').range.mockResolvedValue({
+        data: [],
+        error: null,
+        count: 45,
       });
 
-      const result = await getTransactionsByUser(MOCK_USER_ID, 1, DEFAULT_PAGE_SIZE);
+      const result = await service.getTransactionsByUser(MOCK_USER_ID, 1, DEFAULT_PAGE_SIZE);
 
       expect(result.total).toBe(45);
       expect(result.total_pages).toBe(Math.ceil(45 / DEFAULT_PAGE_SIZE));
     });
 
     it('returns empty result on Supabase error', async () => {
-      mockSupabaseFrom.mockReturnValue({
-        select: vi.fn().mockReturnValue({
-          or: vi.fn().mockReturnValue({
-            order: vi.fn().mockReturnValue({
-              range: vi.fn().mockResolvedValue({
-                data: null,
-                error: { message: 'DB error' },
-                count: null,
-              }),
-            }),
-          }),
-        }),
+      const { mockSupabase, service } = setup();
+
+      mockSupabase._getChain('transactions').range.mockResolvedValue({
+        data: null,
+        error: { message: 'DB error' },
+        count: null,
       });
 
-      const result = await getTransactionsByUser(MOCK_USER_ID);
+      const result = await service.getTransactionsByUser(MOCK_USER_ID);
 
       expect(result.data).toEqual([]);
       expect(result.total).toBe(0);
@@ -463,25 +453,33 @@ describe('Transactions Service', () => {
   // -----------------------------------------
   describe('getTransactionByRequest', () => {
     it('returns transaction on success', async () => {
+      const { mockSupabase, service } = setup();
       const tx = mockTransaction();
 
-      mockSupabaseFrom.mockReturnValue(createQueryBuilder({ data: tx, error: null }));
+      mockSupabase._getChain('transactions').single.mockResolvedValue({
+        data: tx,
+        error: null,
+      });
 
-      const result = await getTransactionByRequest(MOCK_REQUEST_ID);
-
-      expect(result.status).toBe(200);
-      expect(result.data).toEqual(tx);
+      const result = await service.getTransactionByRequest(MOCK_REQUEST_ID);
+      expect(result).toEqual(tx);
     });
 
-    it('returns 404 when transaction not found', async () => {
-      mockSupabaseFrom.mockReturnValue(
-        createQueryBuilder({ data: null, error: { message: 'Not found' } })
-      );
+    it('throws NOT_FOUND when transaction not found', async () => {
+      const { mockSupabase, service } = setup();
 
-      const result = await getTransactionByRequest(MOCK_REQUEST_ID);
+      mockSupabase._getChain('transactions').single.mockResolvedValue({
+        data: null,
+        error: { message: 'Not found' },
+      });
 
-      expect(result.status).toBe(404);
-      expect(result.data).toBeNull();
+      try {
+        await service.getTransactionByRequest(MOCK_REQUEST_ID);
+        expect.fail('should have thrown');
+      } catch (e) {
+        expect(e).toBeInstanceOf(ServiceError);
+        expect((e as ServiceError).code).toBe('NOT_FOUND');
+      }
     });
   });
 });
@@ -490,45 +488,58 @@ describe('Transactions Service', () => {
 // Pure Business Logic Tests (no mocks needed)
 // ============================================
 describe('Transaction Business Logic', () => {
-  describe('Platform fee calculation', () => {
-    const calculateFee = (amount: number) =>
-      Math.round(amount * (PLATFORM_FEE_PERCENT / 100) * 100) / 100;
+  describe('calculateTransactionFees', () => {
+    it('calculates 10% platform fee of 100€', () => {
+      const { platformFee, payoutAmount } = calculateTransactionFees(100);
+      expect(platformFee).toBe(10);
+      expect(payoutAmount).toBe(90);
+    });
 
-    it('calculates 10% of 100€', () => expect(calculateFee(100)).toBe(10));
-    it('calculates 10% of 0€', () => expect(calculateFee(0)).toBe(0));
-    it('calculates 10% of 49.99€', () => expect(calculateFee(49.99)).toBe(5));
-    it('calculates 10% of 1€', () => expect(calculateFee(1)).toBe(0.1));
-    it('handles large amounts', () => expect(calculateFee(9999)).toBe(999.9));
-    it('rounds correctly for 33.33€', () => expect(calculateFee(33.33)).toBe(3.33));
+    it('calculates 10% of 0€', () => {
+      const { platformFee, payoutAmount } = calculateTransactionFees(0);
+      expect(platformFee).toBe(0);
+      expect(payoutAmount).toBe(0);
+    });
+
+    it('rounds correctly for 33.33€', () => {
+      const { platformFee } = calculateTransactionFees(33.33);
+      expect(platformFee).toBe(3.33);
+    });
+
+    it('calculates 10% of 49.99€', () => {
+      const { platformFee } = calculateTransactionFees(49.99);
+      expect(platformFee).toBe(5);
+    });
+
+    it('handles large amounts', () => {
+      const { platformFee } = calculateTransactionFees(9999);
+      expect(platformFee).toBe(999.9);
+    });
   });
 
-  describe('Amount to cents conversion', () => {
-    const toCents = (amount: number) => Math.round(amount * 100);
-
-    it('converts 50€ to 5000 cents', () => expect(toCents(50)).toBe(5000));
-    it('converts 0.01€ to 1 cent', () => expect(toCents(0.01)).toBe(1));
-    it('converts 99.99€ to 9999 cents', () => expect(toCents(99.99)).toBe(9999));
-    it('handles 0€', () => expect(toCents(0)).toBe(0));
-    it('handles floating point: 19.99€', () => expect(toCents(19.99)).toBe(1999));
+  describe('amountToCents', () => {
+    it('converts 50€ to 5000 cents', () => expect(amountToCents(50)).toBe(5000));
+    it('converts 0.01€ to 1 cent', () => expect(amountToCents(0.01)).toBe(1));
+    it('converts 99.99€ to 9999 cents', () => expect(amountToCents(99.99)).toBe(9999));
+    it('handles 0€', () => expect(amountToCents(0)).toBe(0));
+    it('handles floating point: 19.99€', () => expect(amountToCents(19.99)).toBe(1999));
   });
 
-  describe('Pagination math', () => {
+  describe('calculatePaginationOffset', () => {
     it('page 1 starts at offset 0', () => {
-      const from = (1 - 1) * DEFAULT_PAGE_SIZE;
-      expect(from).toBe(0);
+      expect(calculatePaginationOffset(1, DEFAULT_PAGE_SIZE)).toBe(0);
     });
 
-    it('page 2 starts at offset 20', () => {
-      const from = (2 - 1) * DEFAULT_PAGE_SIZE;
-      expect(from).toBe(20);
+    it('page 2 starts at offset DEFAULT_PAGE_SIZE', () => {
+      expect(calculatePaginationOffset(2, DEFAULT_PAGE_SIZE)).toBe(DEFAULT_PAGE_SIZE);
     });
 
-    it('calculates total pages correctly', () => {
-      expect(Math.ceil(0 / DEFAULT_PAGE_SIZE)).toBe(0);
-      expect(Math.ceil(1 / DEFAULT_PAGE_SIZE)).toBe(1);
-      expect(Math.ceil(20 / DEFAULT_PAGE_SIZE)).toBe(1);
-      expect(Math.ceil(21 / DEFAULT_PAGE_SIZE)).toBe(2);
-      expect(Math.ceil(100 / DEFAULT_PAGE_SIZE)).toBe(5);
+    it('page 3 starts at offset 2 * DEFAULT_PAGE_SIZE', () => {
+      expect(calculatePaginationOffset(3, DEFAULT_PAGE_SIZE)).toBe(2 * DEFAULT_PAGE_SIZE);
     });
+  });
+
+  describe('Platform fee calculation (PLATFORM_FEE_PERCENT)', () => {
+    it('is 10%', () => expect(PLATFORM_FEE_PERCENT).toBe(10));
   });
 });

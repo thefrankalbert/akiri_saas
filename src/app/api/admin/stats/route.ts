@@ -1,12 +1,19 @@
-import { NextResponse } from 'next/server';
-import { requireAdmin, getAdminStats } from '@/lib/services/admin';
+import { createClient, createAdminClient } from '@/lib/supabase/server';
+import { createAdminService } from '@/lib/services/admin';
+import { apiSuccess, apiError, withServiceHandler } from '@/lib/api/helpers';
 
 export async function GET() {
-  const admin = await requireAdmin();
-  if (!admin) {
-    return NextResponse.json({ error: 'Non autorisé' }, { status: 403 });
-  }
+  return withServiceHandler('GET /api/admin/stats', async () => {
+    const supabase = await createClient();
+    const adminSupabase = await createAdminClient();
+    const service = createAdminService(supabase, adminSupabase);
 
-  const result = await getAdminStats();
-  return NextResponse.json(result, { status: result.status });
+    const admin = await service.requireAdmin();
+    if (!admin) {
+      return apiError('Non autorisé', 403);
+    }
+
+    const data = await service.getAdminStats();
+    return apiSuccess(data);
+  });
 }

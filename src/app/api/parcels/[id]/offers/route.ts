@@ -1,56 +1,71 @@
 import { NextRequest } from 'next/server';
-import { getAuthUser, apiError, apiSuccess, parseBody } from '@/lib/api/helpers';
-import { getOffersByParcel, createOffer, acceptOffer, rejectOffer } from '@/lib/services/offers';
+import {
+  getAuthUser,
+  apiError,
+  apiSuccess,
+  parseBody,
+  withServiceHandler,
+} from '@/lib/api/helpers';
+import { createClient } from '@/lib/supabase/server';
+import { createOffersService } from '@/lib/services/offers';
 import { createCarryOfferSchema } from '@/lib/validations';
+import { z } from 'zod/v4';
 
 interface RouteParams {
   params: Promise<{ id: string }>;
 }
 
 export async function GET(_request: NextRequest, { params }: RouteParams) {
-  const { id } = await params;
-
-  const offers = await getOffersByParcel(id);
-  return apiSuccess(offers);
+  return withServiceHandler('GET /api/parcels/[id]/offers', async () => {
+    const { id } = await params;
+    const supabase = await createClient();
+    const service = createOffersService(supabase);
+    const data = await service.getOffersByParcel(id);
+    return apiSuccess(data);
+  });
 }
 
 export async function POST(request: NextRequest, { params }: RouteParams) {
-  const user = await getAuthUser();
-  if (!user) return apiError('Non autoris\u00e9', 401);
+  return withServiceHandler('POST /api/parcels/[id]/offers', async () => {
+    const user = await getAuthUser();
+    if (!user) return apiError('Non autorisé', 401);
 
-  const { id } = await params;
-  const body = await parseBody(request, createCarryOfferSchema);
-  if (!body) return apiError('Donn\u00e9es invalides', 400);
+    const { id } = await params;
+    const body = await parseBody(request, createCarryOfferSchema);
+    if (!body) return apiError('Données invalides', 400);
 
-  // Ensure parcel_id in body matches URL param
-  if (body.parcel_id !== id) return apiError('ID de colis incoh\u00e9rent', 400);
+    // Ensure parcel_id in body matches URL param
+    if (body.parcel_id !== id) return apiError('ID de colis incohérent', 400);
 
-  const result = await createOffer(user.id, body);
-
-  if (result.error) return apiError(result.error, result.status);
-  return apiSuccess(result.data, 201);
+    const supabase = await createClient();
+    const service = createOffersService(supabase);
+    const data = await service.createOffer(user.id, body);
+    return apiSuccess(data, 201);
+  });
 }
 
+const offerActionSchema = z.object({
+  offer_id: z.string().uuid(),
+  action: z.enum(['accept', 'reject']),
+});
+
 export async function PATCH(request: NextRequest) {
-  const user = await getAuthUser();
-  if (!user) return apiError('Non autoris\u00e9', 401);
+  return withServiceHandler('PATCH /api/parcels/[id]/offers', async () => {
+    const user = await getAuthUser();
+    if (!user) return apiError('Non autorisé', 401);
 
-  const body = await request.json();
-  const { offer_id, action } = body;
+    const body = await parseBody(request, offerActionSchema);
+    if (!body) return apiError('Données invalides', 400);
 
-  if (!offer_id || !action) return apiError('offer_id et action requis', 400);
+    const supabase = await createClient();
+    const service = createOffersService(supabase);
 
-  if (action === 'accept') {
-    const result = await acceptOffer(offer_id, user.id);
-    if (result.error) return apiError(result.error, result.status);
-    return apiSuccess(result.data);
-  }
+    if (body.action === 'accept') {
+      const data = await service.acceptOffer(body.offer_id, user.id);
+      return apiSuccess(data);
+    }
 
-  if (action === 'reject') {
-    const result = await rejectOffer(offer_id, user.id);
-    if (result.error) return apiError(result.error, result.status);
-    return apiSuccess(result.data);
-  }
-
-  return apiError('Action invalide', 400);
+    const data = await service.rejectOffer(body.offer_id, user.id);
+    return apiSuccess(data);
+  });
 }

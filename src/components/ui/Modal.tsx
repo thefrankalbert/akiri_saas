@@ -65,8 +65,11 @@ const ModalContent = React.forwardRef<
     >
       {children}
       {showCloseButton && (
-        <DialogPrimitive.Close className="text-surface-200 hover:bg-surface-700 focus:ring-primary-500 focus:ring-offset-surface-800 absolute top-4 right-4 rounded-lg p-1.5 transition-colors hover:text-neutral-100 focus:ring-2 focus:ring-offset-2 focus:outline-none">
-          <X size={20} />
+        <DialogPrimitive.Close
+          aria-label="Fermer"
+          className="text-surface-200 hover:bg-surface-700 focus:ring-primary-500 focus:ring-offset-surface-800 absolute top-4 right-4 rounded-lg p-1.5 transition-colors hover:text-neutral-100 focus:ring-2 focus:ring-offset-2 focus:outline-none"
+        >
+          <X size={20} aria-hidden="true" />
           <span className="sr-only">Fermer</span>
         </DialogPrimitive.Close>
       )}

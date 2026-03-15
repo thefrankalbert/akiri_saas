@@ -4,6 +4,7 @@ import { Toaster } from 'sonner';
 import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getMessages } from 'next-intl/server';
 import { PostHogProvider } from '@/components/providers/PostHogProvider';
+import { CookieConsent } from '@/components/CookieConsent';
 import './globals.css';
 
 const inter = Inter({
@@ -141,6 +142,7 @@ export default async function RootLayout({
         <NextIntlClientProvider messages={messages}>
           <PostHogProvider>{children}</PostHogProvider>
         </NextIntlClientProvider>
+        <CookieConsent />
         <Toaster position="top-right" richColors closeButton />
       </body>
     </html>

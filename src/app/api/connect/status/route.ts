@@ -1,12 +1,17 @@
-import { getAuthUser, apiError, apiSuccess } from '@/lib/api/helpers';
-import { checkConnectStatus } from '@/lib/services/transactions';
+import { getAuthUser, apiError, apiSuccess, withServiceHandler } from '@/lib/api/helpers';
+import { createClient, createAdminClient } from '@/lib/supabase/server';
+import { createTransactionService } from '@/lib/services/transactions';
+import { getStripe } from '@/lib/stripe';
 
 export async function GET() {
-  const user = await getAuthUser();
-  if (!user) return apiError('Non autoris\u00e9', 401);
+  return withServiceHandler('GET /api/connect/status', async () => {
+    const user = await getAuthUser();
+    if (!user) return apiError('Non autorisé', 401);
 
-  const result = await checkConnectStatus(user.id);
-
-  if (result.error) return apiError(result.error, result.status);
-  return apiSuccess(result.data);
+    const supabase = await createClient();
+    const adminSupabase = await createAdminClient();
+    const service = createTransactionService(supabase, adminSupabase, getStripe());
+    const data = await service.checkConnectStatus(user.id);
+    return apiSuccess(data);
+  });
 }

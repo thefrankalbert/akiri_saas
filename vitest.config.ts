@@ -14,9 +14,10 @@ export default defineConfig({
         'src/lib/utils/index.ts',
         'src/lib/validations/index.ts',
         'src/constants/index.ts',
-        'src/lib/services/transactions.ts',
-        'src/lib/services/verification.ts',
+        'src/lib/services/**/*.ts',
+        'src/lib/logger.ts',
       ],
+      exclude: ['src/lib/services/__tests__/**', 'src/lib/services/index.ts'],
     },
   },
   resolve: {

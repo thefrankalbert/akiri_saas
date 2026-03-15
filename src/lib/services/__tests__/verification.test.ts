@@ -1,43 +1,14 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { createMockSupabase, asSupabase } from './helpers';
+import { createVerificationService } from '@/lib/services/verification';
+import { ServiceError } from '@/lib/services/errors';
 
-// ============================================
-// Mock Setup — Supabase & Verification Provider
-// ============================================
+vi.mock('@/lib/logger', () => ({
+  logger: { error: vi.fn(), warn: vi.fn(), info: vi.fn() },
+}));
 
-function createQueryBuilder(resolvedValue: { data: unknown; error: unknown }) {
-  const builder: Record<string, unknown> = {};
-  const methods = [
-    'select',
-    'insert',
-    'update',
-    'delete',
-    'eq',
-    'in',
-    'or',
-    'order',
-    'range',
-    'gte',
-    'single',
-    'maybeSingle',
-    'limit',
-  ];
-
-  for (const method of methods) {
-    builder[method] = vi.fn().mockReturnValue(builder);
-  }
-
-  builder['single'] = vi.fn().mockResolvedValue(resolvedValue);
-  builder['maybeSingle'] = vi.fn().mockResolvedValue(resolvedValue);
-
-  return builder;
-}
-
-const mockSupabaseFrom = vi.fn();
-
-vi.mock('@/lib/supabase/server', () => ({
-  createClient: vi.fn().mockResolvedValue({
-    from: (...args: unknown[]) => mockSupabaseFrom(...args),
-  }),
+vi.mock('@/lib/email', () => ({
+  sendOtpEmail: vi.fn().mockResolvedValue(undefined),
 }));
 
 const mockCreateIdentitySession = vi.fn();
@@ -48,15 +19,6 @@ vi.mock('@/lib/verification/provider', () => ({
   })),
 }));
 
-// Import AFTER mocks
-import {
-  sendPhoneOtp,
-  verifyPhoneOtp,
-  createIdentitySession,
-  handleIdentityVerificationResult,
-  getVerificationStatus,
-} from '@/lib/services/verification';
-
 // ============================================
 // Test Data
 // ============================================
@@ -64,16 +26,22 @@ import {
 const MOCK_USER_ID = 'user-123';
 const MOCK_PHONE = '+33612345678';
 
+function setup() {
+  const mockSupabase = createMockSupabase();
+  const mockAdminSupabase = createMockSupabase();
+  const service = createVerificationService(
+    asSupabase(mockSupabase),
+    asSupabase(mockAdminSupabase)
+  );
+  return { mockSupabase, mockAdminSupabase, service };
+}
+
 // ============================================
 // Pure Logic Tests — OTP Generation
 // ============================================
 
 describe('OTP Generation Logic', () => {
-  // The function is private, so we test the properties
-  // through the public API behavior
-
   it('generates a 6-digit string', () => {
-    // Reproduce the OTP generation logic
     const generateOtpCode = () => Math.floor(100000 + Math.random() * 900000).toString();
 
     for (let i = 0; i < 100; i++) {
@@ -99,7 +67,6 @@ describe('OTP Generation Logic', () => {
 // ============================================
 
 describe('Verification Level Calculation', () => {
-  // Reproduce the verification level logic from the service
   function computeLevel(phoneVerified: boolean, idStatus: string): 1 | 2 | 3 {
     let level: 1 | 2 | 3 = 1;
     if (phoneVerified) level = 2;
@@ -141,7 +108,7 @@ describe('Verification Level Calculation', () => {
 });
 
 // ============================================
-// Service Integration Tests (mocked boundaries)
+// Service Tests (DI factory pattern)
 // ============================================
 
 describe('Verification Service', () => {
@@ -153,43 +120,58 @@ describe('Verification Service', () => {
   // sendPhoneOtp
   // -----------------------------------------
   describe('sendPhoneOtp', () => {
-    it('creates a verification session in database', async () => {
-      const insertBuilder = createQueryBuilder({
+    it('creates a verification session and returns session_id', async () => {
+      const { mockSupabase, service } = setup();
+
+      mockSupabase.auth.getUser.mockResolvedValue({
+        data: { user: { email: 'test@example.com' } },
+      });
+      mockSupabase._getChain('verification_sessions').single.mockResolvedValue({
         data: { id: 'session-001' },
         error: null,
       });
-      mockSupabaseFrom.mockReturnValue(insertBuilder);
 
-      const result = await sendPhoneOtp(MOCK_USER_ID, MOCK_PHONE);
+      const result = await service.sendPhoneOtp(MOCK_USER_ID, MOCK_PHONE);
 
-      expect(result.status).toBe(200);
-      expect(result.data?.session_id).toBe('session-001');
-      expect(result.error).toBeNull();
+      expect(result.session_id).toBe('session-001');
     });
 
-    it('returns error when database insert fails', async () => {
-      mockSupabaseFrom.mockReturnValue(
-        createQueryBuilder({ data: null, error: { message: 'DB insert failed' } })
-      );
+    it('throws VALIDATION when database insert fails', async () => {
+      const { mockSupabase, service } = setup();
 
-      const result = await sendPhoneOtp(MOCK_USER_ID, MOCK_PHONE);
+      mockSupabase.auth.getUser.mockResolvedValue({
+        data: { user: null },
+      });
+      mockSupabase._getChain('verification_sessions').single.mockResolvedValue({
+        data: null,
+        error: { message: 'DB insert failed' },
+      });
 
-      expect(result.status).toBe(400);
-      expect(result.error).toBe('DB insert failed');
-      expect(result.data).toBeNull();
+      try {
+        await service.sendPhoneOtp(MOCK_USER_ID, MOCK_PHONE);
+        expect.fail('should have thrown');
+      } catch (e) {
+        expect(e).toBeInstanceOf(ServiceError);
+        expect((e as ServiceError).code).toBe('VALIDATION');
+        expect((e as ServiceError).message).toBe('DB insert failed');
+      }
     });
 
     it('stores phone and OTP code in session metadata', async () => {
-      const insertBuilder = createQueryBuilder({
+      const { mockSupabase, service } = setup();
+
+      mockSupabase.auth.getUser.mockResolvedValue({
+        data: { user: null },
+      });
+      mockSupabase._getChain('verification_sessions').single.mockResolvedValue({
         data: { id: 'session-002' },
         error: null,
       });
-      mockSupabaseFrom.mockReturnValue(insertBuilder);
 
-      await sendPhoneOtp(MOCK_USER_ID, MOCK_PHONE);
+      await service.sendPhoneOtp(MOCK_USER_ID, MOCK_PHONE);
 
       // Verify from was called with 'verification_sessions'
-      expect(mockSupabaseFrom).toHaveBeenCalledWith('verification_sessions');
+      expect(mockSupabase.from).toHaveBeenCalledWith('verification_sessions');
     });
   });
 
@@ -197,84 +179,91 @@ describe('Verification Service', () => {
   // verifyPhoneOtp
   // -----------------------------------------
   describe('verifyPhoneOtp', () => {
-    it('returns 404 when no pending session exists', async () => {
-      mockSupabaseFrom.mockReturnValue(
-        createQueryBuilder({ data: null, error: { message: 'Not found' } })
-      );
+    it('throws NOT_FOUND when no pending session exists', async () => {
+      const { mockSupabase, service } = setup();
 
-      const result = await verifyPhoneOtp(MOCK_USER_ID, MOCK_PHONE, '123456');
+      mockSupabase._getChain('verification_sessions').single.mockResolvedValue({
+        data: null,
+        error: { message: 'Not found' },
+      });
 
-      expect(result.status).toBe(404);
-      expect(result.error).toContain('session');
+      try {
+        await service.verifyPhoneOtp(MOCK_USER_ID, MOCK_PHONE, '123456');
+        expect.fail('should have thrown');
+      } catch (e) {
+        expect(e).toBeInstanceOf(ServiceError);
+        expect((e as ServiceError).code).toBe('NOT_FOUND');
+        expect((e as ServiceError).message).toContain('session');
+      }
     });
 
-    it('returns 400 when phone number does not match', async () => {
+    it('throws VALIDATION when phone number does not match', async () => {
+      const { mockSupabase, service } = setup();
       const session = {
         id: 'session-003',
         user_id: MOCK_USER_ID,
         metadata: { phone: '+33699999999', otp_code: '123456' },
       };
 
-      mockSupabaseFrom.mockReturnValue(createQueryBuilder({ data: session, error: null }));
+      mockSupabase._getChain('verification_sessions').single.mockResolvedValue({
+        data: session,
+        error: null,
+      });
 
-      const result = await verifyPhoneOtp(MOCK_USER_ID, MOCK_PHONE, '123456');
-
-      expect(result.status).toBe(400);
-      expect(result.error).toContain('téléphone');
+      try {
+        await service.verifyPhoneOtp(MOCK_USER_ID, MOCK_PHONE, '123456');
+        expect.fail('should have thrown');
+      } catch (e) {
+        expect(e).toBeInstanceOf(ServiceError);
+        expect((e as ServiceError).code).toBe('VALIDATION');
+        expect((e as ServiceError).message).toContain('téléphone');
+      }
     });
 
-    it('returns 400 when OTP code is incorrect', async () => {
+    it('throws VALIDATION when OTP code is incorrect', async () => {
+      const { mockSupabase, service } = setup();
       const session = {
         id: 'session-004',
         user_id: MOCK_USER_ID,
         metadata: { phone: MOCK_PHONE, otp_code: '999999' },
       };
 
-      let callCount = 0;
-      mockSupabaseFrom.mockImplementation(() => {
-        callCount++;
-        if (callCount === 1) {
-          return createQueryBuilder({ data: session, error: null });
-        }
-        // Update session as failed
-        return createQueryBuilder({ data: null, error: null });
+      mockSupabase._getChain('verification_sessions').single.mockResolvedValue({
+        data: session,
+        error: null,
       });
 
-      const result = await verifyPhoneOtp(MOCK_USER_ID, MOCK_PHONE, '123456');
-
-      expect(result.status).toBe(400);
-      expect(result.error).toContain('incorrect');
+      try {
+        await service.verifyPhoneOtp(MOCK_USER_ID, MOCK_PHONE, '123456');
+        expect.fail('should have thrown');
+      } catch (e) {
+        expect(e).toBeInstanceOf(ServiceError);
+        expect((e as ServiceError).code).toBe('VALIDATION');
+        expect((e as ServiceError).message).toContain('incorrect');
+      }
     });
 
     it('verifies successfully with correct OTP', async () => {
+      const { mockSupabase, service } = setup();
       const session = {
         id: 'session-005',
         user_id: MOCK_USER_ID,
         metadata: { phone: MOCK_PHONE, otp_code: '654321' },
       };
 
-      // Multiple from() calls for: find session, update session, update profile, update level x2
-      mockSupabaseFrom.mockReturnValue(createQueryBuilder({ data: session, error: null }));
-
-      // Override for profile updates — need to handle the updateVerificationLevel calls too
-      let callCount = 0;
-      mockSupabaseFrom.mockImplementation(() => {
-        callCount++;
-        if (callCount === 1) {
-          return createQueryBuilder({ data: session, error: null });
-        }
-        // All subsequent calls: session update, profile update, level check, level update
-        return createQueryBuilder({
-          data: { phone_verified: true, id_verification_status: 'none' },
-          error: null,
-        });
+      // All calls return success
+      mockSupabase._getChain('verification_sessions').single.mockResolvedValue({
+        data: session,
+        error: null,
+      });
+      mockSupabase._getChain('profiles').single.mockResolvedValue({
+        data: { phone_verified: true, id_verification_status: 'none' },
+        error: null,
       });
 
-      const result = await verifyPhoneOtp(MOCK_USER_ID, MOCK_PHONE, '654321');
+      const result = await service.verifyPhoneOtp(MOCK_USER_ID, MOCK_PHONE, '654321');
 
-      expect(result.status).toBe(200);
-      expect(result.data?.verified).toBe(true);
-      expect(result.error).toBeNull();
+      expect(result.verified).toBe(true);
     });
   });
 
@@ -282,34 +271,67 @@ describe('Verification Service', () => {
   // createIdentitySession
   // -----------------------------------------
   describe('createIdentitySession', () => {
-    it('delegates to verification provider', async () => {
+    it('delegates to verification provider and returns session data', async () => {
+      const { mockSupabase, service } = setup();
+
       mockCreateIdentitySession.mockResolvedValue({
         sessionId: 'vs_stripe_123',
         url: 'https://verify.stripe.com/session/123',
       });
 
-      mockSupabaseFrom.mockReturnValue(
-        createQueryBuilder({ data: { id: 'session-006' }, error: null })
+      mockSupabase._getChain('verification_sessions').single.mockResolvedValue({
+        data: { id: 'session-006' },
+        error: null,
+      });
+
+      const result = await service.createIdentitySession(
+        MOCK_USER_ID,
+        'https://akiri.com/callback'
       );
 
-      const result = await createIdentitySession(MOCK_USER_ID, 'https://akiri.com/callback');
-
-      expect(result.status).toBe(200);
-      expect(result.data?.url).toContain('stripe.com');
-      expect(result.data?.session_id).toBe('session-006');
+      expect(result.url).toContain('stripe.com');
+      expect(result.session_id).toBe('session-006');
       expect(mockCreateIdentitySession).toHaveBeenCalledWith(
         MOCK_USER_ID,
         'https://akiri.com/callback'
       );
     });
 
-    it('returns 500 when provider throws', async () => {
+    it('throws INTERNAL when provider throws', async () => {
+      const { service } = setup();
+
       mockCreateIdentitySession.mockRejectedValue(new Error('Stripe Identity unavailable'));
 
-      const result = await createIdentitySession(MOCK_USER_ID);
+      try {
+        await service.createIdentitySession(MOCK_USER_ID);
+        expect.fail('should have thrown');
+      } catch (e) {
+        expect(e).toBeInstanceOf(ServiceError);
+        expect((e as ServiceError).code).toBe('INTERNAL');
+        expect((e as ServiceError).message).toContain('Stripe Identity unavailable');
+      }
+    });
 
-      expect(result.status).toBe(500);
-      expect(result.error).toContain('Stripe Identity unavailable');
+    it('throws VALIDATION when db insert fails after provider success', async () => {
+      const { mockSupabase, service } = setup();
+
+      mockCreateIdentitySession.mockResolvedValue({
+        sessionId: 'vs_stripe_123',
+        url: 'https://verify.stripe.com/session/123',
+      });
+
+      mockSupabase._getChain('verification_sessions').single.mockResolvedValue({
+        data: null,
+        error: { message: 'DB insert error' },
+      });
+
+      try {
+        await service.createIdentitySession(MOCK_USER_ID);
+        expect.fail('should have thrown');
+      } catch (e) {
+        expect(e).toBeInstanceOf(ServiceError);
+        expect((e as ServiceError).code).toBe('VALIDATION');
+      }
     });
   });
 
@@ -317,18 +339,26 @@ describe('Verification Service', () => {
   // handleIdentityVerificationResult
   // -----------------------------------------
   describe('handleIdentityVerificationResult', () => {
-    it('returns 404 when session is not found', async () => {
-      mockSupabaseFrom.mockReturnValue(
-        createQueryBuilder({ data: null, error: { message: 'Not found' } })
-      );
+    it('throws NOT_FOUND when session is not found', async () => {
+      const { mockSupabase, service } = setup();
 
-      const result = await handleIdentityVerificationResult('vs_unknown', 'verified');
+      mockSupabase._getChain('verification_sessions').single.mockResolvedValue({
+        data: null,
+        error: { message: 'Not found' },
+      });
 
-      expect(result.status).toBe(404);
-      expect(result.error).toContain('non trouvée');
+      try {
+        await service.handleIdentityVerificationResult('vs_unknown', 'verified');
+        expect.fail('should have thrown');
+      } catch (e) {
+        expect(e).toBeInstanceOf(ServiceError);
+        expect((e as ServiceError).code).toBe('NOT_FOUND');
+        expect((e as ServiceError).message).toContain('non trouvée');
+      }
     });
 
-    it('updates profile when identity is verified', async () => {
+    it('returns { updated: true } when identity is verified', async () => {
+      const { mockSupabase, service } = setup();
       const session = {
         id: 'session-007',
         user_id: MOCK_USER_ID,
@@ -336,20 +366,22 @@ describe('Verification Service', () => {
         external_session_id: 'vs_test_456',
       };
 
-      mockSupabaseFrom.mockReturnValue(
-        createQueryBuilder({
-          data: { ...session, phone_verified: true, id_verification_status: 'verified' },
-          error: null,
-        })
-      );
+      mockSupabase._getChain('verification_sessions').single.mockResolvedValue({
+        data: session,
+        error: null,
+      });
+      mockSupabase._getChain('profiles').single.mockResolvedValue({
+        data: { phone_verified: true, id_verification_status: 'verified' },
+        error: null,
+      });
 
-      const result = await handleIdentityVerificationResult('vs_test_456', 'verified');
+      const result = await service.handleIdentityVerificationResult('vs_test_456', 'verified');
 
-      expect(result.status).toBe(200);
-      expect(result.data?.updated).toBe(true);
+      expect(result.updated).toBe(true);
     });
 
     it('handles failed verification status', async () => {
+      const { mockSupabase, service } = setup();
       const session = {
         id: 'session-008',
         user_id: MOCK_USER_ID,
@@ -357,17 +389,18 @@ describe('Verification Service', () => {
         external_session_id: 'vs_test_789',
       };
 
-      mockSupabaseFrom.mockReturnValue(
-        createQueryBuilder({
-          data: { ...session, phone_verified: false, id_verification_status: 'failed' },
-          error: null,
-        })
-      );
+      mockSupabase._getChain('verification_sessions').single.mockResolvedValue({
+        data: session,
+        error: null,
+      });
+      mockSupabase._getChain('profiles').single.mockResolvedValue({
+        data: { phone_verified: false, id_verification_status: 'failed' },
+        error: null,
+      });
 
-      const result = await handleIdentityVerificationResult('vs_test_789', 'failed');
+      const result = await service.handleIdentityVerificationResult('vs_test_789', 'failed');
 
-      expect(result.status).toBe(200);
-      expect(result.data?.updated).toBe(true);
+      expect(result.updated).toBe(true);
     });
   });
 
@@ -376,54 +409,59 @@ describe('Verification Service', () => {
   // -----------------------------------------
   describe('getVerificationStatus', () => {
     it('returns profile verification data', async () => {
-      mockSupabaseFrom.mockReturnValue(
-        createQueryBuilder({
-          data: {
-            verification_level: 2,
-            phone_verified: true,
-            id_verification_status: 'none',
-          },
-          error: null,
-        })
-      );
+      const { mockSupabase, service } = setup();
 
-      const result = await getVerificationStatus(MOCK_USER_ID);
+      mockSupabase._getChain('profiles').single.mockResolvedValue({
+        data: {
+          verification_level: 2,
+          phone_verified: true,
+          id_verification_status: 'none',
+        },
+        error: null,
+      });
 
-      expect(result.status).toBe(200);
-      expect(result.data?.verification_level).toBe(2);
-      expect(result.data?.phone_verified).toBe(true);
-      expect(result.data?.id_verification_status).toBe('none');
+      const result = await service.getVerificationStatus(MOCK_USER_ID);
+
+      expect(result.verification_level).toBe(2);
+      expect(result.phone_verified).toBe(true);
+      expect(result.id_verification_status).toBe('none');
     });
 
-    it('returns 404 when profile not found', async () => {
-      mockSupabaseFrom.mockReturnValue(
-        createQueryBuilder({ data: null, error: { message: 'Not found' } })
-      );
+    it('throws NOT_FOUND when profile not found', async () => {
+      const { mockSupabase, service } = setup();
 
-      const result = await getVerificationStatus(MOCK_USER_ID);
+      mockSupabase._getChain('profiles').single.mockResolvedValue({
+        data: null,
+        error: { message: 'Not found' },
+      });
 
-      expect(result.status).toBe(404);
-      expect(result.error).toContain('Profil');
+      try {
+        await service.getVerificationStatus(MOCK_USER_ID);
+        expect.fail('should have thrown');
+      } catch (e) {
+        expect(e).toBeInstanceOf(ServiceError);
+        expect((e as ServiceError).code).toBe('NOT_FOUND');
+        expect((e as ServiceError).message).toContain('Profil');
+      }
     });
 
     it('defaults to level 1 when verification_level is null', async () => {
-      mockSupabaseFrom.mockReturnValue(
-        createQueryBuilder({
-          data: {
-            verification_level: null,
-            phone_verified: null,
-            id_verification_status: null,
-          },
-          error: null,
-        })
-      );
+      const { mockSupabase, service } = setup();
 
-      const result = await getVerificationStatus(MOCK_USER_ID);
+      mockSupabase._getChain('profiles').single.mockResolvedValue({
+        data: {
+          verification_level: null,
+          phone_verified: null,
+          id_verification_status: null,
+        },
+        error: null,
+      });
 
-      expect(result.status).toBe(200);
-      expect(result.data?.verification_level).toBe(1);
-      expect(result.data?.phone_verified).toBe(false);
-      expect(result.data?.id_verification_status).toBe('none');
+      const result = await service.getVerificationStatus(MOCK_USER_ID);
+
+      expect(result.verification_level).toBe(1);
+      expect(result.phone_verified).toBe(false);
+      expect(result.id_verification_status).toBe('none');
     });
   });
 });

@@ -8,6 +8,7 @@ import { createAdminClient } from '@/lib/supabase/server';
 import { createNotification } from '@/lib/services/notifications';
 import { sendConfirmationCodeEmail, sendPaymentEmail } from '@/lib/email';
 import type Stripe from 'stripe';
+import { logger } from '@/lib/logger';
 
 export async function POST(request: Request) {
   const rawBody = await request.text();
@@ -27,11 +28,22 @@ export async function POST(request: Request) {
     );
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Webhook signature verification failed';
-    console.error('Stripe webhook error:', message);
+    logger.error('Stripe webhook error:', message);
     return NextResponse.json({ error: message }, { status: 400 });
   }
 
   const adminSupabase = await createAdminClient();
+
+  // ─── Idempotency check ─────────────────────────────────
+  const { data: existing } = await adminSupabase
+    .from('processed_webhook_events')
+    .select('id')
+    .eq('event_id', event.id)
+    .single();
+
+  if (existing) {
+    return NextResponse.json({ received: true, duplicate: true });
+  }
 
   try {
     switch (event.type) {
@@ -186,6 +198,47 @@ export async function POST(request: Request) {
         break;
       }
 
+      // ─── PaymentIntent canceled (escrow expiry) ─────────
+      case 'payment_intent.canceled': {
+        const paymentIntent = event.data.object as Stripe.PaymentIntent;
+        const piId = paymentIntent.id;
+
+        // Find and update transaction to refunded
+        await adminSupabase
+          .from('transactions')
+          .update({ status: 'refunded', updated_at: new Date().toISOString() })
+          .eq('stripe_payment_intent_id', piId);
+
+        // Find the transaction to cascade status update
+        const { data: expiredTx } = await adminSupabase
+          .from('transactions')
+          .select('request_id, payer_id')
+          .eq('stripe_payment_intent_id', piId)
+          .single();
+
+        if (expiredTx) {
+          await adminSupabase
+            .from('shipment_requests')
+            .update({ status: 'cancelled', updated_at: new Date().toISOString() })
+            .eq('id', expiredTx.request_id);
+
+          await createNotification(
+            expiredTx.payer_id,
+            'payment_received',
+            'Paiement expiré',
+            'Votre paiement a expiré et a été annulé. Veuillez créer une nouvelle demande.',
+            { request_id: expiredTx.request_id }
+          );
+
+          logger.info('PaymentIntent expired', {
+            payment_intent_id: piId,
+            request_id: expiredTx.request_id,
+          });
+        }
+
+        break;
+      }
+
       // ─── Connect account updated (onboarding) ──────────
       case 'account.updated': {
         const account = event.data.object as Stripe.Account;
@@ -208,9 +261,15 @@ export async function POST(request: Request) {
       // Unhandled event type — no action needed
     }
   } catch (err) {
-    console.error('Stripe webhook processing error:', err);
+    logger.error('Stripe webhook processing error:', err);
     // Still return 200 to prevent Stripe from retrying
   }
+
+  // ─── Record processed event ────────────────────────────
+  await adminSupabase.from('processed_webhook_events').insert({
+    event_id: event.id,
+    event_type: event.type,
+  });
 
   return NextResponse.json({ received: true });
 }

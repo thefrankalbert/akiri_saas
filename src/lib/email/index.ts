@@ -169,3 +169,63 @@ export async function sendPayoutEmail(
     `)
   );
 }
+
+/**
+ * Send review notification email
+ */
+export async function sendReviewEmail(
+  to: string,
+  reviewerName: string,
+  rating: number,
+  comment: string | undefined,
+  requestId: string
+): Promise<boolean> {
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+  const commentBlock = comment
+    ? `<p style="margin:0 0 24px;line-height:1.6;font-style:italic;color:#a1a1aa">\u00ab\u00a0${comment}\u00a0\u00bb</p>`
+    : '';
+  return send(
+    to,
+    'Nouvel avis re\u00e7u sur Akiri',
+    baseLayout(`
+      <h2 style="margin:0 0 16px;color:#fff;font-size:20px">Vous avez re\u00e7u un nouvel avis</h2>
+      <p style="margin:0 0 16px;line-height:1.6"><strong>${reviewerName}</strong> vous a laiss\u00e9 un avis :</p>
+      <div style="text-align:center;padding:24px;background:#1a1a24;border-radius:8px;margin-bottom:24px">
+        <span style="font-size:32px;font-weight:700;color:#f59e0b">${rating}/5 \u2b50</span>
+      </div>
+      ${commentBlock}
+      <a href="${appUrl}/demandes/${requestId}"
+         style="display:inline-block;padding:12px 24px;background:#6366f1;color:#fff;text-decoration:none;border-radius:8px;font-weight:600">
+        Voir l\u2019avis
+      </a>
+    `)
+  );
+}
+
+/**
+ * Send dispute notification email
+ */
+export async function sendDisputeEmail(
+  to: string,
+  requestId: string,
+  role: 'sender' | 'traveler'
+): Promise<boolean> {
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+  const roleBody =
+    role === 'sender'
+      ? `Un litige a \u00e9t\u00e9 ouvert concernant votre exp\u00e9dition. Cela signifie qu\u2019un probl\u00e8me a \u00e9t\u00e9 signal\u00e9 apr\u00e8s la livraison de votre colis.`
+      : `Un litige a \u00e9t\u00e9 ouvert concernant une exp\u00e9dition que vous avez transport\u00e9e. Cela signifie que l\u2019exp\u00e9diteur a signal\u00e9 un probl\u00e8me apr\u00e8s la livraison.`;
+  return send(
+    to,
+    'Litige ouvert sur votre exp\u00e9dition \u2014 Akiri',
+    baseLayout(`
+      <h2 style="margin:0 0 16px;color:#fff;font-size:20px">Litige ouvert</h2>
+      <p style="margin:0 0 16px;line-height:1.6">${roleBody}</p>
+      <p style="margin:0 0 24px;line-height:1.6">Notre \u00e9quipe va examiner la situation et vous contactera dans les plus brefs d\u00e9lais. Les fonds sont maintenus en s\u00e9curit\u00e9 le temps de la r\u00e9solution.</p>
+      <a href="${appUrl}/demandes/${requestId}"
+         style="display:inline-block;padding:12px 24px;background:#ef4444;color:#fff;text-decoration:none;border-radius:8px;font-weight:600">
+        Voir le litige
+      </a>
+    `)
+  );
+}

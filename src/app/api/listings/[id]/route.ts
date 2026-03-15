@@ -1,6 +1,13 @@
 import { NextRequest } from 'next/server';
-import { getAuthUser, apiError, apiSuccess, parseBody } from '@/lib/api/helpers';
-import { getListingById, updateListing, cancelListing } from '@/lib/services/listings';
+import {
+  getAuthUser,
+  apiError,
+  apiSuccess,
+  parseBody,
+  withServiceHandler,
+} from '@/lib/api/helpers';
+import { createClient } from '@/lib/supabase/server';
+import { createListingsService } from '@/lib/services/listings';
 import { createListingSchema } from '@/lib/validations';
 
 interface RouteParams {
@@ -8,35 +15,40 @@ interface RouteParams {
 }
 
 export async function GET(_request: NextRequest, { params }: RouteParams) {
-  const { id } = await params;
-
-  const result = await getListingById(id);
-
-  if (result.error) return apiError(result.error, result.status);
-  return apiSuccess(result.data);
+  return withServiceHandler('GET /api/listings/[id]', async () => {
+    const { id } = await params;
+    const supabase = await createClient();
+    const service = createListingsService(supabase);
+    const data = await service.getListingById(id);
+    return apiSuccess(data);
+  });
 }
 
 export async function PATCH(request: NextRequest, { params }: RouteParams) {
-  const user = await getAuthUser();
-  if (!user) return apiError('Non autoris\u00e9', 401);
+  return withServiceHandler('PATCH /api/listings/[id]', async () => {
+    const user = await getAuthUser();
+    if (!user) return apiError('Non autorisé', 401);
 
-  const { id } = await params;
-  const body = await parseBody(request, createListingSchema.partial());
-  if (!body) return apiError('Donn\u00e9es invalides', 400);
+    const { id } = await params;
+    const body = await parseBody(request, createListingSchema.partial());
+    if (!body) return apiError('Données invalides', 400);
 
-  const result = await updateListing(id, user.id, body);
-
-  if (result.error) return apiError(result.error, result.status);
-  return apiSuccess(result.data);
+    const supabase = await createClient();
+    const service = createListingsService(supabase);
+    const data = await service.updateListing(id, user.id, body);
+    return apiSuccess(data);
+  });
 }
 
 export async function DELETE(_request: NextRequest, { params }: RouteParams) {
-  const user = await getAuthUser();
-  if (!user) return apiError('Non autoris\u00e9', 401);
+  return withServiceHandler('DELETE /api/listings/[id]', async () => {
+    const user = await getAuthUser();
+    if (!user) return apiError('Non autorisé', 401);
 
-  const { id } = await params;
-  const result = await cancelListing(id, user.id);
-
-  if (result.error) return apiError(result.error, result.status);
-  return apiSuccess(null);
+    const { id } = await params;
+    const supabase = await createClient();
+    const service = createListingsService(supabase);
+    await service.cancelListing(id, user.id);
+    return apiSuccess(null);
+  });
 }

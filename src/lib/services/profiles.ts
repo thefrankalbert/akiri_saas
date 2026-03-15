@@ -1,49 +1,50 @@
 // ============================================
-// Profiles Service — Server-side business logic
+// Profiles Service — DI factory pattern
 // ============================================
 
-import { createClient } from '@/lib/supabase/server';
-import type { Profile, ApiResponse } from '@/types';
+import type { SupabaseClient } from '@supabase/supabase-js';
+import type { Profile } from '@/types';
 import type { UpdateProfileInput } from '@/lib/validations';
+import { ServiceError } from './errors';
+import { logger } from '@/lib/logger';
 
-/**
- * Get a profile by user_id
- */
-export async function getProfileByUserId(userId: string): Promise<ApiResponse<Profile>> {
-  const supabase = await createClient();
+export function createProfilesService(supabase: SupabaseClient) {
+  return {
+    /**
+     * Get a profile by user_id
+     */
+    async getProfileByUserId(userId: string): Promise<Profile> {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('user_id', userId)
+        .single();
 
-  const { data, error } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('user_id', userId)
-    .single();
+      if (error) {
+        logger.error('Failed to fetch profile', { error: error.message, userId });
+        throw new ServiceError(error.message, 'NOT_FOUND');
+      }
 
-  if (error) {
-    return { data: null, error: error.message, status: 404 };
-  }
+      return data as Profile;
+    },
 
-  return { data: data as Profile, error: null, status: 200 };
-}
+    /**
+     * Update a user's profile
+     */
+    async updateProfile(userId: string, updates: UpdateProfileInput): Promise<Profile> {
+      const { data, error } = await supabase
+        .from('profiles')
+        .update({ ...updates, updated_at: new Date().toISOString() })
+        .eq('user_id', userId)
+        .select()
+        .single();
 
-/**
- * Update a user's profile
- */
-export async function updateProfile(
-  userId: string,
-  updates: UpdateProfileInput
-): Promise<ApiResponse<Profile>> {
-  const supabase = await createClient();
+      if (error) {
+        logger.error('Failed to update profile', { error: error.message, userId });
+        throw new ServiceError(error.message, 'VALIDATION');
+      }
 
-  const { data, error } = await supabase
-    .from('profiles')
-    .update({ ...updates, updated_at: new Date().toISOString() })
-    .eq('user_id', userId)
-    .select()
-    .single();
-
-  if (error) {
-    return { data: null, error: error.message, status: 400 };
-  }
-
-  return { data: data as Profile, error: null, status: 200 };
+      return data as Profile;
+    },
+  };
 }

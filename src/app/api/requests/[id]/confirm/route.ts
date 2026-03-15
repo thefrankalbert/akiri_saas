@@ -1,6 +1,15 @@
 import { NextRequest } from 'next/server';
-import { getAuthUser, apiError, apiSuccess, parseBody } from '@/lib/api/helpers';
-import { confirmDelivery } from '@/lib/services/requests';
+import {
+  getAuthUser,
+  apiError,
+  apiSuccess,
+  parseBody,
+  withServiceHandler,
+} from '@/lib/api/helpers';
+import { createClient, createAdminClient } from '@/lib/supabase/server';
+import { createRequestService } from '@/lib/services/requests';
+import { createTransactionService } from '@/lib/services/transactions';
+import { getStripe } from '@/lib/stripe';
 import { confirmDeliverySchema } from '@/lib/validations';
 import { rateLimitAsync } from '@/lib/api/rate-limit';
 
@@ -10,17 +19,24 @@ interface RouteParams {
 
 export async function POST(request: NextRequest, { params }: RouteParams) {
   const user = await getAuthUser();
-  if (!user) return apiError('Non autoris\u00e9', 401);
+  if (!user) return apiError('Non autorisé', 401);
 
   const limit = await rateLimitAsync(`confirm:${user.id}`, { maxRequests: 5, windowMs: 60_000 });
-  if (!limit.success) return apiError('Trop de tentatives, r\u00e9essayez plus tard', 429);
+  if (!limit.success) return apiError('Trop de tentatives, réessayez plus tard', 429);
 
   const { id } = await params;
   const body = await parseBody(request, confirmDeliverySchema);
-  if (!body) return apiError('Donn\u00e9es invalides', 400);
+  if (!body) return apiError('Données invalides', 400);
 
-  const result = await confirmDelivery(id, user.id, body.confirmation_code);
-
-  if (result.error) return apiError(result.error, result.status);
-  return apiSuccess(result.data);
+  return withServiceHandler(`POST /api/requests/${id}/confirm`, async () => {
+    const supabase = await createClient();
+    const adminSupabase = await createAdminClient();
+    const txService = createTransactionService(supabase, adminSupabase, getStripe());
+    const service = createRequestService(supabase, adminSupabase, {
+      capturePayment: (requestId) => txService.capturePayment(requestId),
+      refundPayment: (requestId, userId) => txService.refundPayment(requestId, userId),
+    });
+    const data = await service.confirmDelivery(id, user.id, body.confirmation_code);
+    return apiSuccess(data);
+  });
 }

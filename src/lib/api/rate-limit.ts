@@ -96,24 +96,6 @@ function memoryRateLimit(
  * Rate limit a request by key.
  * Uses Upstash Redis in production, falls back to in-memory for development.
  */
-export function rateLimit(key: string, options: RateLimitOptions): RateLimitResult {
-  const limiter = getRedisLimiter(options.maxRequests, options.windowMs);
-
-  if (!limiter) {
-    // No Redis configured — use in-memory fallback
-    return memoryRateLimit(key, options);
-  }
-
-  // For synchronous compatibility, trigger Redis check but don't await.
-  // Return optimistic success — the Redis limiter will block on subsequent calls.
-  // For strict enforcement, use rateLimitAsync instead.
-  return memoryRateLimit(key, options);
-}
-
-/**
- * Async rate limit — uses Redis when available, with proper await.
- * Prefer this in API routes where you can await.
- */
 export async function rateLimitAsync(
   key: string,
   { maxRequests, windowMs }: RateLimitOptions
@@ -136,3 +118,8 @@ export async function rateLimitAsync(
     return memoryRateLimit(key, { maxRequests, windowMs });
   }
 }
+
+/**
+ * Alias for rateLimitAsync — use this as the default rate limiter.
+ */
+export const rateLimit = rateLimitAsync;

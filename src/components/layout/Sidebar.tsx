@@ -31,7 +31,7 @@ export function Sidebar() {
       </div>
 
       {/* Primary nav */}
-      <nav className="flex-1 space-y-1 px-2 pt-4">
+      <nav role="navigation" aria-label="Menu principal" className="flex-1 space-y-1 px-2 pt-4">
         {sidebarItems
           .filter((item) => item.id !== 'settings')
           .map((item) => {
@@ -156,6 +156,7 @@ export function Sidebar() {
             <button
               onClick={signOut}
               title="Deconnexion"
+              aria-label="Deconnexion"
               className="text-surface-200 hover:bg-error/10 hover:text-error group relative flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors duration-150"
             >
               <SignOut weight="duotone" size={20} className="shrink-0" />

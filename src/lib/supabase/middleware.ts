@@ -5,7 +5,7 @@
 
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
-import { rateLimit } from '@/lib/api/rate-limit';
+import { rateLimitAsync } from '@/lib/api/rate-limit';
 
 // Rate limit configurations for auth paths (IP-based)
 const AUTH_RATE_LIMITS: Record<string, { maxRequests: number; windowMs: number }> = {
@@ -37,7 +37,7 @@ export async function updateSession(request: NextRequest) {
   for (const [authPath, limits] of Object.entries(AUTH_RATE_LIMITS)) {
     if (pathname.startsWith(authPath) && request.method === 'POST') {
       const ip = getClientIp(request);
-      const result = rateLimit(`auth:${authPath}:${ip}`, limits);
+      const result = await rateLimitAsync(`auth:${authPath}:${ip}`, limits);
 
       if (!result.success) {
         const retryAfterSeconds = Math.ceil(result.retryAfterMs / 1000);
@@ -61,7 +61,7 @@ export async function updateSession(request: NextRequest) {
   for (const [authPath, limits] of Object.entries(AUTH_RATE_LIMITS)) {
     if (pathname.startsWith(authPath)) {
       const ip = getClientIp(request);
-      const result = rateLimit(`auth_page:${authPath}:${ip}`, {
+      const result = await rateLimitAsync(`auth_page:${authPath}:${ip}`, {
         maxRequests: limits.maxRequests * 3, // More lenient for page loads
         windowMs: limits.windowMs,
       });

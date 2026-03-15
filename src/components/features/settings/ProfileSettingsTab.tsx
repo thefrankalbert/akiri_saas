@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { CheckCircle, CreditCard } from '@phosphor-icons/react';
 import { Button, Input, Textarea } from '@/components/ui';
 import { updateProfileSchema, type UpdateProfileInput } from '@/lib/validations';
 import { toasts } from '@/lib/utils/toast';
@@ -16,6 +17,8 @@ interface ProfileSettingsTabProps {
 
 export function ProfileSettingsTab({ profile }: ProfileSettingsTabProps) {
   const [serverError, setServerError] = useState<string | null>(null);
+  const [connectLoading, setConnectLoading] = useState(false);
+  const [connectError, setConnectError] = useState<string | null>(null);
 
   const {
     register,
@@ -33,6 +36,30 @@ export function ProfileSettingsTab({ profile }: ProfileSettingsTabProps) {
   });
 
   const bioValue = watch('bio') || '';
+
+  const handleConnectOnboard = async () => {
+    setConnectError(null);
+    setConnectLoading(true);
+
+    try {
+      const res = await fetch('/api/connect/onboard', {
+        method: 'POST',
+      });
+
+      if (!res.ok) {
+        const json = await res.json();
+        setConnectError(json.error || 'Erreur lors de la configuration des paiements');
+        return;
+      }
+
+      const json = await res.json();
+      window.location.href = json.data.url;
+    } catch {
+      setConnectError('Une erreur est survenue. Veuillez réessayer.');
+    } finally {
+      setConnectLoading(false);
+    }
+  };
 
   const onSubmit = async (data: UpdateProfileInput) => {
     setServerError(null);
@@ -117,6 +144,42 @@ export function ProfileSettingsTab({ profile }: ProfileSettingsTabProps) {
           Enregistrer les modifications
         </Button>
       </form>
+
+      {/* Stripe Connect — Recevoir des paiements */}
+      <div className="space-y-3 border-t border-neutral-200 pt-6">
+        <h3 className="text-lg font-semibold">Recevoir des paiements</h3>
+
+        {profile?.stripe_connect_onboarded ? (
+          <div className="bg-success/10 text-success inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium">
+            <CheckCircle size={20} weight="fill" />
+            Paiements configurés
+          </div>
+        ) : (
+          <div className="space-y-3">
+            <p className="text-sm text-neutral-600">
+              Pour recevoir des paiements en tant que voyageur, vous devez configurer votre compte
+              de paiement. Vous serez redirigé vers notre partenaire Stripe pour compléter la
+              vérification.
+            </p>
+
+            {connectError && (
+              <div className="bg-error/10 text-error rounded-xl px-4 py-3 text-sm">
+                {connectError}
+              </div>
+            )}
+
+            <Button
+              type="button"
+              variant="secondary"
+              isLoading={connectLoading}
+              onClick={handleConnectOnboard}
+            >
+              <CreditCard size={20} weight="bold" />
+              Configurer les paiements
+            </Button>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
