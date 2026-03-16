@@ -161,7 +161,7 @@ export function CorridorsSection() {
                   </span>
                 </div>
                 <div className="text-surface-100 flex items-center gap-1.5 text-xs">
-                  <TrendUp weight="duotone" size={12} className="text-emerald-400" />
+                  <TrendUp weight="duotone" size={12} className="text-success" />
                   <span>
                     <span className="font-medium text-neutral-200">{corridor.totalKg}kg</span> dispo
                   </span>

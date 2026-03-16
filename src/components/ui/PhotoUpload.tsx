@@ -1,6 +1,7 @@
 'use client';
 
 import { useRef } from 'react';
+import Image from 'next/image';
 import { Camera, X } from '@phosphor-icons/react';
 import { cn } from '@/lib/utils';
 import { MAX_PARCEL_PHOTOS } from '@/constants';
@@ -37,14 +38,13 @@ export function PhotoUpload({
       <div className="flex items-center gap-2">
         {photos.map((url, i) => (
           <div key={i} className="group relative h-16 w-16 shrink-0 overflow-hidden rounded-lg">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={url} alt={`Photo ${i + 1}`} className="h-full w-full object-cover" />
+            <Image src={url} alt={`Photo ${i + 1}`} fill className="object-cover" sizes="64px" />
             <button
               type="button"
               onClick={() => onRemove(i)}
-              className="absolute top-0.5 right-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-black/60 text-white opacity-0 transition-opacity group-hover:opacity-100"
+              className="absolute top-0.5 right-0.5 flex h-7 w-7 items-center justify-center rounded-full bg-black/60 text-white opacity-0 transition-opacity group-hover:opacity-100"
             >
-              <X size={10} weight="bold" />
+              <X size={12} weight="bold" />
             </button>
           </div>
         ))}

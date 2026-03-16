@@ -58,11 +58,11 @@ export function Sidebar() {
                   {item.id === 'messages' && totalUnread > 0 && (
                     <>
                       {/* Full badge on desktop */}
-                      <span className="absolute -top-1 -right-1.5 hidden h-4 min-w-[16px] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white lg:flex">
+                      <span className="bg-error absolute -top-1 -right-1.5 hidden h-4 min-w-[16px] items-center justify-center rounded-full px-1 text-[10px] font-bold text-white lg:flex">
                         {totalUnread > 9 ? '9+' : totalUnread}
                       </span>
                       {/* Small dot on tablet (collapsed) */}
-                      <span className="ring-surface-900 absolute -top-0.5 -right-0.5 block h-2.5 w-2.5 rounded-full bg-red-500 ring-2 lg:hidden" />
+                      <span className="ring-surface-900 bg-error absolute -top-0.5 -right-0.5 block h-2.5 w-2.5 rounded-full ring-2 lg:hidden" />
                     </>
                   )}
                 </div>

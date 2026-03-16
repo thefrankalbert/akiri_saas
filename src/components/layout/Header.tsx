@@ -33,7 +33,7 @@ export function Header() {
   return (
     <header
       role="banner"
-      className="bg-surface-950/80 sticky top-0 z-50 border-b border-white/[0.06] backdrop-blur-xl md:ml-16 lg:ml-60"
+      className="safe-top bg-surface-950/80 sticky top-0 z-50 border-b border-white/[0.06] backdrop-blur-xl md:ml-16 lg:ml-60"
     >
       {/* Demo Mode Banner */}
       {isDemo && (
@@ -48,7 +48,7 @@ export function Header() {
         <div className="flex items-center gap-1">
           <button
             onClick={() => router.back()}
-            className="text-surface-200 hover:bg-surface-800 rounded-lg p-2 transition-colors duration-150 hover:text-neutral-100 md:hidden"
+            className="text-surface-200 hover:bg-surface-800 rounded-lg p-3 transition-colors duration-150 hover:text-neutral-100 md:hidden"
             aria-label="Retour"
           >
             <ArrowLeft weight="bold" size={20} />
@@ -65,13 +65,13 @@ export function Header() {
         <div className="hidden items-center gap-2 md:flex">
           <button
             aria-label="Rechercher"
-            className="text-surface-200 hover:bg-surface-800 rounded-lg p-2 transition-colors duration-150 hover:text-neutral-100"
+            className="text-surface-200 hover:bg-surface-800 rounded-lg p-3 transition-colors duration-150 hover:text-neutral-100"
           >
             <MagnifyingGlass weight="duotone" size={20} aria-hidden="true" />
           </button>
           <button
             aria-label="Notifications"
-            className="text-surface-100 hover:bg-surface-800 relative rounded-lg p-2 transition-colors duration-150 hover:text-neutral-100"
+            className="text-surface-100 hover:bg-surface-800 relative rounded-lg p-3 transition-colors duration-150 hover:text-neutral-100"
           >
             <Bell weight="duotone" size={20} aria-hidden="true" />
           </button>
@@ -99,7 +99,7 @@ export function Header() {
           aria-label={mobileMenuOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
           aria-expanded={mobileMenuOpen}
           aria-controls="mobile-menu"
-          className="rounded-lg p-2.5 text-neutral-200 transition-colors duration-150 hover:text-neutral-100 md:hidden"
+          className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg p-2.5 text-neutral-200 transition-colors duration-150 hover:text-neutral-100 md:hidden"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
         >
           {mobileMenuOpen ? (

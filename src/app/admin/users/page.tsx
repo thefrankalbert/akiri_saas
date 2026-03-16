@@ -95,14 +95,14 @@ export default function AdminUsersPage() {
                     </td>
                     <td className="px-4 py-3">
                       {user.verification_level >= 3 ? (
-                        <span className="inline-flex items-center gap-1 text-emerald-400">
+                        <span className="text-success inline-flex items-center gap-1">
                           <ShieldCheck size={14} weight="fill" /> Niveau {user.verification_level}
                         </span>
                       ) : (
                         <span className="text-surface-400">Niveau {user.verification_level}</span>
                       )}
                     </td>
-                    <td className="px-4 py-3 text-amber-400">
+                    <td className="text-warning px-4 py-3">
                       {user.rating > 0 ? `${user.rating}/5` : '-'}
                     </td>
                     <td className="text-surface-300 px-4 py-3">{user.total_trips}</td>
@@ -112,7 +112,7 @@ export default function AdminUsersPage() {
                     <td className="px-4 py-3">
                       <button
                         onClick={() => handleAction(user.user_id, 'ban')}
-                        className="text-xs text-red-400 hover:text-red-300"
+                        className="text-error hover:text-error/80 text-xs"
                       >
                         <Warning size={14} className="mr-1 inline" />
                         Suspendre

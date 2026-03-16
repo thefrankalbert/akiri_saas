@@ -19,8 +19,8 @@ const heroStats = [
     value: 15000,
     suffix: '+',
     icon: Package,
-    iconColor: 'text-emerald-400',
-    iconBg: 'bg-emerald-500/10',
+    iconColor: 'text-success',
+    iconBg: 'bg-success/10',
   },
   {
     label: 'Corridors',

@@ -52,7 +52,7 @@ export function FeaturesSection() {
             )}
           >
             <div className="relative z-10">
-              <div className="inline-flex items-center gap-2 rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-400">
+              <div className="bg-success/10 text-success inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold">
                 <Lock weight="fill" size={12} />
                 Système Escrow
               </div>
@@ -73,27 +73,25 @@ export function FeaturesSection() {
                 <div className="bg-surface-800 flex h-10 w-10 items-center justify-center rounded-lg border border-white/[0.08]">
                   <Wallet weight="duotone" size={18} className="text-surface-100" />
                 </div>
-                <div className="from-surface-400 to-surface-400 h-px flex-1 bg-gradient-to-r via-emerald-400" />
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-500 text-white">
+                <div className="from-surface-400 to-surface-400 via-success h-px flex-1 bg-gradient-to-r" />
+                <div className="bg-success flex h-10 w-10 items-center justify-center rounded-lg text-white">
                   <ShieldCheck weight="fill" size={18} />
                 </div>
-                <div className="from-surface-400 to-surface-400 h-px flex-1 bg-gradient-to-r via-emerald-400" />
+                <div className="from-surface-400 to-surface-400 via-success h-px flex-1 bg-gradient-to-r" />
                 <div className="bg-surface-800 flex h-10 w-10 items-center justify-center rounded-lg border border-white/[0.08]">
-                  <CheckCircle weight="duotone" size={18} className="text-emerald-400" />
+                  <CheckCircle weight="duotone" size={18} className="text-success" />
                 </div>
               </div>
 
               <div className="text-surface-100 mt-3 flex items-center gap-3 text-[11px]">
                 <span className="flex-1 text-center">Expéditeur paie</span>
-                <span className="flex-1 text-center font-medium text-emerald-400">
-                  Escrow sécurisé
-                </span>
+                <span className="text-success flex-1 text-center font-medium">Escrow sécurisé</span>
                 <span className="flex-1 text-center">Voyageur reçoit</span>
               </div>
             </div>
 
             {/* Decorative gradient */}
-            <div className="pointer-events-none absolute -right-8 -bottom-8 h-48 w-48 rounded-full bg-emerald-500/5 blur-3xl transition-all duration-500 group-hover:bg-emerald-500/10" />
+            <div className="bg-success/5 group-hover:bg-success/10 pointer-events-none absolute -right-8 -bottom-8 h-48 w-48 rounded-full blur-3xl transition-all duration-500" />
           </div>
 
           {/* Card 2 — 15+ corridors */}
@@ -157,7 +155,7 @@ export function FeaturesSection() {
             <div className="mt-4 flex items-center gap-2">
               <div className="bg-surface-800 flex-1 rounded-lg px-3 py-2 text-center">
                 <p className="text-surface-100 text-xs">Fret classique</p>
-                <p className="text-sm font-bold text-red-400 line-through">25&euro;/kg</p>
+                <p className="text-error text-sm font-bold line-through">25&euro;/kg</p>
               </div>
               <ArrowRight weight="bold" size={14} className="text-primary-400" />
               <div className="bg-primary-500/10 flex-1 rounded-lg px-3 py-2 text-center">
@@ -195,7 +193,7 @@ export function FeaturesSection() {
               </div>
               <div className="bg-surface-800 rounded-lg p-2 text-center">
                 <div className="flex items-center justify-center gap-0.5">
-                  <CheckCircle weight="fill" size={12} className="text-emerald-400" />
+                  <CheckCircle weight="fill" size={12} className="text-success" />
                   <span className="text-sm font-bold text-neutral-100">96%</span>
                 </div>
                 <p className="text-surface-100 text-[10px]">succès</p>

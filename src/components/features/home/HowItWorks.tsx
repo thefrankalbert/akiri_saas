@@ -45,9 +45,9 @@ const steps = [
     description:
       'Point de collecte convenu via le chat. Le voyageur prend le colis en main propre.',
     visual: 'meetup',
-    accent: 'from-emerald-500 to-emerald-600',
-    accentBg: 'bg-emerald-500/10',
-    accentText: 'text-emerald-400',
+    accent: 'from-success to-success',
+    accentBg: 'bg-success/10',
+    accentText: 'text-success',
   },
   {
     step: 4,
@@ -56,9 +56,9 @@ const steps = [
     description:
       'Code à 6 chiffres unique. Le destinataire confirme. Le voyageur est payé instantanément.',
     visual: 'confirmed',
-    accent: 'from-amber-500 to-amber-600',
-    accentBg: 'bg-amber-500/10',
-    accentText: 'text-amber-400',
+    accent: 'from-warning to-warning',
+    accentBg: 'bg-warning/10',
+    accentText: 'text-warning',
   },
 ];
 
@@ -113,7 +113,7 @@ function StepVisual({ step }: { step: (typeof steps)[0] }) {
         <div className="bg-surface-800 rounded-lg border border-white/[0.08] p-3">
           <div className="flex items-center justify-between text-xs">
             <span className="font-medium text-neutral-100">Demande d&apos;envoi</span>
-            <span className="rounded-full bg-amber-500/10 px-2 py-0.5 text-[10px] font-medium text-amber-400">
+            <span className="bg-warning/10 text-warning rounded-full px-2 py-0.5 text-[10px] font-medium">
               En attente
             </span>
           </div>
@@ -133,9 +133,9 @@ function StepVisual({ step }: { step: (typeof steps)[0] }) {
             </div>
           </div>
         </div>
-        <div className="flex items-center gap-2 rounded-lg bg-emerald-500/10 px-3 py-2">
-          <ShieldCheck weight="duotone" size={14} className="text-emerald-400" />
-          <span className="text-[11px] text-emerald-400">Escrow — Paiement sécurisé</span>
+        <div className="bg-success/10 flex items-center gap-2 rounded-lg px-3 py-2">
+          <ShieldCheck weight="duotone" size={14} className="text-success" />
+          <span className="text-success text-[11px]">Escrow — Paiement sécurisé</span>
         </div>
       </div>
     );
@@ -177,16 +177,16 @@ function StepVisual({ step }: { step: (typeof steps)[0] }) {
 
   return (
     <div className="space-y-3">
-      <div className="flex items-center justify-center rounded-lg border border-emerald-500/20 bg-emerald-500/10 py-4">
+      <div className="border-success/20 bg-success/10 flex items-center justify-center rounded-lg border py-4">
         <div className="text-center">
-          <QrCode weight="duotone" size={32} className="mx-auto text-emerald-400" />
+          <QrCode weight="duotone" size={32} className="text-success mx-auto" />
           <div className="mt-2 font-mono text-2xl font-bold tracking-[0.3em] text-neutral-100">
             4 8 2 9 1 5
           </div>
-          <p className="mt-1 text-[10px] text-emerald-400">Code de confirmation</p>
+          <p className="text-success mt-1 text-[10px]">Code de confirmation</p>
         </div>
       </div>
-      <div className="flex items-center gap-2 rounded-lg bg-emerald-500 px-3 py-2.5">
+      <div className="bg-success flex items-center gap-2 rounded-lg px-3 py-2.5">
         <CurrencyEur weight="bold" size={16} className="text-white" />
         <span className="text-xs font-medium text-white">Paiement libéré au voyageur</span>
         <CheckCircle weight="fill" size={14} className="ml-auto text-white" />
@@ -318,7 +318,7 @@ export function HowItWorks() {
                   {isActive && (
                     <div className="bg-surface-600 absolute right-5 bottom-0 left-5 h-0.5 overflow-hidden rounded-full">
                       <div
-                        className={cn('bg-primary-500 h-full rounded-full')}
+                        className={cn('bg-primary-500 h-full origin-left rounded-full')}
                         style={{ animation: 'progressBar 4s linear' }}
                       />
                     </div>
@@ -384,10 +384,10 @@ export function HowItWorks() {
       <style jsx>{`
         @keyframes progressBar {
           from {
-            width: 0%;
+            transform: scaleX(0);
           }
           to {
-            width: 100%;
+            transform: scaleX(1);
           }
         }
       `}</style>

@@ -54,7 +54,7 @@ export function BottomNav() {
               <div className="relative">
                 <Icon weight={isActive ? 'fill' : 'regular'} size={22} />
                 {showBadge && (
-                  <span className="absolute -top-1 -right-1.5 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white">
+                  <span className="bg-error absolute -top-1 -right-1.5 flex h-4 min-w-[16px] items-center justify-center rounded-full px-1 text-[10px] font-bold text-white">
                     {totalUnread > 9 ? '9+' : totalUnread}
                   </span>
                 )}

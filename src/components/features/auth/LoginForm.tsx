@@ -122,7 +122,7 @@ export function LoginForm() {
                   <Button
                     type="button"
                     onClick={handleDemoLogin}
-                    className="bg-warning text-surface-950 hover:bg-amber-600"
+                    className="bg-warning text-surface-950 hover:bg-warning/80"
                     size="sm"
                   >
                     Connexion Démo Rapide
@@ -130,7 +130,7 @@ export function LoginForm() {
                   <button
                     type="button"
                     onClick={fillDemoCredentials}
-                    className="text-warning text-sm font-medium underline hover:text-amber-300"
+                    className="text-warning hover:text-warning/80 text-sm font-medium underline"
                   >
                     ou remplir le formulaire
                   </button>

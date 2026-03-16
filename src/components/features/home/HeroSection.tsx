@@ -46,8 +46,8 @@ export function HeroSection() {
         >
           <div className="glass inline-flex items-center gap-2.5 rounded-full px-5 py-2">
             <span className="relative flex h-2.5 w-2.5">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-              <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-400" />
+              <span className="bg-success absolute inline-flex h-full w-full animate-ping rounded-full opacity-75" />
+              <span className="bg-success relative inline-flex h-2.5 w-2.5 rounded-full" />
             </span>
             <span className="text-surface-50 text-sm font-medium">
               <span className="font-bold text-neutral-100">+250</span> voyageurs cette semaine
