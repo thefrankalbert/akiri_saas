@@ -95,6 +95,8 @@
     scroll-behavior: smooth;
     -webkit-tap-highlight-color: transparent;
     color-scheme: dark;
+    overscroll-behavior: none;
+    height: 100%;
     @apply font-sans;
   }
 
@@ -104,8 +106,10 @@
     letter-spacing: -0.011em;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    overscroll-behavior: none;
     overflow-x: hidden;
     width: 100%;
+    height: 100%;
     position: relative;
   }
 
@@ -377,6 +381,16 @@
   .glass-strong {
     @apply border border-white/[0.12] bg-white/[0.06] backdrop-blur-2xl;
   }
+}
+
+/* Layout constants — single source of truth for heights */
+:root {
+  --nav-height: 4rem; /* 64px — BottomNav height */
+  --header-height: 4rem; /* 64px — Header height */
+  --sidebar-width: 15rem; /* 240px — desktop sidebar */
+  --sidebar-collapsed: 4rem; /* 64px — tablet sidebar */
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --content-bottom: calc(var(--nav-height) + var(--safe-bottom));
 }
 
 :root {

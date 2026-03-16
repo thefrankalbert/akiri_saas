@@ -22,7 +22,7 @@ export function HeroSection() {
   }, []);
 
   return (
-    <section className="bg-surface-950 relative min-h-dvh overflow-hidden sm:min-h-[88vh]">
+    <section className="bg-surface-950 relative min-h-svh overflow-hidden sm:min-h-[88svh]">
       {/* Gradient mesh — primary + accent */}
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(108,92,231,0.15),transparent_50%)]" />
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,rgba(139,92,246,0.1),transparent_60%)]" />

@@ -8,7 +8,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
     <div className="bg-surface-950 flex min-h-screen flex-col">
       <Sidebar />
       <Header />
-      <main className="min-w-0 flex-1 overflow-x-hidden pb-24 md:pb-0 md:pl-16 lg:pl-60">
+      <main className="min-w-0 flex-1 overflow-x-hidden pb-[var(--content-bottom)] md:pb-0 md:pl-[var(--sidebar-collapsed)] lg:pl-[var(--sidebar-width)]">
         <div className="mx-auto max-w-[1800px]">{children}</div>
       </main>
       <BottomNav />

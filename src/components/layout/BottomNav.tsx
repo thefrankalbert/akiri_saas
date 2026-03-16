@@ -18,7 +18,7 @@ export function BottomNav() {
       aria-label="Navigation principale"
       className="safe-bottom bg-surface-950/90 fixed right-0 bottom-0 left-0 z-50 border-t border-white/[0.06] backdrop-blur-xl md:hidden"
     >
-      <div className="mx-auto flex h-16 max-w-lg items-center justify-around px-1">
+      <div className="mx-auto flex h-[var(--nav-height)] max-w-lg items-center justify-around px-1">
         {navItems.map((item) => {
           const isActive =
             item.href === '/dashboard'

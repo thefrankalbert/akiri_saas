@@ -89,11 +89,11 @@ export function MessagesPage() {
   };
 
   return (
-    <div className="-mb-24 flex h-[calc(100dvh-4rem)] overflow-hidden md:mb-0 md:h-[calc(100dvh-4rem)]">
+    <div className="-mb-24 flex h-[calc(100svh-var(--header-height))] overflow-hidden md:mb-0 md:h-[calc(100svh-var(--header-height))]">
       {/* Conversations panel */}
       <div
         className={cn(
-          'w-full flex-col border-r border-white/[0.06] pb-24 md:flex md:w-80 md:pb-0 lg:w-96',
+          'w-full flex-col border-r border-white/[0.06] pb-[var(--content-bottom)] md:flex md:w-80 md:pb-0 lg:w-96',
           viewMode === 'list' ? 'flex' : 'hidden'
         )}
       >
@@ -140,7 +140,7 @@ export function MessagesPage() {
       {/* Chat panel */}
       <div
         className={cn(
-          'flex-1 flex-col pb-24 md:flex md:pb-0',
+          'flex-1 flex-col pb-[var(--content-bottom)] md:flex md:pb-0',
           viewMode === 'chat' ? 'flex' : 'hidden'
         )}
       >
