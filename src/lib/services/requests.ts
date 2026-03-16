@@ -2,6 +2,7 @@
 // Shipment Requests Service — Server-side business logic
 // ============================================
 
+import { randomInt } from 'node:crypto';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { ServiceError } from './errors';
 import { logger } from '@/lib/logger';
@@ -34,7 +35,7 @@ function isValidTransition(from: RequestStatus, to: RequestStatus): boolean {
  * Generate a 6-digit confirmation code
  */
 function generateConfirmationCode(): string {
-  return Math.floor(100000 + Math.random() * 900000).toString();
+  return randomInt(100000, 1000000).toString();
 }
 
 /**
@@ -100,6 +101,8 @@ export function createRequestService(
     // Calculate total price
     const totalPrice = Math.round(input.weight_kg * listing.price_per_kg * 100) / 100;
 
+    const confirmationCode = generateConfirmationCode();
+
     const { data, error } = await supabase
       .from('shipment_requests')
       .insert({
@@ -111,7 +114,6 @@ export function createRequestService(
         special_instructions: input.special_instructions || null,
         status: 'pending',
         total_price: totalPrice,
-        confirmation_code: generateConfirmationCode(),
       })
       .select()
       .single();
@@ -119,6 +121,11 @@ export function createRequestService(
     if (error) {
       throw new ServiceError(error.message, 'VALIDATION');
     }
+
+    // Store confirmation code in a separate table (sender-only access via RLS)
+    await supabase
+      .from('confirmation_codes')
+      .insert({ request_id: data.id, code: confirmationCode });
 
     // Notify the traveler about the new request
     await createNotification(
@@ -344,8 +351,14 @@ export function createRequestService(
       throw new ServiceError("Seul l'expéditeur peut confirmer la livraison", 'AUTH');
     }
 
-    // Verify confirmation code
-    if (request.confirmation_code !== confirmationCode) {
+    // Verify confirmation code from separate table
+    const { data: codeRecord } = await supabase
+      .from('confirmation_codes')
+      .select('code')
+      .eq('request_id', requestId)
+      .single();
+
+    if (!codeRecord || codeRecord.code !== confirmationCode) {
       throw new ServiceError('Code de confirmation incorrect', 'VALIDATION');
     }
 
@@ -510,13 +523,24 @@ export function createRequestService(
 
   /**
    * Resolve a dispute — either refund (cancel) or release payment (confirm).
-   * Can be called by either party. In production, an admin panel would handle this.
+   * Admin-only: only platform administrators can resolve disputes.
    */
   async function resolveDispute(
     requestId: string,
     userId: string,
     resolution: 'refund' | 'release'
   ): Promise<ShipmentRequest> {
+    // Admin-only authorization
+    const { data: callerProfile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('user_id', userId)
+      .single();
+
+    if (!callerProfile || callerProfile.role !== 'admin') {
+      throw new ServiceError('Seul un administrateur peut résoudre les litiges', 'AUTH');
+    }
+
     const { data: request, error: fetchError } = await supabase
       .from('shipment_requests')
       .select('*, listing:listings!listing_id(*)')
@@ -526,13 +550,6 @@ export function createRequestService(
 
     if (fetchError || !request) {
       throw new ServiceError('Litige introuvable', 'NOT_FOUND');
-    }
-
-    const isSender = request.sender_id === userId;
-    const isTraveler = request.listing.traveler_id === userId;
-
-    if (!isSender && !isTraveler) {
-      throw new ServiceError('Non autorisé', 'AUTH');
     }
 
     if (resolution === 'refund') {

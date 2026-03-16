@@ -2,6 +2,7 @@
 // Verification Service — Phone & Identity KYC
 // ============================================
 
+import { createHash, randomInt } from 'node:crypto';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { ServiceError } from './errors';
 import { logger } from '@/lib/logger';
@@ -15,10 +16,17 @@ const KYC_MODE = process.env.KYC_MODE || 'mock';
 const OTP_EXPIRATION_MINUTES = 10;
 
 /**
- * Generate a 6-digit OTP code
+ * Generate a cryptographically secure 6-digit OTP code.
  */
 function generateOtpCode(): string {
-  return Math.floor(100000 + Math.random() * 900000).toString();
+  return randomInt(100000, 1000000).toString();
+}
+
+/**
+ * Hash an OTP code with SHA-256 before storing it in the database.
+ */
+export function hashOtp(otp: string): string {
+  return createHash('sha256').update(otp).digest('hex');
 }
 
 export function createVerificationService(
@@ -93,7 +101,7 @@ export function createVerificationService(
         status: 'pending',
         metadata: {
           phone,
-          otp_code: otpCode,
+          otp_code: hashOtp(otpCode),
         },
         expires_at: expiresAt,
       })
@@ -141,8 +149,8 @@ export function createVerificationService(
       throw new ServiceError('Numéro de téléphone incorrect', 'VALIDATION');
     }
 
-    // Check if OTP matches
-    if (metadata.otp_code !== code) {
+    // Hash the submitted code and compare against the stored hash
+    if (hashOtp(code) !== metadata.otp_code) {
       // Update session as failed
       await supabase
         .from('verification_sessions')

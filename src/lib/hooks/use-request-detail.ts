@@ -14,6 +14,7 @@ export interface RequestDetailData {
   error: string | null;
   actionLoading: boolean;
   confirmCode: string;
+  confirmationCode: string | null;
   hasReviewed: boolean;
   role: 'sender' | 'traveler';
   counterparty: Profile | undefined;
@@ -29,6 +30,7 @@ export function useRequestDetail(requestId: string): RequestDetailData {
   const [error, setError] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
   const [confirmCode, setConfirmCode] = useState('');
+  const [confirmationCode, setConfirmationCode] = useState<string | null>(null);
   const [hasReviewed, setHasReviewed] = useState(false);
 
   useEffect(() => {
@@ -66,6 +68,15 @@ export function useRequestDetail(requestId: string): RequestDetailData {
       }
 
       setRequest(data as unknown as ShipmentRequest);
+
+      // Fetch confirmation code from separate table (sender-only via RLS)
+      const { data: codeData } = await supabase
+        .from('confirmation_codes')
+        .select('code')
+        .eq('request_id', requestId)
+        .single();
+      if (codeData) setConfirmationCode(codeData.code);
+
       setLoading(false);
     };
 
@@ -93,9 +104,8 @@ export function useRequestDetail(requestId: string): RequestDetailData {
           setRequest((prev) => (prev ? { ...prev, status: 'cancelled' } : prev));
         } else if (action === 'pay') {
           toasts.paymentSuccess();
-          setRequest((prev) =>
-            prev ? { ...prev, status: 'paid', confirmation_code: '482915' } : prev
-          );
+          setRequest((prev) => (prev ? { ...prev, status: 'paid' } : prev));
+          setConfirmationCode('482915');
         } else if (action === 'confirm') {
           toasts.deliveryConfirmed();
           setRequest((prev) => (prev ? { ...prev, status: 'confirmed' } : prev));
@@ -164,11 +174,11 @@ export function useRequestDetail(requestId: string): RequestDetailData {
   );
 
   const copyCode = useCallback(() => {
-    if (request?.confirmation_code) {
-      navigator.clipboard.writeText(request.confirmation_code);
+    if (confirmationCode) {
+      navigator.clipboard.writeText(confirmationCode);
       toasts.copiedToClipboard();
     }
-  }, [request?.confirmation_code]);
+  }, [confirmationCode]);
 
   return {
     request,
@@ -176,6 +186,7 @@ export function useRequestDetail(requestId: string): RequestDetailData {
     error,
     actionLoading,
     confirmCode,
+    confirmationCode,
     hasReviewed,
     role,
     counterparty,

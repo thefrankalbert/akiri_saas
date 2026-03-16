@@ -85,7 +85,6 @@ export interface ShipmentRequest {
   special_instructions: string | null;
   status: RequestStatus;
   total_price: number;
-  confirmation_code: string | null;
   created_at: string;
   updated_at: string;
   // Joined

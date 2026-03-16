@@ -47,7 +47,6 @@ function mockShipmentRequest(overrides: Record<string, unknown> = {}) {
     special_instructions: null,
     status: 'pending',
     total_price: 50,
-    confirmation_code: MOCK_CONFIRMATION_CODE,
     listing: {
       id: MOCK_LISTING_ID,
       traveler_id: MOCK_TRAVELER_ID,
@@ -266,6 +265,11 @@ describe('Request Service', () => {
         .single.mockResolvedValueOnce({ data: request, error: null })
         .mockResolvedValueOnce({ data: confirmedRequest, error: null });
 
+      mockSupabase._getChain('confirmation_codes').single.mockResolvedValue({
+        data: { code: MOCK_CONFIRMATION_CODE },
+        error: null,
+      });
+
       const result = await service.confirmDelivery(
         MOCK_REQUEST_ID,
         MOCK_SENDER_ID,
@@ -282,6 +286,11 @@ describe('Request Service', () => {
 
       mockSupabase._getChain('shipment_requests').single.mockResolvedValue({
         data: request,
+        error: null,
+      });
+
+      mockSupabase._getChain('confirmation_codes').single.mockResolvedValue({
+        data: { code: MOCK_CONFIRMATION_CODE },
         error: null,
       });
 
@@ -342,6 +351,11 @@ describe('Request Service', () => {
         ._getChain('shipment_requests')
         .single.mockResolvedValueOnce({ data: request, error: null })
         .mockResolvedValueOnce({ data: confirmedRequest, error: null });
+
+      mockSupabase._getChain('confirmation_codes').single.mockResolvedValue({
+        data: { code: MOCK_CONFIRMATION_CODE },
+        error: null,
+      });
 
       // Should not throw — capturePayment failure is logged but not propagated
       const result = await service.confirmDelivery(

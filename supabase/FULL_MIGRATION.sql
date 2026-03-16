@@ -80,6 +80,7 @@ CREATE INDEX idx_requests_sender ON shipment_requests(sender_id);
 CREATE INDEX idx_requests_status ON shipment_requests(status);
 
 -- ─── 3b. Confirmation Codes (sender-only access) ────────────
+-- Stored separately so the traveler cannot read them via RLS.
 CREATE TABLE confirmation_codes (
   id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   request_id UUID NOT NULL UNIQUE REFERENCES shipment_requests(id) ON DELETE CASCADE,
@@ -89,11 +90,13 @@ CREATE TABLE confirmation_codes (
 
 ALTER TABLE confirmation_codes ENABLE ROW LEVEL SECURITY;
 
+-- Only the sender of the related request can read the confirmation code
 CREATE POLICY "Sender can view confirmation code" ON confirmation_codes
   FOR SELECT USING (
     auth.uid() = (SELECT sender_id FROM shipment_requests WHERE id = request_id)
   );
 
+-- Authenticated senders can insert (enforced by FK + app logic)
 CREATE POLICY "Sender can create confirmation code" ON confirmation_codes
   FOR INSERT WITH CHECK (
     auth.uid() = (SELECT sender_id FROM shipment_requests WHERE id = request_id)
@@ -467,3 +470,208 @@ CREATE POLICY "Authenticated users can upload item photos"
 ALTER PUBLICATION supabase_realtime ADD TABLE messages;
 ALTER PUBLICATION supabase_realtime ADD TABLE notifications;
 ALTER PUBLICATION supabase_realtime ADD TABLE conversations;
+-- Parcel Postings: senders publish parcels they want to ship
+CREATE TABLE IF NOT EXISTS parcel_postings (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  sender_id UUID NOT NULL REFERENCES profiles(user_id) ON DELETE CASCADE,
+  departure_city TEXT NOT NULL,
+  departure_country TEXT NOT NULL,
+  arrival_city TEXT NOT NULL,
+  arrival_country TEXT NOT NULL,
+  weight_kg NUMERIC NOT NULL CHECK (weight_kg > 0 AND weight_kg <= 30),
+  description TEXT NOT NULL,
+  category TEXT NOT NULL CHECK (category IN ('clothing', 'electronics', 'food', 'documents', 'cosmetics', 'other')),
+  photos TEXT[] DEFAULT '{}',
+  budget_per_kg NUMERIC CHECK (budget_per_kg IS NULL OR budget_per_kg > 0),
+  urgency TEXT NOT NULL DEFAULT 'flexible' CHECK (urgency IN ('flexible', 'within_2_weeks', 'urgent')),
+  is_fragile BOOLEAN NOT NULL DEFAULT false,
+  desired_date DATE,
+  status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'matched', 'in_progress', 'completed', 'cancelled')),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- Carry Offers: travelers offer to carry a parcel
+CREATE TABLE IF NOT EXISTS carry_offers (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  parcel_id UUID NOT NULL REFERENCES parcel_postings(id) ON DELETE CASCADE,
+  traveler_id UUID NOT NULL REFERENCES profiles(user_id) ON DELETE CASCADE,
+  listing_id UUID REFERENCES listings(id) ON DELETE SET NULL,
+  proposed_price NUMERIC NOT NULL CHECK (proposed_price > 0),
+  departure_date DATE NOT NULL,
+  message TEXT,
+  status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'accepted', 'rejected', 'cancelled')),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- Indexes
+CREATE INDEX idx_parcel_postings_sender ON parcel_postings(sender_id);
+CREATE INDEX idx_parcel_postings_corridor ON parcel_postings(departure_country, arrival_country);
+CREATE INDEX idx_parcel_postings_status ON parcel_postings(status);
+CREATE INDEX idx_carry_offers_parcel ON carry_offers(parcel_id);
+CREATE INDEX idx_carry_offers_traveler ON carry_offers(traveler_id);
+
+-- RLS
+ALTER TABLE parcel_postings ENABLE ROW LEVEL SECURITY;
+ALTER TABLE carry_offers ENABLE ROW LEVEL SECURITY;
+
+-- Parcel postings: anyone can read active, owner can CRUD
+CREATE POLICY "Anyone can view active parcels" ON parcel_postings
+  FOR SELECT USING (status = 'active' OR sender_id = auth.uid());
+
+CREATE POLICY "Authenticated users can create parcels" ON parcel_postings
+  FOR INSERT WITH CHECK (auth.uid() = sender_id);
+
+CREATE POLICY "Owner can update own parcels" ON parcel_postings
+  FOR UPDATE USING (auth.uid() = sender_id);
+
+-- Carry offers: parcel owner + offer creator can read, travelers can create
+CREATE POLICY "Parcel owner and offer creator can view offers" ON carry_offers
+  FOR SELECT USING (
+    traveler_id = auth.uid()
+    OR parcel_id IN (SELECT id FROM parcel_postings WHERE sender_id = auth.uid())
+  );
+
+CREATE POLICY "Authenticated travelers can create offers" ON carry_offers
+  FOR INSERT WITH CHECK (auth.uid() = traveler_id);
+
+CREATE POLICY "Offer creator can update own offers" ON carry_offers
+  FOR UPDATE USING (auth.uid() = traveler_id);
+
+CREATE POLICY "Parcel owner can update offer status" ON carry_offers
+  FOR UPDATE USING (
+    parcel_id IN (SELECT id FROM parcel_postings WHERE sender_id = auth.uid())
+  );
+
+-- Enable Realtime
+ALTER PUBLICATION supabase_realtime ADD TABLE parcel_postings;
+ALTER PUBLICATION supabase_realtime ADD TABLE carry_offers;
+
+-- Updated_at trigger
+CREATE TRIGGER update_parcel_postings_updated_at
+  BEFORE UPDATE ON parcel_postings
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+
+-- Storage bucket for parcel photos
+INSERT INTO storage.buckets (id, name, public) VALUES ('parcel-photos', 'parcel-photos', true)
+ON CONFLICT (id) DO NOTHING;
+
+CREATE POLICY "Authenticated users can upload parcel photos" ON storage.objects
+  FOR INSERT WITH CHECK (bucket_id = 'parcel-photos' AND auth.role() = 'authenticated');
+
+CREATE POLICY "Anyone can view parcel photos" ON storage.objects
+  FOR SELECT USING (bucket_id = 'parcel-photos');
+-- Add role column to profiles
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS role TEXT NOT NULL DEFAULT 'user'
+  CHECK (role IN ('user', 'admin'));
+
+-- Add is_banned column for user suspension
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS is_banned BOOLEAN NOT NULL DEFAULT false;
+
+-- Index for admin lookups
+CREATE INDEX IF NOT EXISTS idx_profiles_role ON profiles(role);
+-- ============================================
+-- Migration: Critical Blockers Fix
+-- Date: 2026-02-22
+-- ============================================
+
+-- 1. Add Stripe Connect fields to profiles
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS stripe_connect_account_id TEXT DEFAULT NULL;
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS stripe_connect_onboarded BOOLEAN DEFAULT FALSE;
+
+-- 2. Add payout fields to transactions
+ALTER TABLE transactions ADD COLUMN IF NOT EXISTS payout_amount DECIMAL(10,2) DEFAULT NULL;
+ALTER TABLE transactions ADD COLUMN IF NOT EXISTS stripe_transfer_id TEXT DEFAULT NULL;
+
+-- 3. Add missing phone verification fields to profiles (if not exist)
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS phone_verified_at TIMESTAMPTZ DEFAULT NULL;
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS id_verified_at TIMESTAMPTZ DEFAULT NULL;
+
+-- 4. Index on stripe_connect_account_id for webhook lookups
+CREATE INDEX IF NOT EXISTS idx_profiles_stripe_connect
+  ON profiles (stripe_connect_account_id)
+  WHERE stripe_connect_account_id IS NOT NULL;
+
+-- 5. Index on stripe_transfer_id for payout tracking
+CREATE INDEX IF NOT EXISTS idx_transactions_stripe_transfer
+  ON transactions (stripe_transfer_id)
+  WHERE stripe_transfer_id IS NOT NULL;
+-- Push notification subscriptions
+CREATE TABLE IF NOT EXISTS push_subscriptions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES profiles(user_id) ON DELETE CASCADE,
+  endpoint TEXT NOT NULL UNIQUE,
+  keys JSONB NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_push_subscriptions_user ON push_subscriptions(user_id);
+
+-- RLS
+ALTER TABLE push_subscriptions ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users manage own subscriptions" ON push_subscriptions
+  FOR ALL USING (auth.uid() = user_id);
+-- Webhook idempotency: prevent duplicate processing of Stripe events
+
+CREATE TABLE IF NOT EXISTS processed_webhook_events (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  event_id TEXT NOT NULL UNIQUE,
+  event_type TEXT NOT NULL,
+  processed_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_webhook_events_processed_at ON processed_webhook_events (processed_at);
+
+ALTER TABLE processed_webhook_events ENABLE ROW LEVEL SECURITY;
+-- Prevent users from updating their own role or is_banned fields
+-- Uses a trigger instead of RLS WITH CHECK to avoid recursive read issues
+
+CREATE OR REPLACE FUNCTION prevent_role_self_elevation()
+RETURNS TRIGGER AS $$
+BEGIN
+  IF current_setting('role') != 'service_role' THEN
+    NEW.role := OLD.role;
+    NEW.is_banned := OLD.is_banned;
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+CREATE TRIGGER tr_prevent_role_self_elevation
+  BEFORE UPDATE ON profiles
+  FOR EACH ROW
+  EXECUTE FUNCTION prevent_role_self_elevation();
+-- Verification sessions for phone OTP and identity verification
+
+CREATE TABLE IF NOT EXISTS verification_sessions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  type TEXT NOT NULL CHECK (type IN ('phone', 'identity')),
+  provider TEXT NOT NULL CHECK (provider IN ('mock', 'stripe', 'twilio')),
+  status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'processing', 'verified', 'failed', 'expired')),
+  external_session_id TEXT,
+  metadata JSONB DEFAULT '{}',
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_verification_sessions_user ON verification_sessions (user_id, type, status);
+
+ALTER TABLE verification_sessions ENABLE ROW LEVEL SECURITY;
+
+-- SECURITY: OTP verification is handled server-side only; no client SELECT needed.
+-- Removed to prevent users from reading their own OTP codes from metadata.
+-- Storage bucket for chat media (images shared in conversations)
+
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('chat-media', 'chat-media', false)
+ON CONFLICT (id) DO NOTHING;
+
+CREATE POLICY "Authenticated users can upload chat media"
+ON storage.objects FOR INSERT TO authenticated
+WITH CHECK (bucket_id = 'chat-media');
+
+CREATE POLICY "Authenticated users can read chat media"
+ON storage.objects FOR SELECT TO authenticated
+USING (bucket_id = 'chat-media');

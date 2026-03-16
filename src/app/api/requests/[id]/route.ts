@@ -73,6 +73,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
         const data = await service.openDispute(id, user.id, body.reason);
         return apiSuccess(data);
       }
+      // Dispute resolution is admin-only (enforced in service layer)
       case 'resolve_refund': {
         const data = await service.resolveDispute(id, user.id, 'refund');
         return apiSuccess(data);

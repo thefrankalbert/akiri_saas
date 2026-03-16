@@ -98,8 +98,14 @@ export async function POST(request: Request) {
         if (payerId && requestId) {
           const { data: req } = await adminSupabase
             .from('shipment_requests')
-            .select('confirmation_code, listing:listings!listing_id(departure_city, arrival_city)')
+            .select('listing:listings!listing_id(departure_city, arrival_city)')
             .eq('id', requestId)
+            .single();
+
+          const { data: codeRecord } = await adminSupabase
+            .from('confirmation_codes')
+            .select('code')
+            .eq('request_id', requestId)
             .single();
 
           const { data: profile } = await adminSupabase
@@ -121,8 +127,8 @@ export async function POST(request: Request) {
               ? `${listing.departure_city} \u2192 ${listing.arrival_city}`
               : 'votre trajet';
 
-            if (authUser?.email && req.confirmation_code) {
-              await sendConfirmationCodeEmail(authUser.email, req.confirmation_code, route);
+            if (authUser?.email && codeRecord?.code) {
+              await sendConfirmationCodeEmail(authUser.email, codeRecord.code, route);
             }
 
             // Send payment confirmation email
