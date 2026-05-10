@@ -30,8 +30,8 @@ export function LiveTicker() {
       <div className="flex items-center">
         <div className="bg-surface-800 z-10 flex shrink-0 items-center gap-1.5 pr-2 pl-3 sm:gap-2 sm:pr-3 sm:pl-4">
           <span className="relative flex h-2 w-2">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75" />
-            <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500" />
+            <span className="bg-success/75 absolute inline-flex h-full w-full animate-ping rounded-full opacity-75" />
+            <span className="bg-success relative inline-flex h-2 w-2 rounded-full" />
           </span>
           <span className="text-success text-[10px] font-bold tracking-wider uppercase sm:text-xs">
             Live
