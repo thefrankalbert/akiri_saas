@@ -285,6 +285,25 @@
   }
 }
 
+@keyframes progressBar {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
 @layer utilities {
   .animate-slide-in-right {
     animation: slide-in-right 0.4s ease-out forwards;
@@ -332,6 +351,9 @@
   }
   .animate-bounce-subtle {
     animation: bounce-subtle 2s ease-in-out infinite;
+  }
+  .animate-progress-bar {
+    animation: progressBar 4s linear;
   }
 
   /* Typography scale */

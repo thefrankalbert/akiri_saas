@@ -200,6 +200,7 @@ export function HowItWorks() {
   const { inViewRef, inView } = useInView(0.1);
 
   useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     const timer = setInterval(() => {
       setActiveStep((prev) => (prev + 1) % steps.length);
     }, 4000);
@@ -318,8 +319,9 @@ export function HowItWorks() {
                   {isActive && (
                     <div className="bg-surface-600 absolute right-5 bottom-0 left-5 h-0.5 overflow-hidden rounded-full">
                       <div
-                        className={cn('bg-primary-500 h-full origin-left rounded-full')}
-                        style={{ animation: 'progressBar 4s linear' }}
+                        className={cn(
+                          'bg-primary-500 animate-progress-bar h-full origin-left rounded-full'
+                        )}
                       />
                     </div>
                   )}
@@ -367,6 +369,8 @@ export function HowItWorks() {
                   <button
                     key={i}
                     onClick={() => setActiveStep(i)}
+                    aria-label={`Etape ${i + 1} : ${step.title}`}
+                    aria-current={i === activeStep ? 'true' : undefined}
                     className={cn(
                       'h-1.5 rounded-full transition-all duration-300',
                       i === activeStep
@@ -380,17 +384,6 @@ export function HowItWorks() {
           </div>
         </div>
       </div>
-
-      <style jsx>{`
-        @keyframes progressBar {
-          from {
-            transform: scaleX(0);
-          }
-          to {
-            transform: scaleX(1);
-          }
-        }
-      `}</style>
     </section>
   );
 }
