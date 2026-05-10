@@ -30,7 +30,7 @@ export const mockProfiles: Profile[] = [
     id: 'mock-profile-001',
     user_id: 'mock-user-001',
     first_name: 'Moussa',
-    role: 'admin',
+    role: 'user',
     last_name: 'Ndiaye',
     phone: '+33612345678',
     phone_verified: true,
