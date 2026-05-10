@@ -288,3 +288,19 @@ export const createIdentitySessionSchema = z.object({
 });
 
 export type CreateIdentitySessionInput = z.infer<typeof createIdentitySessionSchema>;
+
+// ─── Admin Schemas ─────────────────────────────────────────
+
+export const resolveDisputeSchema = z.object({
+  request_id: z.string().uuid('ID de demande invalide'),
+  resolution: z.enum(['refund', 'release']),
+});
+
+export type ResolveDisputeInput = z.infer<typeof resolveDisputeSchema>;
+
+export const recoverStuckSchema = z.object({
+  request_id: z.string().uuid('ID de demande invalide'),
+  action: z.literal('recover_stuck'),
+});
+
+export type RecoverStuckInput = z.infer<typeof recoverStuckSchema>;

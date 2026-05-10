@@ -1,4 +1,10 @@
-export type ServiceErrorCode = 'NOT_FOUND' | 'CONFLICT' | 'VALIDATION' | 'INTERNAL' | 'AUTH';
+export type ServiceErrorCode =
+  | 'NOT_FOUND'
+  | 'CONFLICT'
+  | 'VALIDATION'
+  | 'INTERNAL'
+  | 'AUTH'
+  | 'UNAUTHORIZED';
 
 export class ServiceError extends Error {
   constructor(
@@ -16,7 +22,8 @@ export function serviceErrorToStatus(code: ServiceErrorCode): number {
     NOT_FOUND: 404,
     CONFLICT: 409,
     VALIDATION: 400,
-    AUTH: 403,
+    AUTH: 401,
+    UNAUTHORIZED: 403,
     INTERNAL: 500,
   };
   return map[code];

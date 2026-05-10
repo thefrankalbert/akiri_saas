@@ -1,7 +1,16 @@
 import { NextRequest } from 'next/server';
-import { createClient, createAdminClient } from '@/lib/supabase/server';
+import { z } from 'zod/v4';
+import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { createAdminService } from '@/lib/services/admin';
 import { apiSuccess, apiError, withServiceHandler } from '@/lib/api/helpers';
+import { verifyOrigin } from '@/lib/csrf';
+import { rateLimit } from '@/lib/api/rate-limit';
+
+const adminUserActionSchema = z.object({
+  user_id: z.string().uuid(),
+  action: z.enum(['ban', 'unban']),
+});
 
 export async function GET(request: NextRequest) {
   return withServiceHandler('GET /api/admin/users', async () => {
@@ -24,6 +33,16 @@ export async function GET(request: NextRequest) {
 }
 
 export async function PATCH(request: NextRequest) {
+  const csrfError = verifyOrigin(request);
+  if (csrfError) return csrfError;
+
+  const ip =
+    request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+    request.headers.get('x-real-ip') ||
+    'unknown';
+  const limit = await rateLimit(`admin-users:${ip}`, { maxRequests: 20, windowMs: 60_000 });
+  if (!limit.success) return apiError('Trop de tentatives, réessayez plus tard', 429);
+
   return withServiceHandler('PATCH /api/admin/users', async () => {
     const supabase = await createClient();
     const adminSupabase = await createAdminClient();
@@ -35,17 +54,14 @@ export async function PATCH(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { user_id, action } = body;
+    const parsed = adminUserActionSchema.safeParse(body);
 
-    if (!user_id || !action) {
-      return apiError('user_id et action requis', 400);
+    if (!parsed.success) {
+      return apiError('user_id (uuid) et action (ban|unban) requis', 400);
     }
 
-    if (action === 'ban' || action === 'unban') {
-      const data = await service.toggleUserBan(user_id, action === 'ban');
-      return apiSuccess(data);
-    }
-
-    return apiError('Action inconnue', 400);
+    const { user_id, action } = parsed.data;
+    const data = await service.toggleUserBan(user_id, action === 'ban');
+    return apiSuccess(data);
   });
 }

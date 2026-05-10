@@ -22,9 +22,9 @@ function getClientIp(request: NextRequest): string {
   );
 }
 
-export async function updateSession(request: NextRequest) {
+export async function updateSession(request: NextRequest, requestHeaders?: Headers) {
   let supabaseResponse = NextResponse.next({
-    request,
+    request: requestHeaders ? { headers: requestHeaders } : request,
   });
 
   // Skip auth when Supabase is not configured (local dev without env vars)
@@ -86,7 +86,7 @@ export async function updateSession(request: NextRequest) {
         setAll(cookiesToSet) {
           cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
           supabaseResponse = NextResponse.next({
-            request,
+            request: requestHeaders ? { headers: requestHeaders } : request,
           });
           cookiesToSet.forEach(({ name, value, options }) =>
             supabaseResponse.cookies.set(name, value, options)

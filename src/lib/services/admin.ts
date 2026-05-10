@@ -6,6 +6,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Profile } from '@/types';
 import { ServiceError } from './errors';
 import { logger } from '@/lib/logger';
+import { paginationRange } from '@/lib/utils/pagination';
 
 export function createAdminService(supabase: SupabaseClient, adminSupabase: SupabaseClient) {
   return {
@@ -99,8 +100,7 @@ export function createAdminService(supabase: SupabaseClient, adminSupabase: Supa
       perPage = 20,
       search?: string
     ): Promise<{ users: Profile[]; total: number }> {
-      const from = (page - 1) * perPage;
-      const to = from + perPage - 1;
+      const { from, to } = paginationRange(page, perPage);
 
       let query = adminSupabase.from('profiles').select('*', { count: 'exact' });
 
@@ -142,8 +142,7 @@ export function createAdminService(supabase: SupabaseClient, adminSupabase: Supa
       }>;
       total: number;
     }> {
-      const from = (page - 1) * perPage;
-      const to = from + perPage - 1;
+      const { from, to } = paginationRange(page, perPage);
 
       const { data, count, error } = await adminSupabase
         .from('shipment_requests')
@@ -176,8 +175,7 @@ export function createAdminService(supabase: SupabaseClient, adminSupabase: Supa
       page = 1,
       perPage = 20
     ): Promise<{ transactions: Record<string, unknown>[]; total: number }> {
-      const from = (page - 1) * perPage;
-      const to = from + perPage - 1;
+      const { from, to } = paginationRange(page, perPage);
 
       const { data, count, error } = await adminSupabase
         .from('transactions')

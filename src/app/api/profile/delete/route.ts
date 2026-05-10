@@ -1,9 +1,18 @@
-import { createAdminClient } from '@/lib/supabase/server';
+import { NextRequest } from 'next/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { getAuthUser, apiError, apiSuccess } from '@/lib/api/helpers';
+import { verifyOrigin } from '@/lib/csrf';
+import { rateLimit } from '@/lib/api/rate-limit';
 
-export async function DELETE() {
+export async function DELETE(request: NextRequest) {
+  const csrfError = verifyOrigin(request);
+  if (csrfError) return csrfError;
+
   const user = await getAuthUser();
   if (!user) return apiError('Non autorisé', 401);
+
+  const limit = await rateLimit(`profile-delete:${user.id}`, { maxRequests: 3, windowMs: 60_000 });
+  if (!limit.success) return apiError('Trop de tentatives, réessayez plus tard', 429);
 
   const adminSupabase = await createAdminClient();
 

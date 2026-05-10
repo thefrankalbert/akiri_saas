@@ -28,7 +28,8 @@ describe('serviceErrorToStatus', () => {
     ['NOT_FOUND', 404],
     ['CONFLICT', 409],
     ['VALIDATION', 400],
-    ['AUTH', 403],
+    ['AUTH', 401],
+    ['UNAUTHORIZED', 403],
     ['INTERNAL', 500],
   ];
 

@@ -1,5 +1,6 @@
 import { getAuthUser, apiError, apiSuccess, withServiceHandler } from '@/lib/api/helpers';
-import { createClient, createAdminClient } from '@/lib/supabase/server';
+import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { createTransactionService } from '@/lib/services/transactions';
 import { getStripe } from '@/lib/stripe';
 import { NextRequest } from 'next/server';

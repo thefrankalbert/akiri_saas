@@ -5,10 +5,10 @@
 import { randomInt } from 'node:crypto';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { ServiceError } from './errors';
+import { hashOtp } from './verification';
 import { logger } from '@/lib/logger';
 import type { ShipmentRequest, RequestStatus } from '@/types';
 import type { CreateRequestInput } from '@/lib/validations';
-import { PLATFORM_FEE_PERCENT } from '@/constants';
 import { createNotification } from './notifications';
 
 // Valid state transitions: each key lists the statuses it can transition FROM
@@ -49,7 +49,7 @@ export interface RequestServiceDeps {
 
 export function createRequestService(
   supabase: SupabaseClient,
-  _adminSupabase: SupabaseClient,
+  adminSupabase: SupabaseClient,
   deps: RequestServiceDeps = {}
 ) {
   /**
@@ -58,7 +58,7 @@ export function createRequestService(
   async function createRequest(
     senderId: string,
     input: CreateRequestInput
-  ): Promise<ShipmentRequest> {
+  ): Promise<ShipmentRequest & { confirmationCode: string }> {
     // Fetch the listing to calculate price
     const { data: listing, error: listingError } = await supabase
       .from('listings')
@@ -102,6 +102,7 @@ export function createRequestService(
     const totalPrice = Math.round(input.weight_kg * listing.price_per_kg * 100) / 100;
 
     const confirmationCode = generateConfirmationCode();
+    const hashedCode = hashOtp(confirmationCode);
 
     const { data, error } = await supabase
       .from('shipment_requests')
@@ -123,9 +124,7 @@ export function createRequestService(
     }
 
     // Store confirmation code in a separate table (sender-only access via RLS)
-    await supabase
-      .from('confirmation_codes')
-      .insert({ request_id: data.id, code: confirmationCode });
+    await supabase.from('confirmation_codes').insert({ request_id: data.id, code: hashedCode });
 
     // Notify the traveler about the new request
     await createNotification(
@@ -136,7 +135,7 @@ export function createRequestService(
       { request_id: data.id, listing_id: listing.id }
     );
 
-    return data as ShipmentRequest;
+    return { ...(data as ShipmentRequest), confirmationCode };
   }
 
   /**
@@ -314,6 +313,12 @@ export function createRequestService(
       throw new ServiceError(error.message, 'VALIDATION');
     }
 
+    // Set confirmation code expiry to 48 hours from delivery
+    await adminSupabase
+      .from('confirmation_codes')
+      .update({ expires_at: new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString() })
+      .eq('request_id', requestId);
+
     // Notify sender that parcel has been delivered — they need to confirm with code
     await createNotification(
       request.sender_id,
@@ -354,12 +359,17 @@ export function createRequestService(
     // Verify confirmation code from separate table
     const { data: codeRecord } = await supabase
       .from('confirmation_codes')
-      .select('code')
+      .select('code, expires_at')
       .eq('request_id', requestId)
       .single();
 
-    if (!codeRecord || codeRecord.code !== confirmationCode) {
+    if (!codeRecord || codeRecord.code !== hashOtp(confirmationCode)) {
       throw new ServiceError('Code de confirmation incorrect', 'VALIDATION');
+    }
+
+    // Check code expiration (if set)
+    if (codeRecord.expires_at && new Date(codeRecord.expires_at) < new Date()) {
+      throw new ServiceError('Code de confirmation expiré — contactez le support', 'VALIDATION');
     }
 
     const { data, error } = await supabase
@@ -497,7 +507,7 @@ export function createRequestService(
       .from('shipment_requests')
       .update({
         status: 'disputed',
-        special_instructions: `[LITIGE] ${reason}`,
+        dispute_reason: reason,
         updated_at: new Date().toISOString(),
       })
       .eq('id', requestId)

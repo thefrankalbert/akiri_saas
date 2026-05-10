@@ -8,6 +8,7 @@ import type { CreateParcelPostingInput, SearchParcelsInput } from '@/lib/validat
 import { DEFAULT_PAGE_SIZE } from '@/constants';
 import { ServiceError } from './errors';
 import { logger } from '@/lib/logger';
+import { paginationRange } from '@/lib/utils/pagination';
 
 export function createParcelsService(supabase: SupabaseClient) {
   return {
@@ -19,8 +20,7 @@ export function createParcelsService(supabase: SupabaseClient) {
     ): Promise<PaginatedResponse<ParcelPosting>> {
       const page = params.page || 1;
       const perPage = params.per_page || DEFAULT_PAGE_SIZE;
-      const from = (page - 1) * perPage;
-      const to = from + perPage - 1;
+      const { from, to } = paginationRange(page, perPage);
 
       let query = supabase
         .from('parcel_postings')

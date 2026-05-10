@@ -42,31 +42,4 @@ export async function createClient() {
   );
 }
 
-/**
- * Create an admin client with service role key
- * Use only in server-side code for admin operations
- */
-export async function createAdminClient() {
-  const cookieStore = await cookies();
-
-  return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL || FALLBACK_URL,
-    process.env.SUPABASE_SERVICE_ROLE_KEY || FALLBACK_KEY,
-    {
-      cookies: {
-        getAll() {
-          return cookieStore.getAll();
-        },
-        setAll(cookiesToSet) {
-          try {
-            cookiesToSet.forEach(({ name, value, options }) => {
-              cookieStore.set(name, value, options);
-            });
-          } catch {
-            // Ignore in Server Components
-          }
-        },
-      },
-    }
-  );
-}
+// Admin client with service_role key: import from '@/lib/supabase/admin' instead.

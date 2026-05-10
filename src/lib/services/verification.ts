@@ -12,6 +12,21 @@ import type { VerificationSession } from '@/types';
 
 const KYC_MODE = process.env.KYC_MODE || 'mock';
 
+/**
+ * Guard against mock KYC mode in production.
+ * Called at the start of verification functions rather than module load
+ * to avoid blocking the build process (NODE_ENV=production during build).
+ */
+function assertNotMockInProduction() {
+  if (process.env.NODE_ENV === 'production' && KYC_MODE === 'mock') {
+    if (process.env.NEXT_PHASE !== 'phase-production-build') {
+      throw new Error(
+        'KYC_MODE must be "stripe" in production — set KYC_MODE=stripe in environment variables'
+      );
+    }
+  }
+}
+
 // OTP expiration in minutes
 const OTP_EXPIRATION_MINUTES = 10;
 
@@ -31,8 +46,12 @@ export function hashOtp(otp: string): string {
 
 export function createVerificationService(
   supabase: SupabaseClient,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- reserved for future admin ops
   _adminSupabase: SupabaseClient
 ) {
+  // Guard against mock mode at service creation time (runtime, not build)
+  assertNotMockInProduction();
+
   /**
    * Update user's verification level based on completed verifications.
    * Level 1: Email verified (default)

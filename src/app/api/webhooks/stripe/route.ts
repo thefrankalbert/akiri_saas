@@ -4,9 +4,9 @@
 
 import { NextResponse } from 'next/server';
 import { getStripe } from '@/lib/stripe';
-import { createAdminClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { createNotification } from '@/lib/services/notifications';
-import { sendConfirmationCodeEmail, sendPaymentEmail } from '@/lib/email';
+import { sendPaymentEmail } from '@/lib/email';
 import type Stripe from 'stripe';
 import { logger } from '@/lib/logger';
 
@@ -94,7 +94,7 @@ export async function POST(request: Request) {
           );
         }
 
-        // Send confirmation code to sender via email
+        // Send payment confirmation email
         if (payerId && requestId) {
           const { data: req } = await adminSupabase
             .from('shipment_requests')
@@ -102,45 +102,25 @@ export async function POST(request: Request) {
             .eq('id', requestId)
             .single();
 
-          const { data: codeRecord } = await adminSupabase
-            .from('confirmation_codes')
-            .select('code')
-            .eq('request_id', requestId)
-            .single();
+          const {
+            data: { user: authUser },
+          } = await adminSupabase.auth.admin.getUserById(payerId);
+          const listing = req?.listing as unknown as {
+            departure_city: string;
+            arrival_city: string;
+          } | null;
+          const route = listing
+            ? `${listing.departure_city} \u2192 ${listing.arrival_city}`
+            : 'votre trajet';
 
-          const { data: profile } = await adminSupabase
-            .from('profiles')
-            .select('user_id')
-            .eq('user_id', payerId)
-            .single();
-
-          if (req && profile) {
-            // Get sender email from auth
-            const {
-              data: { user: authUser },
-            } = await adminSupabase.auth.admin.getUserById(payerId);
-            const listing = req.listing as unknown as {
-              departure_city: string;
-              arrival_city: string;
-            } | null;
-            const route = listing
-              ? `${listing.departure_city} \u2192 ${listing.arrival_city}`
-              : 'votre trajet';
-
-            if (authUser?.email && codeRecord?.code) {
-              await sendConfirmationCodeEmail(authUser.email, codeRecord.code, route);
-            }
-
-            // Send payment confirmation email
-            const amountCents = session.amount_total;
-            if (authUser?.email && amountCents) {
-              await sendPaymentEmail(
-                authUser.email,
-                amountCents / 100,
-                (session.currency || 'EUR').toUpperCase(),
-                route
-              );
-            }
+          const amountCents = session.amount_total;
+          if (authUser?.email && amountCents) {
+            await sendPaymentEmail(
+              authUser.email,
+              amountCents / 100,
+              (session.currency || 'EUR').toUpperCase(),
+              route
+            );
           }
         }
 
@@ -266,16 +246,28 @@ export async function POST(request: Request) {
       default:
       // Unhandled event type — no action needed
     }
+    // Record processed event — ignore unique constraint violations from concurrent webhooks
+    try {
+      await adminSupabase.from('processed_webhook_events').insert({
+        event_id: event.id,
+        event_type: event.type,
+      });
+    } catch (insertErr: unknown) {
+      const code =
+        insertErr && typeof insertErr === 'object' && 'code' in insertErr
+          ? (insertErr as { code: string }).code
+          : '';
+      if (code !== '23505') throw insertErr;
+    }
   } catch (err) {
-    logger.error('Stripe webhook processing error:', err);
-    // Still return 200 to prevent Stripe from retrying
+    logger.error('Stripe webhook processing error:', {
+      event_id: event.id,
+      event_type: event.type,
+      error: err,
+    });
+    // Return 500 so Stripe retries the event
+    return NextResponse.json({ error: 'Webhook processing failed' }, { status: 500 });
   }
-
-  // ─── Record processed event ────────────────────────────
-  await adminSupabase.from('processed_webhook_events').insert({
-    event_id: event.id,
-    event_type: event.type,
-  });
 
   return NextResponse.json({ received: true });
 }

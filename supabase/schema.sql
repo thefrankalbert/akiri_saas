@@ -22,6 +22,7 @@ CREATE TABLE profiles (
   total_reviews  INT NOT NULL DEFAULT 0,
   total_trips    INT NOT NULL DEFAULT 0,
   total_shipments INT NOT NULL DEFAULT 0,
+  role           TEXT NOT NULL DEFAULT 'user',
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );

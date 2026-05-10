@@ -41,16 +41,17 @@ export function usePushNotifications() {
         applicationServerKey: process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY,
       });
 
-      // Send subscription to server
-      await fetch('/api/notifications/subscribe', {
+      const res = await fetch('/api/notifications/subscribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ subscription: subscription.toJSON() }),
       });
 
-      setIsSubscribed(true);
-    } catch (err) {
-      // Push subscription failed — user may have denied permission
+      if (res.ok) {
+        setIsSubscribed(true);
+      }
+    } catch {
+      // Push subscription failed -- user may have denied permission
     } finally {
       setLoading(false);
     }
@@ -75,7 +76,7 @@ export function usePushNotifications() {
       }
 
       setIsSubscribed(false);
-    } catch (err) {
+    } catch {
       // Push unsubscribe failed
     } finally {
       setLoading(false);

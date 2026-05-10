@@ -2,7 +2,8 @@
 // Phone OTP Verify API Route
 // ============================================
 
-import { createClient, createAdminClient } from '@/lib/supabase/server';
+import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { verifyPhoneOtpSchema } from '@/lib/validations';
 import { createVerificationService } from '@/lib/services/verification';
 import { apiSuccess, apiError, withServiceHandler } from '@/lib/api/helpers';

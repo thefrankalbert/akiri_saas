@@ -7,22 +7,15 @@ import {
   parseBody,
   withServiceHandler,
 } from '@/lib/api/helpers';
-import { createClient, createAdminClient } from '@/lib/supabase/server';
+import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { createRequestService } from '@/lib/services/requests';
 import { createTransactionService } from '@/lib/services/transactions';
 import { getStripe } from '@/lib/stripe';
+import { verifyOrigin } from '@/lib/csrf';
 
 const updateStatusSchema = z.object({
-  action: z.enum([
-    'accept',
-    'cancel',
-    'collect',
-    'in_transit',
-    'deliver',
-    'dispute',
-    'resolve_refund',
-    'resolve_release',
-  ]),
+  action: z.enum(['accept', 'cancel', 'collect', 'in_transit', 'deliver', 'dispute']),
   reason: z.string().max(500).optional(),
 });
 
@@ -31,6 +24,9 @@ interface RouteParams {
 }
 
 export async function PATCH(request: NextRequest, { params }: RouteParams) {
+  const csrfError = verifyOrigin(request);
+  if (csrfError) return csrfError;
+
   const user = await getAuthUser();
   if (!user) return apiError('Non autorisé', 401);
 
@@ -71,15 +67,6 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       case 'dispute': {
         if (!body.reason) return apiError('Raison du litige requise', 400);
         const data = await service.openDispute(id, user.id, body.reason);
-        return apiSuccess(data);
-      }
-      // Dispute resolution is admin-only (enforced in service layer)
-      case 'resolve_refund': {
-        const data = await service.resolveDispute(id, user.id, 'refund');
-        return apiSuccess(data);
-      }
-      case 'resolve_release': {
-        const data = await service.resolveDispute(id, user.id, 'release');
         return apiSuccess(data);
       }
       default:

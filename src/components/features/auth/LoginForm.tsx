@@ -22,7 +22,8 @@ const DEMO_CREDENTIALS = {
 export function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirectTo = searchParams.get('redirect') || '/dashboard';
+  const raw = searchParams.get('redirect') || '/dashboard';
+  const redirectTo = raw.startsWith('/') && !raw.startsWith('//') ? raw : '/dashboard';
 
   const [showPassword, setShowPassword] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
@@ -91,9 +92,8 @@ export function LoginForm() {
 
       router.push(redirectTo);
       router.refresh();
-    } catch (err) {
+    } catch {
       // Network error or Supabase not configured properly
-      // Login network error — shown to user via serverError state
       setServerError(
         'Impossible de se connecter au serveur. Vérifiez votre connexion ou utilisez le mode démo.'
       );
