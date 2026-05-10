@@ -9,8 +9,14 @@ const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 
 export async function POST(request: NextRequest) {
+  const csrfError = verifyOrigin(request);
+  if (csrfError) return csrfError;
+
   const user = await getAuthUser();
-  if (!user) return apiError('Non autoris\u00e9', 401);
+  if (!user) return apiError('Non autorise', 401);
+
+  const limit = await rateLimit(`parcels-upload:${user.id}`, { maxRequests: 10, windowMs: 60_000 });
+  if (!limit.success) return apiError('Trop de tentatives', 429);
 
   let formData: FormData;
   try {
