@@ -105,7 +105,10 @@ export function createAdminService(supabase: SupabaseClient, adminSupabase: Supa
       let query = adminSupabase.from('profiles').select('*', { count: 'exact' });
 
       if (search) {
-        query = query.or(`first_name.ilike.%${search}%,last_name.ilike.%${search}%`);
+        const safeSearch = search
+          .replace(/[^a-zA-Z0-9\s\-'àâäéèêëîïôùûüçÀÂÄÉÈÊËÎÏÔÙÛÜÇ]/g, '')
+          .substring(0, 100);
+        query = query.or(`first_name.ilike.%${safeSearch}%,last_name.ilike.%${safeSearch}%`);
       }
 
       const { data, count, error } = await query

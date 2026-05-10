@@ -344,6 +344,12 @@ CREATE POLICY "Involved parties can update requests"
     OR auth.uid() IN (
       SELECT traveler_id FROM listings WHERE id = listing_id
     )
+  )
+  WITH CHECK (
+    auth.uid() = sender_id
+    OR auth.uid() IN (
+      SELECT traveler_id FROM listings WHERE id = listing_id
+    )
   );
 
 -- ─── Transactions ─────────────────────────────────────────
@@ -373,7 +379,8 @@ CREATE POLICY "Authenticated users can create conversations"
 
 CREATE POLICY "Participants can update conversations"
   ON conversations FOR UPDATE
-  USING (auth.uid() = ANY(participant_ids));
+  USING (auth.uid() = ANY(participant_ids))
+  WITH CHECK (auth.uid() = ANY(participant_ids));
 
 -- ─── Messages ─────────────────────────────────────────────
 CREATE POLICY "Participants can view messages"
@@ -400,6 +407,13 @@ CREATE POLICY "Participants can send messages"
 CREATE POLICY "Participants can update messages (read status)"
   ON messages FOR UPDATE
   USING (
+    EXISTS (
+      SELECT 1 FROM conversations
+      WHERE id = messages.conversation_id
+        AND auth.uid() = ANY(participant_ids)
+    )
+  )
+  WITH CHECK (
     EXISTS (
       SELECT 1 FROM conversations
       WHERE id = messages.conversation_id
