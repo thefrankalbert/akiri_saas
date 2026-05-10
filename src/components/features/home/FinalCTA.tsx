@@ -81,7 +81,7 @@ export function FinalCTA() {
             <div className="mt-10 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
               <Link
                 href="/register"
-                className="group from-primary-500 to-primary-600 shadow-glow-primary inline-flex h-12 items-center gap-2 rounded-xl bg-gradient-to-r px-7 text-sm font-semibold text-white transition-all hover:shadow-lg"
+                className="group from-primary-500 to-primary-600 shadow-glow-primary inline-flex h-14 items-center gap-2 rounded-xl bg-gradient-to-r px-7 text-sm font-semibold text-white transition-all hover:shadow-lg"
               >
                 Créer mon compte gratuitement
                 <ArrowRight
@@ -92,7 +92,7 @@ export function FinalCTA() {
               </Link>
               <Link
                 href="/annonces"
-                className="glass inline-flex h-12 items-center rounded-xl px-7 text-sm font-semibold text-neutral-100 transition-colors hover:bg-white/[0.06]"
+                className="glass inline-flex h-14 items-center rounded-xl px-7 text-sm font-semibold text-neutral-100 transition-colors hover:bg-white/[0.06]"
               >
                 Voir les annonces
               </Link>
