@@ -10,7 +10,7 @@ const adminLinks = [
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="bg-surface-950 flex min-h-screen">
+    <div className="bg-surface-950 flex min-h-dvh">
       {/* Sidebar */}
       <aside className="bg-surface-900 fixed top-0 left-0 z-30 flex h-full w-56 flex-col border-r border-white/[0.06]">
         <div className="flex h-14 items-center gap-2 border-b border-white/[0.06] px-4">

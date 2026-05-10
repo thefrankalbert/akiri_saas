@@ -13,7 +13,7 @@ import { FinalCTA } from '@/components/features/home/FinalCTA';
 
 export default function HomePage() {
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="flex min-h-dvh flex-col">
       <Header />
 
       <main className="flex-1 overflow-x-hidden">
