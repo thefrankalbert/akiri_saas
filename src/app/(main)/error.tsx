@@ -20,7 +20,7 @@ export default function MainError({
     <div className="flex flex-1 items-center justify-center px-4 py-16">
       <div className="text-center">
         <div className="bg-surface-800 mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl border border-white/[0.06]">
-          <ArrowCounterClockwise size={28} weight="duotone" className="text-amber-400" />
+          <ArrowCounterClockwise size={28} weight="duotone" className="text-warning" />
         </div>
         <h1 className="mb-2 text-2xl font-bold text-neutral-100">Oups, une erreur est survenue</h1>
         <p className="text-surface-200 mx-auto mb-6 max-w-md text-sm">

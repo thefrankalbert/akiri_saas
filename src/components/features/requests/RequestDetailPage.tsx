@@ -20,6 +20,7 @@ export function RequestDetailPage({ requestId }: RequestDetailPageProps) {
     error,
     actionLoading,
     confirmCode,
+    confirmationCode,
     hasReviewed,
     role,
     counterparty,
@@ -70,6 +71,7 @@ export function RequestDetailPage({ requestId }: RequestDetailPageProps) {
           request={request}
           role={role}
           counterparty={counterparty}
+          confirmationCode={confirmationCode}
           onCopyCode={copyCode}
         />
 

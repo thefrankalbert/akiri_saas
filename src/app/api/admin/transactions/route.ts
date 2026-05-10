@@ -1,5 +1,6 @@
 import { NextRequest } from 'next/server';
-import { createClient, createAdminClient } from '@/lib/supabase/server';
+import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { createAdminService } from '@/lib/services/admin';
 import { apiSuccess, apiError, withServiceHandler } from '@/lib/api/helpers';
 

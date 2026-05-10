@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { Check, Checks } from '@phosphor-icons/react';
 import { motion } from 'framer-motion';
 import { Avatar } from '@/components/ui';
@@ -58,10 +59,12 @@ export function MessageBubble({
             onClick={() => onImageClick?.(message.media_url!)}
             className="overflow-hidden rounded-2xl transition-opacity hover:opacity-90"
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
+            <Image
               src={message.media_url}
               alt="Image partagée"
+              width={400}
+              height={300}
+              sizes="(max-width: 768px) 100vw, 400px"
               className="h-auto w-full object-cover"
             />
           </button>

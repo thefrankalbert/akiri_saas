@@ -6,13 +6,18 @@ import {
   parseBody,
   withServiceHandler,
 } from '@/lib/api/helpers';
-import { createClient, createAdminClient } from '@/lib/supabase/server';
+import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { createTransactionService } from '@/lib/services/transactions';
 import { getStripe } from '@/lib/stripe';
 import { refundSchema } from '@/lib/validations';
 import { rateLimit } from '@/lib/api/rate-limit';
+import { verifyOrigin } from '@/lib/csrf';
 
 export async function POST(request: NextRequest) {
+  const csrfError = verifyOrigin(request);
+  if (csrfError) return csrfError;
+
   const user = await getAuthUser();
   if (!user) return apiError('Non autorisé', 401);
 

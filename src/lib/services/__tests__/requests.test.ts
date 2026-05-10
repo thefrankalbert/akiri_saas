@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { createMockSupabase, asSupabase } from './helpers';
 import { createRequestService } from '@/lib/services/requests';
+import { hashOtp } from '@/lib/services/verification';
 import { calculateTransactionFees } from '@/lib/utils';
 import { ServiceError } from '@/lib/services/errors';
 
@@ -47,7 +48,6 @@ function mockShipmentRequest(overrides: Record<string, unknown> = {}) {
     special_instructions: null,
     status: 'pending',
     total_price: 50,
-    confirmation_code: MOCK_CONFIRMATION_CODE,
     listing: {
       id: MOCK_LISTING_ID,
       traveler_id: MOCK_TRAVELER_ID,
@@ -266,6 +266,11 @@ describe('Request Service', () => {
         .single.mockResolvedValueOnce({ data: request, error: null })
         .mockResolvedValueOnce({ data: confirmedRequest, error: null });
 
+      mockSupabase._getChain('confirmation_codes').single.mockResolvedValue({
+        data: { code: hashOtp(MOCK_CONFIRMATION_CODE) },
+        error: null,
+      });
+
       const result = await service.confirmDelivery(
         MOCK_REQUEST_ID,
         MOCK_SENDER_ID,
@@ -282,6 +287,11 @@ describe('Request Service', () => {
 
       mockSupabase._getChain('shipment_requests').single.mockResolvedValue({
         data: request,
+        error: null,
+      });
+
+      mockSupabase._getChain('confirmation_codes').single.mockResolvedValue({
+        data: { code: MOCK_CONFIRMATION_CODE },
         error: null,
       });
 
@@ -342,6 +352,11 @@ describe('Request Service', () => {
         ._getChain('shipment_requests')
         .single.mockResolvedValueOnce({ data: request, error: null })
         .mockResolvedValueOnce({ data: confirmedRequest, error: null });
+
+      mockSupabase._getChain('confirmation_codes').single.mockResolvedValue({
+        data: { code: hashOtp(MOCK_CONFIRMATION_CODE) },
+        error: null,
+      });
 
       // Should not throw — capturePayment failure is logged but not propagated
       const result = await service.confirmDelivery(
@@ -537,6 +552,361 @@ describe('Request Service', () => {
         expect((e as ServiceError).code).toBe('VALIDATION');
         expect((e as ServiceError).message).toContain('Impossible');
       }
+    });
+  });
+
+  // -----------------------------------------
+  // collectParcel
+  // -----------------------------------------
+  describe('collectParcel', () => {
+    it('marks a paid request as collected (happy path)', async () => {
+      const { mockSupabase, service } = setup();
+      const request = mockShipmentRequest({ status: 'paid' });
+      const collectedRequest = { ...request, status: 'collected' };
+
+      mockSupabase
+        ._getChain('shipment_requests')
+        .single.mockResolvedValueOnce({ data: request, error: null })
+        .mockResolvedValueOnce({ data: collectedRequest, error: null });
+
+      const result = await service.collectParcel(MOCK_REQUEST_ID, MOCK_TRAVELER_ID);
+
+      expect(result.status).toBe('collected');
+    });
+
+    it('throws AUTH when non-traveler tries to collect', async () => {
+      const { mockSupabase, service } = setup();
+      const request = mockShipmentRequest({ status: 'paid' });
+
+      mockSupabase._getChain('shipment_requests').single.mockResolvedValue({
+        data: request,
+        error: null,
+      });
+
+      try {
+        await service.collectParcel(MOCK_REQUEST_ID, MOCK_SENDER_ID); // sender != traveler
+        expect.fail('should have thrown');
+      } catch (e) {
+        expect(e).toBeInstanceOf(ServiceError);
+        expect((e as ServiceError).code).toBe('AUTH');
+      }
+    });
+
+    it('throws VALIDATION when request is not in paid status', async () => {
+      const { mockSupabase, service } = setup();
+      const request = mockShipmentRequest({ status: 'pending' }); // invalid: must be 'paid'
+
+      mockSupabase._getChain('shipment_requests').single.mockResolvedValue({
+        data: request,
+        error: null,
+      });
+
+      try {
+        await service.collectParcel(MOCK_REQUEST_ID, MOCK_TRAVELER_ID);
+        expect.fail('should have thrown');
+      } catch (e) {
+        expect(e).toBeInstanceOf(ServiceError);
+        expect((e as ServiceError).code).toBe('VALIDATION');
+        expect((e as ServiceError).message).toContain('Impossible');
+      }
+    });
+
+    it('throws NOT_FOUND when request does not exist', async () => {
+      const { mockSupabase, service } = setup();
+
+      mockSupabase._getChain('shipment_requests').single.mockResolvedValue({
+        data: null,
+        error: { message: 'Not found' },
+      });
+
+      try {
+        await service.collectParcel(MOCK_REQUEST_ID, MOCK_TRAVELER_ID);
+        expect.fail('should have thrown');
+      } catch (e) {
+        expect(e).toBeInstanceOf(ServiceError);
+        expect((e as ServiceError).code).toBe('NOT_FOUND');
+      }
+    });
+  });
+
+  // -----------------------------------------
+  // markInTransit
+  // -----------------------------------------
+  describe('markInTransit', () => {
+    it('marks a collected request as in_transit (happy path)', async () => {
+      const { mockSupabase, service } = setup();
+      const request = mockShipmentRequest({ status: 'collected' });
+      const inTransitRequest = { ...request, status: 'in_transit' };
+
+      mockSupabase
+        ._getChain('shipment_requests')
+        .single.mockResolvedValueOnce({ data: request, error: null })
+        .mockResolvedValueOnce({ data: inTransitRequest, error: null });
+
+      const result = await service.markInTransit(MOCK_REQUEST_ID, MOCK_TRAVELER_ID);
+
+      expect(result.status).toBe('in_transit');
+    });
+
+    it('throws AUTH when non-traveler tries to mark in transit', async () => {
+      const { mockSupabase, service } = setup();
+      const request = mockShipmentRequest({ status: 'collected' });
+
+      mockSupabase._getChain('shipment_requests').single.mockResolvedValue({
+        data: request,
+        error: null,
+      });
+
+      try {
+        await service.markInTransit(MOCK_REQUEST_ID, MOCK_SENDER_ID); // sender != traveler
+        expect.fail('should have thrown');
+      } catch (e) {
+        expect(e).toBeInstanceOf(ServiceError);
+        expect((e as ServiceError).code).toBe('AUTH');
+      }
+    });
+
+    it('throws VALIDATION when request is not in collected status', async () => {
+      const { mockSupabase, service } = setup();
+      const request = mockShipmentRequest({ status: 'paid' }); // invalid: must be 'collected'
+
+      mockSupabase._getChain('shipment_requests').single.mockResolvedValue({
+        data: request,
+        error: null,
+      });
+
+      try {
+        await service.markInTransit(MOCK_REQUEST_ID, MOCK_TRAVELER_ID);
+        expect.fail('should have thrown');
+      } catch (e) {
+        expect(e).toBeInstanceOf(ServiceError);
+        expect((e as ServiceError).code).toBe('VALIDATION');
+        expect((e as ServiceError).message).toContain('Impossible');
+      }
+    });
+
+    it('throws NOT_FOUND when request does not exist', async () => {
+      const { mockSupabase, service } = setup();
+
+      mockSupabase._getChain('shipment_requests').single.mockResolvedValue({
+        data: null,
+        error: { message: 'Not found' },
+      });
+
+      try {
+        await service.markInTransit(MOCK_REQUEST_ID, MOCK_TRAVELER_ID);
+        expect.fail('should have thrown');
+      } catch (e) {
+        expect(e).toBeInstanceOf(ServiceError);
+        expect((e as ServiceError).code).toBe('NOT_FOUND');
+      }
+    });
+  });
+
+  // -----------------------------------------
+  // openDispute
+  // -----------------------------------------
+  describe('openDispute', () => {
+    it('opens a dispute on a paid request (sender perspective)', async () => {
+      const { mockSupabase, service } = setup();
+      const request = mockShipmentRequest({ status: 'paid' });
+      const disputedRequest = { ...request, status: 'disputed' };
+
+      mockSupabase
+        ._getChain('shipment_requests')
+        .single.mockResolvedValueOnce({ data: request, error: null })
+        .mockResolvedValueOnce({ data: disputedRequest, error: null });
+
+      const result = await service.openDispute(MOCK_REQUEST_ID, MOCK_SENDER_ID, 'Colis endommagé');
+
+      expect(result.status).toBe('disputed');
+    });
+
+    it('opens a dispute on a delivered request (traveler perspective)', async () => {
+      const { mockSupabase, service } = setup();
+      const request = mockShipmentRequest({ status: 'delivered' });
+      const disputedRequest = { ...request, status: 'disputed' };
+
+      mockSupabase
+        ._getChain('shipment_requests')
+        .single.mockResolvedValueOnce({ data: request, error: null })
+        .mockResolvedValueOnce({ data: disputedRequest, error: null });
+
+      const result = await service.openDispute(
+        MOCK_REQUEST_ID,
+        MOCK_TRAVELER_ID,
+        'Destinataire absent'
+      );
+
+      expect(result.status).toBe('disputed');
+    });
+
+    it('throws AUTH when unrelated user tries to open dispute', async () => {
+      const { mockSupabase, service } = setup();
+      const request = mockShipmentRequest({ status: 'paid' });
+
+      mockSupabase._getChain('shipment_requests').single.mockResolvedValue({
+        data: request,
+        error: null,
+      });
+
+      try {
+        await service.openDispute(MOCK_REQUEST_ID, 'random-user-999', 'Some reason');
+        expect.fail('should have thrown');
+      } catch (e) {
+        expect(e).toBeInstanceOf(ServiceError);
+        expect((e as ServiceError).code).toBe('AUTH');
+      }
+    });
+
+    it('throws VALIDATION when request is in pending status', async () => {
+      const { mockSupabase, service } = setup();
+      const request = mockShipmentRequest({ status: 'pending' }); // not in valid dispute statuses
+
+      mockSupabase._getChain('shipment_requests').single.mockResolvedValue({
+        data: request,
+        error: null,
+      });
+
+      try {
+        await service.openDispute(MOCK_REQUEST_ID, MOCK_SENDER_ID, 'Some reason');
+        expect.fail('should have thrown');
+      } catch (e) {
+        expect(e).toBeInstanceOf(ServiceError);
+        expect((e as ServiceError).code).toBe('VALIDATION');
+        expect((e as ServiceError).message).toContain('Impossible');
+      }
+    });
+
+    it('throws NOT_FOUND when request does not exist', async () => {
+      const { mockSupabase, service } = setup();
+
+      mockSupabase._getChain('shipment_requests').single.mockResolvedValue({
+        data: null,
+        error: { message: 'Not found' },
+      });
+
+      try {
+        await service.openDispute(MOCK_REQUEST_ID, MOCK_SENDER_ID, 'Some reason');
+        expect.fail('should have thrown');
+      } catch (e) {
+        expect(e).toBeInstanceOf(ServiceError);
+        expect((e as ServiceError).code).toBe('NOT_FOUND');
+      }
+    });
+  });
+
+  // -----------------------------------------
+  // resolveDispute
+  // -----------------------------------------
+  describe('resolveDispute', () => {
+    const MOCK_ADMIN_ID = 'admin-user-001';
+
+    it('resolves dispute with refund (cancels request)', async () => {
+      const { mockSupabase, mockRefundPayment, service } = setup();
+      const request = mockShipmentRequest({ status: 'disputed' });
+      const cancelledRequest = { ...request, status: 'cancelled' };
+
+      // First: admin profile check
+      mockSupabase._getChain('profiles').single.mockResolvedValue({
+        data: { role: 'admin' },
+        error: null,
+      });
+
+      // Second chain: fetch disputed request, then update result
+      mockSupabase
+        ._getChain('shipment_requests')
+        .single.mockResolvedValueOnce({ data: request, error: null })
+        .mockResolvedValueOnce({ data: cancelledRequest, error: null });
+
+      const result = await service.resolveDispute(MOCK_REQUEST_ID, MOCK_ADMIN_ID, 'refund');
+
+      expect(result.status).toBe('cancelled');
+      expect(mockRefundPayment).toHaveBeenCalledWith(MOCK_REQUEST_ID, MOCK_SENDER_ID);
+    });
+
+    it('resolves dispute with release (confirms request)', async () => {
+      const { mockSupabase, mockCapturePayment, service } = setup();
+      const request = mockShipmentRequest({ status: 'disputed' });
+      const confirmedRequest = { ...request, status: 'confirmed' };
+
+      mockSupabase._getChain('profiles').single.mockResolvedValue({
+        data: { role: 'admin' },
+        error: null,
+      });
+
+      mockSupabase
+        ._getChain('shipment_requests')
+        .single.mockResolvedValueOnce({ data: request, error: null })
+        .mockResolvedValueOnce({ data: confirmedRequest, error: null });
+
+      const result = await service.resolveDispute(MOCK_REQUEST_ID, MOCK_ADMIN_ID, 'release');
+
+      expect(result.status).toBe('confirmed');
+      expect(mockCapturePayment).toHaveBeenCalledWith(MOCK_REQUEST_ID);
+    });
+
+    it('throws AUTH when non-admin tries to resolve dispute', async () => {
+      const { mockSupabase, service } = setup();
+
+      mockSupabase._getChain('profiles').single.mockResolvedValue({
+        data: { role: 'user' },
+        error: null,
+      });
+
+      try {
+        await service.resolveDispute(MOCK_REQUEST_ID, MOCK_SENDER_ID, 'refund');
+        expect.fail('should have thrown');
+      } catch (e) {
+        expect(e).toBeInstanceOf(ServiceError);
+        expect((e as ServiceError).code).toBe('AUTH');
+        expect((e as ServiceError).message).toContain('administrateur');
+      }
+    });
+
+    it('throws NOT_FOUND when request is not in disputed status', async () => {
+      const { mockSupabase, service } = setup();
+
+      mockSupabase._getChain('profiles').single.mockResolvedValue({
+        data: { role: 'admin' },
+        error: null,
+      });
+
+      mockSupabase._getChain('shipment_requests').single.mockResolvedValue({
+        data: null,
+        error: { message: 'Not found' },
+      });
+
+      try {
+        await service.resolveDispute(MOCK_REQUEST_ID, MOCK_ADMIN_ID, 'release');
+        expect.fail('should have thrown');
+      } catch (e) {
+        expect(e).toBeInstanceOf(ServiceError);
+        expect((e as ServiceError).code).toBe('NOT_FOUND');
+      }
+    });
+
+    it('still returns success even if refundPayment fails', async () => {
+      const { mockSupabase, service } = setup({
+        refundPayment: vi.fn().mockRejectedValue(new Error('Stripe unavailable')),
+      });
+      const request = mockShipmentRequest({ status: 'disputed' });
+      const cancelledRequest = { ...request, status: 'cancelled' };
+
+      mockSupabase._getChain('profiles').single.mockResolvedValue({
+        data: { role: 'admin' },
+        error: null,
+      });
+
+      mockSupabase
+        ._getChain('shipment_requests')
+        .single.mockResolvedValueOnce({ data: request, error: null })
+        .mockResolvedValueOnce({ data: cancelledRequest, error: null });
+
+      // Should not throw — refundPayment failure is logged but not propagated
+      const result = await service.resolveDispute(MOCK_REQUEST_ID, MOCK_ADMIN_ID, 'refund');
+
+      expect(result.status).toBe('cancelled');
     });
   });
 });

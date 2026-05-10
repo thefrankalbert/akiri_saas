@@ -42,6 +42,7 @@ export function ReviewForm({
     },
   });
 
+  // eslint-disable-next-line react-hooks/incompatible-library -- React Compiler disabled in next.config.ts
   const ratingValue = watch('rating');
   const commentValue = watch('comment') || '';
 

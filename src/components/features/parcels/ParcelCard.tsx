@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { CalendarBlank, MapPin, Package, Warning, Scales, Star } from '@phosphor-icons/react';
+import { CalendarBlank, MapPin, Warning, Scales, Star } from '@phosphor-icons/react';
 import { Avatar, Badge, Card, CardContent } from '@/components/ui';
 import {
   PARCEL_CATEGORIES,

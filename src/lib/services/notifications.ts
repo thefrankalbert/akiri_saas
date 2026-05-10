@@ -8,7 +8,9 @@ import type { NotificationType } from '@/types';
 import { DEFAULT_PAGE_SIZE } from '@/constants';
 import { ServiceError } from './errors';
 import { logger } from '@/lib/logger';
+import { paginationRange } from '@/lib/utils/pagination';
 import { sendPushToUser } from './push';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 export function createNotificationsService(supabase: SupabaseClient) {
   return {
@@ -20,8 +22,7 @@ export function createNotificationsService(supabase: SupabaseClient) {
       page: number = 1,
       perPage: number = DEFAULT_PAGE_SIZE
     ): Promise<PaginatedResponse<Notification>> {
-      const from = (page - 1) * perPage;
-      const to = from + perPage - 1;
+      const { from, to } = paginationRange(page, perPage);
 
       const { data, error, count } = await supabase
         .from('notifications')
@@ -101,7 +102,7 @@ export function createNotificationsService(supabase: SupabaseClient) {
         body,
         url: typeof data.url === 'string' ? data.url : '/',
         tag: type,
-      }).catch(() => {});
+      }).catch((err) => logger.warn('[PUSH] delivery failed', { userId, type, error: err }));
 
       return notification as Notification;
     },
@@ -128,7 +129,6 @@ export function createNotificationsService(supabase: SupabaseClient) {
 
 // -------------------------------------------------
 // Standalone backward-compat export (used by other services not yet migrated)
-// TODO: Remove once all callers use DI
 // -------------------------------------------------
 export async function createNotification(
   userId: string,
@@ -137,7 +137,6 @@ export async function createNotification(
   body: string,
   data: Record<string, unknown> = {}
 ): Promise<Notification> {
-  const { createAdminClient } = await import('@/lib/supabase/server');
   const adminSupabase = await createAdminClient();
   const service = createNotificationsService(adminSupabase);
   return service.createNotification(userId, type, title, body, data);

@@ -10,6 +10,7 @@ import type { Transaction, PaginatedResponse } from '@/types';
 import { DEFAULT_PAGE_SIZE, APP_URL } from '@/constants';
 import { calculateTransactionFees } from '@/lib/utils';
 import { sendPayoutEmail } from '@/lib/email';
+import { paginationRange } from '@/lib/utils/pagination';
 
 export function createTransactionService(
   supabase: SupabaseClient,
@@ -130,17 +131,21 @@ export function createTransactionService(
    * Called when sender confirms delivery with 6-digit code.
    * If traveler has Stripe Connect, creates a transfer to their connected account.
    */
-  async function capturePayment(requestId: string, _userId?: string): Promise<Transaction> {
+  async function capturePayment(requestId: string): Promise<Transaction> {
     // Find the transaction
     const { data: transaction, error: txError } = await adminSupabase
       .from('transactions')
       .select('*')
       .eq('request_id', requestId)
-      .eq('status', 'held')
       .single();
 
     if (txError || !transaction) {
-      throw new ServiceError('Transaction introuvable ou non retenue', 'NOT_FOUND');
+      throw new ServiceError('Transaction introuvable', 'NOT_FOUND');
+    }
+
+    // Prevent double-capture race condition
+    if (transaction.status !== 'held') {
+      throw new ServiceError('Transaction déjà capturée ou non retenue', 'CONFLICT');
     }
 
     try {
@@ -174,16 +179,25 @@ export function createTransactionService(
           });
           transferId = transfer.id;
         } catch (transferError) {
-          // Log transfer failure but don't fail the capture
-          logger.error('[PAYOUT] Transfer failed', transferError);
+          // Log transfer failure — transaction stays 'held' for admin retry
+          logger.error('[PAYOUT] Transfer failed — transaction remains held for admin retry', {
+            transaction_id: transaction.id,
+            request_id: requestId,
+            error: transferError,
+          });
         }
       }
+
+      // Only mark as 'released' if transfer succeeded or traveler has no Connect account
+      const hasConnectAccount =
+        !!payeeProfile?.stripe_connect_account_id && payeeProfile?.stripe_connect_onboarded;
+      const newStatus = transferId ? 'released' : hasConnectAccount ? 'held' : 'released';
 
       // Update transaction status
       const { data, error } = await adminSupabase
         .from('transactions')
         .update({
-          status: 'released',
+          status: newStatus,
           payout_amount: payoutAmount,
           stripe_transfer_id: transferId,
           updated_at: new Date().toISOString(),
@@ -359,8 +373,7 @@ export function createTransactionService(
     page: number = 1,
     perPage: number = DEFAULT_PAGE_SIZE
   ): Promise<PaginatedResponse<Transaction>> {
-    const from = (page - 1) * perPage;
-    const to = from + perPage - 1;
+    const { from, to } = paginationRange(page, perPage);
 
     const { data, error, count } = await supabase
       .from('transactions')

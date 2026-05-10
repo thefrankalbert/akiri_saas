@@ -49,18 +49,18 @@ export default function AdminDashboard() {
   const cards = stats
     ? [
         { label: 'Utilisateurs', value: stats.totalUsers, icon: Users, color: 'text-blue-400' },
-        { label: 'Annonces', value: stats.totalListings, icon: Package, color: 'text-emerald-400' },
+        { label: 'Annonces', value: stats.totalListings, icon: Package, color: 'text-success' },
         {
           label: 'Transactions',
           value: stats.totalTransactions,
           icon: CurrencyDollar,
-          color: 'text-amber-400',
+          color: 'text-warning',
         },
         {
           label: 'Litiges actifs',
           value: stats.activeDisputes,
           icon: Gavel,
-          color: 'text-red-400',
+          color: 'text-error',
         },
         {
           label: 'Vérifications en attente',

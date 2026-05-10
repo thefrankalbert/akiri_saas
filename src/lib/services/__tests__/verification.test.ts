@@ -1,6 +1,7 @@
+import { randomInt } from 'node:crypto';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { createMockSupabase, asSupabase } from './helpers';
-import { createVerificationService } from '@/lib/services/verification';
+import { createVerificationService, hashOtp } from '@/lib/services/verification';
 import { ServiceError } from '@/lib/services/errors';
 
 vi.mock('@/lib/logger', () => ({
@@ -42,7 +43,7 @@ function setup() {
 
 describe('OTP Generation Logic', () => {
   it('generates a 6-digit string', () => {
-    const generateOtpCode = () => Math.floor(100000 + Math.random() * 900000).toString();
+    const generateOtpCode = () => randomInt(100000, 1000000).toString();
 
     for (let i = 0; i < 100; i++) {
       const code = generateOtpCode();
@@ -53,7 +54,7 @@ describe('OTP Generation Logic', () => {
   });
 
   it('generates numeric-only codes', () => {
-    const generateOtpCode = () => Math.floor(100000 + Math.random() * 900000).toString();
+    const generateOtpCode = () => randomInt(100000, 1000000).toString();
 
     for (let i = 0; i < 50; i++) {
       const code = generateOtpCode();
@@ -202,7 +203,7 @@ describe('Verification Service', () => {
       const session = {
         id: 'session-003',
         user_id: MOCK_USER_ID,
-        metadata: { phone: '+33699999999', otp_code: '123456' },
+        metadata: { phone: '+33699999999', otp_code: hashOtp('123456') },
       };
 
       mockSupabase._getChain('verification_sessions').single.mockResolvedValue({
@@ -225,7 +226,7 @@ describe('Verification Service', () => {
       const session = {
         id: 'session-004',
         user_id: MOCK_USER_ID,
-        metadata: { phone: MOCK_PHONE, otp_code: '999999' },
+        metadata: { phone: MOCK_PHONE, otp_code: hashOtp('999999') },
       };
 
       mockSupabase._getChain('verification_sessions').single.mockResolvedValue({
@@ -248,7 +249,7 @@ describe('Verification Service', () => {
       const session = {
         id: 'session-005',
         user_id: MOCK_USER_ID,
-        metadata: { phone: MOCK_PHONE, otp_code: '654321' },
+        metadata: { phone: MOCK_PHONE, otp_code: hashOtp('654321') },
       };
 
       // All calls return success

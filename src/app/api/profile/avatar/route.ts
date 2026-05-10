@@ -1,6 +1,8 @@
 import { NextRequest } from 'next/server';
 import { getAuthUser, apiError, apiSuccess } from '@/lib/api/helpers';
 import { createClient } from '@/lib/supabase/server';
+import { verifyOrigin } from '@/lib/csrf';
+import { rateLimit } from '@/lib/api/rate-limit';
 
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 const MAX_SIZE = 5 * 1024 * 1024; // 5MB
@@ -45,8 +47,14 @@ async function validateMagicBytes(file: File, mimeType: string): Promise<boolean
 }
 
 export async function POST(request: NextRequest) {
+  const csrfError = verifyOrigin(request);
+  if (csrfError) return csrfError;
+
   const user = await getAuthUser();
-  if (!user) return apiError('Non autoris\u00e9', 401);
+  if (!user) return apiError('Non autorise', 401);
+
+  const limit = await rateLimit(`avatar-upload:${user.id}`, { maxRequests: 5, windowMs: 60_000 });
+  if (!limit.success) return apiError('Trop de tentatives', 429);
 
   const formData = await request.formData();
   const file = formData.get('avatar');

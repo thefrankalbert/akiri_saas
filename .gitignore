@@ -55,3 +55,14 @@ next-env.d.ts
 
 # OS
 ._*
+.gstack/
+
+# AI tooling
+.agent/
+.agents/
+.claude-flow/
+.claude/
+.kiro/
+.swarm/
+ruvector.db
+skills-lock.json

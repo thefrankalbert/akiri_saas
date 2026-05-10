@@ -13,9 +13,9 @@ const variantStyles: Record<string, string> = {
   default: 'bg-surface-800 border border-white/[0.08] rounded-2xl',
   bordered: 'bg-surface-800 border border-white/[0.08] rounded-2xl',
   elevated:
-    'bg-surface-800 border border-white/[0.08] rounded-2xl shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300',
+    'bg-surface-800 border border-white/[0.12] rounded-2xl hover:border-white/[0.16] hover:-translate-y-0.5 transition-all duration-300',
   interactive:
-    'bg-surface-800 border border-white/[0.08] rounded-2xl shadow-sm hover:shadow-md hover:-translate-y-0.5 hover:scale-[1.01] hover:border-primary-500/30 cursor-pointer transition-all duration-300',
+    'bg-surface-800 border border-white/[0.08] rounded-2xl hover:-translate-y-0.5 hover:scale-[1.01] hover:border-primary-500/30 cursor-pointer transition-all duration-300',
   gradient: 'glass rounded-2xl',
   glass: 'glass rounded-2xl',
 };

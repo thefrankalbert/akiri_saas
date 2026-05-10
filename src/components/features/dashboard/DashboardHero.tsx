@@ -80,7 +80,7 @@ export function DashboardHero({ profile, statItems }: DashboardHeroProps) {
             </div>
             <Link
               href="/profil/verification"
-              className="text-warning flex items-center gap-1 text-xs font-medium hover:text-amber-300"
+              className="text-warning hover:text-warning/80 flex items-center gap-1 text-xs font-medium"
             >
               Vérifier
               <ArrowRight weight="bold" size={12} />

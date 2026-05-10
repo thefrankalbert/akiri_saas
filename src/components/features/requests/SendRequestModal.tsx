@@ -49,6 +49,7 @@ export function SendRequestModal({ listing, children }: SendRequestModalProps) {
     },
   });
 
+  // eslint-disable-next-line react-hooks/incompatible-library -- React Compiler disabled in next.config.ts
   const weightValue = watch('weight_kg') || 0;
   const dynamicPrice = weightValue * listing.price_per_kg;
 

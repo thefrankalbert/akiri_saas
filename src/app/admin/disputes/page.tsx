@@ -56,7 +56,7 @@ export default function AdminDisputesPage() {
   return (
     <div>
       <div className="mb-6 flex items-center gap-3">
-        <Gavel size={28} weight="duotone" className="text-red-400" />
+        <Gavel size={28} weight="duotone" className="text-error" />
         <h1 className="text-2xl font-bold text-white">Litiges ({total})</h1>
       </div>
 
@@ -99,7 +99,7 @@ export default function AdminDisputesPage() {
                   <button
                     onClick={() => handleResolve(dispute.id, 'refund')}
                     disabled={actionLoading === dispute.id}
-                    className="flex items-center gap-1.5 rounded-lg bg-red-500/10 px-3 py-2 text-xs font-medium text-red-400 transition-colors hover:bg-red-500/20 disabled:opacity-50"
+                    className="bg-error/10 text-error hover:bg-error/20 flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-medium transition-colors disabled:opacity-50"
                   >
                     <ArrowUUpLeft size={14} />
                     Rembourser
@@ -107,7 +107,7 @@ export default function AdminDisputesPage() {
                   <button
                     onClick={() => handleResolve(dispute.id, 'release')}
                     disabled={actionLoading === dispute.id}
-                    className="flex items-center gap-1.5 rounded-lg bg-emerald-500/10 px-3 py-2 text-xs font-medium text-emerald-400 transition-colors hover:bg-emerald-500/20 disabled:opacity-50"
+                    className="bg-success/10 text-success hover:bg-success/20 flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-medium transition-colors disabled:opacity-50"
                   >
                     <Check size={14} />
                     Libérer paiement

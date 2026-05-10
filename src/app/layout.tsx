@@ -1,18 +1,14 @@
 import type { Metadata, Viewport } from 'next';
-import { Inter, JetBrains_Mono } from 'next/font/google';
+import { JetBrains_Mono, Geist } from 'next/font/google';
 import { Toaster } from 'sonner';
 import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getMessages } from 'next-intl/server';
 import { PostHogProvider } from '@/components/providers/PostHogProvider';
 import { CookieConsent } from '@/components/CookieConsent';
 import './globals.css';
+import { cn } from '@/lib/utils';
 
-const inter = Inter({
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-inter',
-  weight: ['400', '500', '600', '700', '800'],
-});
+const geist = Geist({ subsets: ['latin'], variable: '--font-sans', display: 'swap' });
 
 const jetbrainsMono = JetBrains_Mono({
   subsets: ['latin'],
@@ -129,7 +125,7 @@ export default async function RootLayout({
   return (
     <html
       lang={locale}
-      className={`${inter.variable} ${jetbrainsMono.variable}`}
+      className={cn(geist.variable, jetbrainsMono.variable, 'font-sans')}
       suppressHydrationWarning
     >
       <head>

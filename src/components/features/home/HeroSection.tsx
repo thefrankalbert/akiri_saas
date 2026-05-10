@@ -22,7 +22,7 @@ export function HeroSection() {
   }, []);
 
   return (
-    <section className="bg-surface-950 relative min-h-dvh overflow-hidden sm:min-h-[88vh]">
+    <section className="bg-surface-950 relative min-h-svh overflow-hidden sm:min-h-[88svh]">
       {/* Gradient mesh — primary + accent */}
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(108,92,231,0.15),transparent_50%)]" />
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,rgba(139,92,246,0.1),transparent_60%)]" />
@@ -46,8 +46,8 @@ export function HeroSection() {
         >
           <div className="glass inline-flex items-center gap-2.5 rounded-full px-5 py-2">
             <span className="relative flex h-2.5 w-2.5">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-              <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-400" />
+              <span className="bg-success absolute inline-flex h-full w-full animate-ping rounded-full opacity-75" />
+              <span className="bg-success relative inline-flex h-2.5 w-2.5 rounded-full" />
             </span>
             <span className="text-surface-50 text-sm font-medium">
               <span className="font-bold text-neutral-100">+250</span> voyageurs cette semaine

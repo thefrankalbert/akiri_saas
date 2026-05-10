@@ -4,7 +4,7 @@ import { AuthBackButton } from '@/components/layout/AuthBackButton';
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="bg-surface-950 relative flex min-h-screen flex-col">
+    <div className="bg-surface-950 relative flex min-h-dvh flex-col">
       {/* Radial gradient overlay */}
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(108,92,231,0.15),transparent_50%)]" />
 

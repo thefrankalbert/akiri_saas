@@ -40,10 +40,10 @@ export default function AdminTransactionsPage() {
   }, [fetchTransactions]);
 
   const statusColors: Record<string, string> = {
-    pending: 'text-amber-400 bg-amber-400/10',
-    completed: 'text-emerald-400 bg-emerald-400/10',
-    refunded: 'text-red-400 bg-red-400/10',
-    failed: 'text-red-400 bg-red-400/10',
+    pending: 'text-warning bg-warning/10',
+    completed: 'text-success bg-success/10',
+    refunded: 'text-error bg-error/10',
+    failed: 'text-error bg-error/10',
   };
 
   const totalPages = Math.ceil(total / 20);
@@ -84,7 +84,7 @@ export default function AdminTransactionsPage() {
                     <td className="text-primary-400 px-4 py-3">
                       {formatCurrency(tx.platform_fee)}
                     </td>
-                    <td className="px-4 py-3 text-emerald-400">
+                    <td className="text-success px-4 py-3">
                       {tx.payout_amount ? formatCurrency(tx.payout_amount) : '-'}
                     </td>
                     <td className="px-4 py-3">

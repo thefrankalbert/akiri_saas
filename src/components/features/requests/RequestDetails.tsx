@@ -9,10 +9,17 @@ interface RequestDetailsProps {
   request: ShipmentRequest;
   role: 'sender' | 'traveler';
   counterparty: Profile | undefined;
+  confirmationCode: string | null;
   onCopyCode: () => void;
 }
 
-export function RequestDetails({ request, role, counterparty, onCopyCode }: RequestDetailsProps) {
+export function RequestDetails({
+  request,
+  role,
+  counterparty,
+  confirmationCode,
+  onCopyCode,
+}: RequestDetailsProps) {
   return (
     <>
       {/* Info */}
@@ -83,7 +90,7 @@ export function RequestDetails({ request, role, counterparty, onCopyCode }: Requ
 
       {/* Confirmation code */}
       {role === 'sender' &&
-        request.confirmation_code &&
+        confirmationCode &&
         ['paid', 'collected', 'in_transit', 'delivered', 'confirmed'].includes(request.status) && (
           <Card className="mb-4">
             <CardContent className="p-4">
@@ -93,7 +100,7 @@ export function RequestDetails({ request, role, counterparty, onCopyCode }: Requ
               </div>
               <div className="mt-2 flex items-center gap-2">
                 <span className="bg-surface-700 rounded-lg px-4 py-2 font-mono text-lg font-bold tracking-widest text-neutral-100">
-                  {request.confirmation_code}
+                  {confirmationCode}
                 </span>
                 <button
                   onClick={onCopyCode}

@@ -5,7 +5,7 @@
 import { NextResponse } from 'next/server';
 import type Stripe from 'stripe';
 import { getStripe } from '@/lib/stripe';
-import { createAdminClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { createVerificationService } from '@/lib/services/verification';
 import { logger } from '@/lib/logger';
 
@@ -56,7 +56,7 @@ export async function POST(request: Request) {
     }
   } catch (err) {
     logger.error('Stripe Identity webhook processing error:', err);
-    // Still return 200 to prevent Stripe from retrying
+    return NextResponse.json({ error: 'Processing failed' }, { status: 500 });
   }
 
   return NextResponse.json({ received: true }, { status: 200 });

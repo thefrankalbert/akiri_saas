@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import Link from 'next/link';
 import {
   ArrowRight,
@@ -188,7 +188,7 @@ function mapApiCorridorsToComputed(apiCorridors: ApiCorridor[]): ComputedCorrido
 export function CorridorsPage() {
   // --- State ---
   const [visibleEvents, setVisibleEvents] = useState<MockActivityEvent[]>([]);
-  const [, setCurrentEventIndex] = useState(0);
+  const currentEventIndexRef = useRef(0);
   const [displayedStats, setDisplayedStats] = useState({
     listings: 0,
     kg: 0,
@@ -286,18 +286,15 @@ export function CorridorsPage() {
   // Live activity feed cycling
   useEffect(() => {
     setVisibleEvents(mockActivityFeed.slice(0, 3));
-    setCurrentEventIndex(3);
+    currentEventIndexRef.current = 3;
 
     const timer = setInterval(() => {
-      setCurrentEventIndex((prev) => {
-        const nextIndex = (prev + 1) % mockActivityFeed.length;
+      const nextIndex = (currentEventIndexRef.current + 1) % mockActivityFeed.length;
+      currentEventIndexRef.current = nextIndex;
 
-        setVisibleEvents((prevEvents) => {
-          const newEvent = mockActivityFeed[nextIndex];
-          return [newEvent, ...prevEvents].slice(0, 5);
-        });
-
-        return nextIndex;
+      setVisibleEvents((prevEvents) => {
+        const newEvent = mockActivityFeed[nextIndex];
+        return [newEvent, ...prevEvents].slice(0, 5);
       });
     }, 4000);
 

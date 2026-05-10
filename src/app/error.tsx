@@ -15,7 +15,7 @@ export default function Error({
   }, [error]);
 
   return (
-    <div className="flex min-h-screen items-center justify-center px-4">
+    <div className="flex min-h-dvh items-center justify-center px-4">
       <div className="text-center">
         <div className="mb-4 text-6xl">&#x26A0;&#xFE0F;</div>
         <h1 className="mb-2 text-2xl font-bold text-neutral-100">

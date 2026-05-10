@@ -22,6 +22,7 @@ CREATE TABLE profiles (
   total_reviews  INT NOT NULL DEFAULT 0,
   total_trips    INT NOT NULL DEFAULT 0,
   total_shipments INT NOT NULL DEFAULT 0,
+  role           TEXT NOT NULL DEFAULT 'user',
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
@@ -71,7 +72,6 @@ CREATE TABLE shipment_requests (
                         'in_transit', 'delivered', 'confirmed', 'disputed', 'cancelled'
                       )),
   total_price         NUMERIC(10,2) NOT NULL CHECK (total_price >= 0),
-  confirmation_code   TEXT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
@@ -79,6 +79,26 @@ CREATE TABLE shipment_requests (
 CREATE INDEX idx_requests_listing ON shipment_requests(listing_id);
 CREATE INDEX idx_requests_sender ON shipment_requests(sender_id);
 CREATE INDEX idx_requests_status ON shipment_requests(status);
+
+-- ─── 3b. Confirmation Codes (sender-only access) ────────────
+CREATE TABLE confirmation_codes (
+  id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  request_id UUID NOT NULL UNIQUE REFERENCES shipment_requests(id) ON DELETE CASCADE,
+  code       TEXT NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+ALTER TABLE confirmation_codes ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Sender can view confirmation code" ON confirmation_codes
+  FOR SELECT USING (
+    auth.uid() = (SELECT sender_id FROM shipment_requests WHERE id = request_id)
+  );
+
+CREATE POLICY "Sender can create confirmation code" ON confirmation_codes
+  FOR INSERT WITH CHECK (
+    auth.uid() = (SELECT sender_id FROM shipment_requests WHERE id = request_id)
+  );
 
 -- ─── 4. Transactions ──────────────────────────────────────
 CREATE TABLE transactions (
@@ -416,6 +436,7 @@ CREATE POLICY "Users can upload avatars"
   WITH CHECK (
     bucket_id = 'avatars'
     AND auth.role() = 'authenticated'
+    AND auth.uid()::text = (storage.foldername(name))[1]
   );
 
 CREATE POLICY "Users can update own avatars"

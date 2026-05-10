@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import {
   MapPin,
@@ -23,6 +24,7 @@ import { MakeOfferModal } from './MakeOfferModal';
 import { OfferCard } from './OfferCard';
 import { MatchedTravelers } from './MatchedTravelers';
 import { useParcelDetail } from '@/lib/hooks/use-parcel-detail';
+import { useAuth } from '@/lib/hooks';
 import { formatCurrency, formatDate, formatRelativeDate, cn } from '@/lib/utils';
 import {
   PARCEL_CATEGORIES,
@@ -39,6 +41,7 @@ interface ParcelDetailProps {
 
 export function ParcelDetail({ parcelId }: ParcelDetailProps) {
   const { parcel, offers, loading, error, refetch } = useParcelDetail(parcelId);
+  const { user } = useAuth();
 
   // Accept / reject offer handlers
   const handleAcceptOffer = async (offerId: string) => {
@@ -127,9 +130,7 @@ export function ParcelDetail({ parcelId }: ParcelDetailProps) {
   const statusLabel = PARCEL_STATUS_LABELS[parcel.status] ?? parcel.status;
   const statusColor = PARCEL_STATUS_COLORS[parcel.status] ?? 'bg-white/10 text-surface-50';
 
-  // For the demo, check if user is parcel owner (mock-user-006 is the sender for parcel-001)
-  // In production this would compare with auth user id
-  const isOwner = false; // Default to traveler view for demo; real app checks auth
+  const isOwner = user?.id === parcel.sender_id;
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 md:px-7 lg:px-8">
@@ -152,10 +153,13 @@ export function ParcelDetail({ parcelId }: ParcelDetailProps) {
                 <div className="-mx-6 -mt-6 mb-6">
                   <div className="scrollbar-hide flex gap-2 overflow-x-auto px-6 pt-6 pb-2">
                     {parcel.photos.map((photo, i) => (
-                      <img
+                      <Image
                         key={i}
                         src={photo}
                         alt={`Photo ${i + 1}`}
+                        width={256}
+                        height={192}
+                        sizes="256px"
                         className="h-48 w-64 shrink-0 rounded-xl object-cover"
                       />
                     ))}
