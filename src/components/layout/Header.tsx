@@ -80,13 +80,13 @@ export function Header() {
               <div className="mx-2 h-6 w-px bg-white/[0.06]" />
               <Link
                 href="/login"
-                className="text-surface-100 rounded-lg px-3 py-2 text-sm font-medium transition-colors duration-150 hover:text-neutral-100"
+                className="text-surface-100 inline-flex min-h-[44px] items-center rounded-lg px-3 text-sm font-medium transition-colors duration-150 hover:text-neutral-100"
               >
                 Connexion
               </Link>
               <Link
                 href="/register"
-                className="from-primary-500 to-primary-600 hover:shadow-glow-primary rounded-xl bg-gradient-to-r px-4 py-2 text-sm font-medium text-white transition-all duration-150"
+                className="from-primary-500 to-primary-600 hover:shadow-glow-primary inline-flex min-h-[44px] items-center rounded-xl bg-gradient-to-r px-4 text-sm font-medium text-white transition-colors duration-150"
               >
                 Publier une annonce
               </Link>
