@@ -16,7 +16,7 @@ export default function GlobalError({
 
   return (
     <html lang="fr">
-      <body className="bg-[#0A0A0F] text-white">
+      <body className="bg-surface-950 text-white">
         <div className="flex min-h-screen items-center justify-center px-4">
           <div className="text-center">
             <div className="mb-4 text-6xl">&#x26A0;&#xFE0F;</div>
@@ -26,7 +26,7 @@ export default function GlobalError({
             </p>
             <button
               onClick={reset}
-              className="rounded-xl bg-purple-600 px-6 py-3 font-semibold text-white transition-colors hover:bg-purple-500"
+              className="bg-primary-500 hover:bg-primary-400 rounded-xl px-6 py-3 font-semibold text-white transition-colors"
             >
               R&eacute;essayer
             </button>
