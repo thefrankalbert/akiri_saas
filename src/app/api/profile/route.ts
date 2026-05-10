@@ -9,6 +9,8 @@ import {
 import { createClient } from '@/lib/supabase/server';
 import { createProfilesService } from '@/lib/services/profiles';
 import { updateProfileSchema } from '@/lib/validations';
+import { verifyOrigin } from '@/lib/csrf';
+import { rateLimit } from '@/lib/api/rate-limit';
 
 export async function GET() {
   return withServiceHandler('GET /api/profile', async () => {
