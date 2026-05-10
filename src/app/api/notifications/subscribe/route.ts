@@ -3,8 +3,13 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createPushService } from '@/lib/services/push';
 import { withServiceHandler } from '@/lib/api/helpers';
+import { verifyOrigin } from '@/lib/csrf';
+import { rateLimit } from '@/lib/api/rate-limit';
 
 export async function POST(request: NextRequest) {
+  const csrfError = verifyOrigin(request);
+  if (csrfError) return csrfError;
+
   return withServiceHandler('POST /api/notifications/subscribe', async () => {
     const supabase = await createClient();
     const {
@@ -12,8 +17,14 @@ export async function POST(request: NextRequest) {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
+      return NextResponse.json({ error: 'Non authentifie' }, { status: 401 });
     }
+
+    const limit = await rateLimit(`push-subscribe:${user.id}`, {
+      maxRequests: 10,
+      windowMs: 60_000,
+    });
+    if (!limit.success) return NextResponse.json({ error: 'Trop de tentatives' }, { status: 429 });
 
     const body = await request.json();
     const { subscription } = body;
@@ -31,6 +42,9 @@ export async function POST(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
+  const csrfError = verifyOrigin(request);
+  if (csrfError) return csrfError;
+
   return withServiceHandler('DELETE /api/notifications/subscribe', async () => {
     const supabase = await createClient();
     const {
@@ -38,8 +52,14 @@ export async function DELETE(request: NextRequest) {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
+      return NextResponse.json({ error: 'Non authentifie' }, { status: 401 });
     }
+
+    const limit = await rateLimit(`push-unsubscribe:${user.id}`, {
+      maxRequests: 10,
+      windowMs: 60_000,
+    });
+    if (!limit.success) return NextResponse.json({ error: 'Trop de tentatives' }, { status: 429 });
 
     const body = await request.json();
     const { endpoint } = body;

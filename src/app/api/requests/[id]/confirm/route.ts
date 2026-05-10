@@ -13,12 +13,16 @@ import { createTransactionService } from '@/lib/services/transactions';
 import { getStripe } from '@/lib/stripe';
 import { confirmDeliverySchema } from '@/lib/validations';
 import { rateLimitAsync } from '@/lib/api/rate-limit';
+import { verifyOrigin } from '@/lib/csrf';
 
 interface RouteParams {
   params: Promise<{ id: string }>;
 }
 
 export async function POST(request: NextRequest, { params }: RouteParams) {
+  const csrfError = verifyOrigin(request);
+  if (csrfError) return csrfError;
+
   const user = await getAuthUser();
   if (!user) return apiError('Non autorisé', 401);
 
